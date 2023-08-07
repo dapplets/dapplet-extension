@@ -143,6 +143,7 @@ export const Notifications = () => {
                               _id={x.id}
                               date={x.createdAt}
                               actions={x.actions}
+                              teaser={x.teaser}
                             />
                           )
                         })}

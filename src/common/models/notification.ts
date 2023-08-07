@@ -7,6 +7,8 @@ export type NotificationAction = {
   icon?: string
 }
 
+
+
 export type NotificationPayload = {
   title: string
   message?: string
@@ -14,6 +16,7 @@ export type NotificationPayload = {
   timeout?: number
   payload?: JsonValue
   icon?: StorageRef // ToDo: remove icon from Dapplet API
+  teaser?: string
 }
 
 export enum NotificationType {
@@ -42,4 +45,5 @@ export class Notification extends Base {
   actions?: NotificationAction[] = null
   expiresAt?: Date | number = null
   payload?: JsonValue = null
+  teaser?: string = null
 }

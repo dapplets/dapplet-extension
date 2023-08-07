@@ -46,8 +46,12 @@ export default class Near extends React.Component<Props, State> {
     this._mounted = true
 
     try {
-      const { connectWallet, getWalletDescriptors, createLoginConfirmation } =
-        await initBGFunctions(browser)
+      const {
+        connectWallet,
+        getWalletDescriptors,
+        createLoginConfirmation,
+        getSuitableLoginConfirmations,
+      } = await initBGFunctions(browser)
       await connectWallet(this.props.chain, WalletTypes.NEAR, null)
       const descriptors = await getWalletDescriptors()
       const descriptor = descriptors.find(
@@ -57,8 +61,29 @@ export default class Near extends React.Component<Props, State> {
       // sign message if required
       let confirmationId = undefined
       const secureLogin = this.props.data.loginRequest.secureLogin
+
       if (secureLogin === 'required') {
-        this.setState({ signing: true })
+        // ToDo: handle optional mode
+        const confirmations = await getSuitableLoginConfirmations(
+          this.props.data.app,
+          this.props.data.loginRequest
+        )
+
+        // ToDo: similar code is in login-session/index.tsx
+        const connectedWallets = descriptors
+          .filter((x) => x.connected)
+          .filter((x) => x.chain === this.props.chain)
+
+        const validConfirmations = confirmations.filter(
+          (x) => !!connectedWallets.find((y) => y.chain === x.authMethod && y.type === x.wallet)
+        )
+
+        if (validConfirmations.length > 0) {
+          this.props.redirect('/login-confirmations')
+          return
+        }
+        // ToDo ends
+
         const app = this.props.data.app
         const loginRequest = this.props.data.loginRequest
         const chain = this.props.chain
@@ -115,7 +140,7 @@ export default class Near extends React.Component<Props, State> {
     if (s.signing)
       return (
         <Loading
-          title="NEAR Wallet"
+          title="MyNearWallet"
           subtitle="Please confirm signing in your wallet to continue"
           onBackButtonClick={this.goBack.bind(this)}
         />
@@ -124,7 +149,7 @@ export default class Near extends React.Component<Props, State> {
     if (!s.connected)
       return (
         <Loading
-          title="NEAR Wallet"
+          title="MyNearWallet"
           subtitle="Please unlock your wallet to continue"
           onBackButtonClick={this.goBack.bind(this)}
         />

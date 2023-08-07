@@ -161,7 +161,7 @@ export const DevModule: FC<PropsDevModule> = memo(function DevModule(props: Prop
 
     const _updateDeploymentStatus = async () => {
       setDeploymentStatus(DeploymentStatus.Unknown)
-
+      if (!targetRegistry || !mi.name) return
       const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser)
       const miF = await getModuleInfoByName(targetRegistry, mi.name)
       const deployed = vi

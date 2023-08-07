@@ -109,16 +109,14 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         }
         const newWalletImage = newDescriptors.account && makeBlockie(newDescriptors.account)
         setWalletImage(newWalletImage)
+        setWalletIcon(newDescriptors.meta.icon)
+
         if (newDescriptors.type === 'near') {
           setWalletAccount(newDescriptors.account)
         } else {
           setWalletAccount(newDescriptors.account && truncateEthAddress(newDescriptors.account))
         }
-        if (newDescriptors.type !== 'dapplets') {
-          setWalletIcon(newDescriptors.meta.icon)
-        } else {
-          setWalletIcon(walletIcons[newDescriptors.type])
-        }
+
         if (selectedWallet === 'walletconnect') {
           setWalletTypeWalletConnect(walletIcons[newDescriptors.type])
         } else {
@@ -189,9 +187,18 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
           setOpen()
         }}
       >
+        {/* connectedDescriptors && connectedDescriptors.length > 0 && !selectedWallet */}
         {walletImage ? (
           <img
             src={walletImage}
+            className={styles.avatar}
+            onClick={() => {
+              setOpen()
+            }}
+          />
+        ) : connectedDescriptors && connectedDescriptors.length > 0 && !selectedWallet ? (
+          <img
+            src={makeBlockie(connectedDescriptors[0].account)}
             className={styles.avatar}
             onClick={() => {
               setOpen()
@@ -219,6 +226,10 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
             <p style={{ fontSize: '12px' }} className={styles.hash}>
               {walletAccount}
             </p>
+          ) : connectedDescriptors && connectedDescriptors.length > 0 && !selectedWallet ? (
+            <p style={{ fontSize: '12px' }} className={styles.hash}>
+              {truncateEthAddress(connectedDescriptors[0].account)}
+            </p>
           ) : (
             <p style={{ fontSize: '12px', textTransform: 'uppercase' }} className={styles.hash}>
               wallets
@@ -236,9 +247,23 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
               {walletTypeWalletConnect ? (
                 <img className={styles.walletsIcon} src={walletTypeWalletConnect} alt="" />
               ) : null}
+
               {walletIcon ? <img className={styles.walletsIcon} src={walletIcon} alt="" /> : null}
             </div>
           )}
+
+          {connectedDescriptors && connectedDescriptors.length > 0 && !selectedWallet ? (
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                marginLeft: '5px',
+              }}
+            >
+              <img className={styles.walletsIcon} src={connectedDescriptors[0].meta.icon} alt="" />
+            </div>
+          ) : null}
         </div>
       </header>
 

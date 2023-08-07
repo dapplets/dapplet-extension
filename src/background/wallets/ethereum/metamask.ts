@@ -7,6 +7,7 @@ import browser from 'webextension-polyfill'
 import { NotImplementedError } from '../../../common/errors'
 import { CacheMethod } from '../../../common/helpers'
 import { EthereumWallet } from './interface'
+import * as walletIcons from '../../../common/resources/wallets'
 
 export default class extends ethers.Signer implements EthereumWallet {
   public provider: ethers.providers.StaticJsonRpcProvider
@@ -123,7 +124,7 @@ export default class extends ethers.Signer implements EthereumWallet {
     return {
       name: 'MetaMask',
       description: 'MetaMask Browser Extension',
-      icon: 'https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg',
+      icon: walletIcons['metamask'],
     }
   }
 

@@ -175,6 +175,8 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
   const getAdmins = async () => {
     const { getAdmins } = await initBGFunctions(browser)
+    if (!targetRegistry) return
+
     const authors = await getAdmins(targetRegistry, mi.name)
 
     setAdmins(authors)
