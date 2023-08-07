@@ -88,7 +88,13 @@ export class Button extends LitElement implements IButtonProps {
           <div
             class="wrapper-button button-block-secondary button-border-radius button-border button-secondary-block button-transition-duration"
           ></div>
-          <img src="${this.loading ? LOADER : this.img || null}" class="button-img-display" />
+          <img
+            style=${styleMap({
+              'max-width': '1.25em',
+            })}
+            src="${this.loading ? LOADER : this.img || null}"
+            class="button-img-display test"
+          />
         </div>`}
         ${this.label?.toString() &&
         html`<div class="wrapper-button button-secondary-block button-label-overflow">
