@@ -6,8 +6,8 @@ import PortStream from 'extension-port-stream'
 import browser from 'webextension-polyfill'
 import { NotImplementedError } from '../../../common/errors'
 import { CacheMethod } from '../../../common/helpers'
-import { EthereumWallet } from './interface'
 import * as walletIcons from '../../../common/resources/wallets'
+import { EthereumWallet } from './interface'
 
 export default class extends ethers.Signer implements EthereumWallet {
   public provider: ethers.providers.StaticJsonRpcProvider
@@ -196,7 +196,20 @@ export default class extends ethers.Signer implements EthereumWallet {
           },
         })
         metamask['autoRefreshOnNetworkChange'] = false // silence the warning from metamask https://docs.metamask.io/guide/ethereum-provider.html#ethereum-autorefreshonnetworkchange
-        metamask.on('connect', () => res(metamask))
+        metamask.on('connect', () => {
+          // MV3 Extension doesn't have HTML-based background pages where favicon can be defined
+          // We use the undocumented method metamask_sendDomainMetadata to manually provide metadata
+          // https://github.com/MetaMask/providers/blob/6206aada4b1a8c14912fc9b0fcd0ec922d41251b/src/siteMetadata.ts#L23
+          metamask.request({
+            method: 'metamask_sendDomainMetadata',
+            params: {
+              name: 'Dapplets',
+              icon: walletIcons['dapplets'],
+            },
+          })
+
+          res(metamask)
+        })
         metamask.on('disconnect', () => {
           this._metamaskProviderPromise = null
           rej('MetaMask is unavailable.')
