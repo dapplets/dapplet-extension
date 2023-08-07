@@ -71,7 +71,8 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
     const registries = await getRegistries()
 
     setRegistries(registries.filter((r) => r.isDev === true))
-  }, [memorizedSetModules])
+    initModules()
+  }, [initModules, memorizedSetModules])
 
   const memorizedUpdateData = useCallback(async () => {
     setLoadButton(true)
@@ -127,7 +128,6 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
     }
 
     newFunction()
-    initModules()
     setTimeout(() => setLoadAdd(false), 3000)
   }
 
@@ -136,7 +136,6 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
     const { removeRegistry } = await initBGFunctions(browser)
     await removeRegistry(url)
     memorizedLoadRegistries()
-    initModules()
     setTimeout(() => setLoadAdd(false), 3000)
   }
 
@@ -145,7 +144,6 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
     const { enableRegistry } = await initBGFunctions(browser)
     await enableRegistry(url)
     memorizedLoadRegistries()
-    initModules()
     setTimeout(() => {
       setLoadButtonLocalhost(false)
     }, 1500)
@@ -156,7 +154,6 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
     const { disableRegistry } = await initBGFunctions(browser)
     await disableRegistry(url)
     memorizedLoadRegistries()
-    initModules()
     setTimeout(() => {
       setLoadButtonLocalhost(false)
     }, 1500)
