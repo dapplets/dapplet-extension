@@ -1,5 +1,9 @@
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef } from 'react'
+import browser from 'webextension-polyfill'
+import * as EventBus from '../../../../../../common/global-event-bus'
+import { NotificationStatus } from '../../../../../../common/models/notification'
 import { ReactComponent as Noties } from '../../../assets/icons/notificationIcons/defaultIcon.svg'
 import { CloseIcon } from '../../CloseIcon'
 import { DappletImage } from '../../DappletImage'
@@ -38,6 +42,27 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
         clearTimeout(timerStyles)
         clearTimeout(timerRemove)
       }
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleUpdateNotifications = async () => {
+      const { getNotifications } = await initBGFunctions(browser)
+      const notifications = await getNotifications()
+      if (
+        notifications &&
+        notifications.filter((x) => x.status === NotificationStatus.Default && x.id === payload.id)
+      ) {
+        notificationRef.current?.classList.add('remove_notification')
+        setTimeout(() => {
+          onRemove(payload)
+        }, 500)
+      }
+    }
+    EventBus.on('notifications_updated', handleUpdateNotifications)
+
+    return () => {
+      EventBus.off('notifications_updated', handleUpdateNotifications)
     }
   }, [])
 
