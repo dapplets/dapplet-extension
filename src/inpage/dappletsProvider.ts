@@ -85,6 +85,14 @@ export class DappletsProvider {
     return this._rpc.call('callBackground', ['wipeAllExtensionData', []])
   }
 
+  async addRegistry(url: string, isDev: boolean): Promise<void> {
+    return this._rpc.call('callBackground', ['addRegistry', [url, isDev]], window)
+  }
+
+  async removeRegistry(url: string): Promise<void> {
+    return this._rpc.call('callBackground', ['removeRegistry', [url]], window)
+  }
+
   onTrustedUsersChanged(callback: () => void): void {
     EventBus.on('trustedusers_changed', callback)
   }
