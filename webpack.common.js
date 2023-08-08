@@ -68,6 +68,7 @@ function handleInsertStyles(element) {
 }
 
 module.exports = {
+  target: 'web',
   entry: {
     'service-worker': path.join(__dirname, 'src/background/index.ts'),
     contentscript: path.join(__dirname, 'src/contentscript/index.ts'),
@@ -150,6 +151,7 @@ module.exports = {
       zlib: false,
     },
   },
+  node: { global: false },
   plugins: [
     new CopyWebpackPlugin({
       patterns: [
@@ -175,6 +177,7 @@ module.exports = {
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
       process: 'process/browser',
+      global: require.resolve('./src/global.js'),
     }),
     new ForkTsCheckerWebpackPlugin(),
   ],
