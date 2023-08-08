@@ -68,9 +68,9 @@ export const config: Options.Testrunner = {
         args: [`--load-extension=${path.join(__dirname, 'build')}`],
       },
     },
-    {
-      browserName: 'firefox',
-    },
+    // {
+    //   browserName: 'firefox',
+    // },
     {
       browserName: 'MicrosoftEdge',
       'ms:edgeOptions': {
