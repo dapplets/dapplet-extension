@@ -36,38 +36,9 @@ describe('Test Common dapplet', () => {
 
       // activate CA dapplet
       cy.runDapplet(dappletIdToActivate)
-      cy.wait(10000)
 
       // widget exists
-      cy.get('.dapplet-widget', {
-        timeout: 50000,
-        includeShadowDom: true,
-      })
-
-      // // popup is not visible
-      // cy.get('.dapplets-connected-accounts-wrapper').find('.accounts').should('not.be.visible')
-
-      // // open popup and find more than 1 connected accounts
-      // cy.get('.dapplet-widget').find('.profile-badge').click({ force: true })
-      // cy.get('.dapplets-connected-accounts-wrapper')
-      //   .find('.accounts')
-      //   .should('be.visible')
-      //   .find('.account-container')
-      //   .should('have.length.greaterThan', 1)
-
-      // // find nikter.near among accounts
-      // cy.get('.dapplets-connected-accounts-wrapper').contains('nikter.near')
-
-      // //  check the link to accounts page
-      // cy.get('.dapplets-connected-accounts-wrapper').find('.accounts').should('be.visible')
-      // cy.get('.dapplets-connected-accounts-wrapper').find('.account').contains('Ni-2')
-      // // .should('have.attr', 'href', urlToCheck)
-      // // .should('have.attr', 'target', '_blank')
-
-      // // popup closes after click
-      // cy.get('.dapplets-connected-accounts-wrapper').find('.accounts').should('be.visible')
-      // cy.get('body').click({ force: true })
-      // cy.get('.dapplets-connected-accounts-wrapper').find('.accounts').should('not.be.visible')
+      cy.get('.dapplet-widget')
     })
   )
 })
