@@ -53,10 +53,10 @@ try {
 try {
   if (typeof window === 'undefined') {
     environment = EnvType.BACKGROUND
-  } else if (self !== top) {
-    environment = EnvType.CONTENT_FRAME
   } else if (browser.runtime) {
     environment = EnvType.CONTENT_SCRIPT
+  } else if (self !== top) {
+    environment = EnvType.CONTENT_FRAME
   } else {
     environment = EnvType.INPAGE_SCRIPT
   }
