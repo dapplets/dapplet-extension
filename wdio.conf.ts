@@ -62,18 +62,21 @@ export const config: Options.Testrunner = {
   // https://saucelabs.com/platform/platform-configurator
   //
   capabilities: [
-    // {
-    //   browserName: 'chrome',
-    //   'goog:chromeOptions': {
-    //     args: [`--load-extension=${path.join(__dirname, 'build')}`],
-    //   },
-    // },
+    {
+      browserName: 'chrome',
+      'goog:chromeOptions': {
+        args: [`--load-extension=${path.join(__dirname, 'build')}`],
+      },
+    },
     {
       browserName: 'firefox',
     },
-    // {
-    //   browserName: 'MicrosoftEdge',
-    // },
+    {
+      browserName: 'MicrosoftEdge',
+      'ms:edgeOptions': {
+        args: [`--load-extension=${path.join(__dirname, 'build')}`],
+      },
+    },
   ],
 
   //
