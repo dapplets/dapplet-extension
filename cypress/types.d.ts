@@ -10,6 +10,8 @@ declare global {
   interface InjectedDappletsApi {
     openPopup(): Promise<void>
     addTrustedUser(account: string): Promise<void>
+    addRegistry(url: string, isDev: boolean): Promise<void>
+    removeRegistry(url: string): Promise<void>
     wipeAllExtensionData(): Promise<void>
   }
 
