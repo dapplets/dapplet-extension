@@ -44,31 +44,13 @@
   color: rgb(145 145 145);
 }
 
-.caHeaderTop > div {
-  width: 118px;
-  height: 23px;
+.header {
+  user-select: none;
+  display: flex;
 
-  font-size: 12px;
-  font-style: inherit;
-  color: #444;
-
-  background: white;
-  border: 1px solid;
-}
-
-.caHeaderTop > div > div:last-child {
-  border: 1px solid;
-}
-
-.caHeaderTop > div > div:last-child > div {
-  width: 118px;
-  height: 23px;
-
-  font-size: 12px;
-  font-style: inherit;
-  color: #444;
-
-  background: white;
+  & > div:first-child {
+    width: 64%;
+  }
 }
 
 .scrollContent {
