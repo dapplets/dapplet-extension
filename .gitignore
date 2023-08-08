@@ -9,3 +9,6 @@ cypress/downloads
 cypress/reports
 .env
 .DS_Store
+/test-results/
+/playwright-report/
+/playwright/.cache/
