@@ -1,12 +1,11 @@
 import { $, browser, expect } from '@wdio/globals'
 
-describe('Example', () => {
-  it('should show empty dapplets list ', async () => {
+describe('Overlay', () => {
+  // ToDo: Qase ID = 4
+  it('should show empty dapplets list', async () => {
     await browser.url(`https://example.com`)
-    await browser.pause(3000)
 
     await browser.execute('window.dapplets.openPopup()')
-
     const overlay = await $('dapplets-overlay-manager')
     await overlay.shadow$('[data-testid="system-tab-dapplets"]').click()
 
