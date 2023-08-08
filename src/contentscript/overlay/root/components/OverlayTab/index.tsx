@@ -63,6 +63,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     !document
       .querySelector('#dapplets-overlay-manager')
       ?.classList.contains('dapplets-overlay-collapsed') && setMenuVisible(false)
+      getHome()
   }, [menuVisible, isHome])
 
   useEffect(() => {
