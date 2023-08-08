@@ -1,4 +1,6 @@
-import type { Options } from '@wdio/types'
+import { browser } from '@wdio/globals'
+import type { Capabilities, Options } from '@wdio/types'
+import fs from 'node:fs'
 import path from 'node:path'
 
 export const config: Options.Testrunner = {
@@ -60,15 +62,15 @@ export const config: Options.Testrunner = {
   // https://saucelabs.com/platform/platform-configurator
   //
   capabilities: [
-    {
-      browserName: 'chrome',
-      'goog:chromeOptions': {
-        args: [`--load-extension=${path.join(__dirname, 'build')}`],
-      },
-    },
     // {
-    //   browserName: 'firefox',
+    //   browserName: 'chrome',
+    //   'goog:chromeOptions': {
+    //     args: [`--load-extension=${path.join(__dirname, 'build')}`],
+    //   },
     // },
+    {
+      browserName: 'firefox',
+    },
     // {
     //   browserName: 'MicrosoftEdge',
     // },
@@ -121,7 +123,18 @@ export const config: Options.Testrunner = {
   // Services take over a specific job you don't want to take care of. They enhance
   // your test setup with almost no effort. Unlike plugins, they don't add new
   // commands. Instead, they hook themselves up into the test process.
-  // services: [],
+  // services: [
+  //   [
+  //     'firefox-profile',
+  //     {
+  //       extensions: [path.join(__dirname, 'build')],
+  //       'xpinstall.signatures.required': false,
+  //       'browser.startup.homepage': 'https://example.com',
+  //       // legacy: true, // only use for firefox <= 55
+  //     },
+  //   ],
+  // ],
+
   //
   // Framework you want to run your specs with.
   // The following are supported: Mocha, Jasmine, and Cucumber
@@ -204,8 +217,16 @@ export const config: Options.Testrunner = {
    * @param {Array.<String>} specs        List of spec file paths that are to be run
    * @param {object}         browser      instance of created browser/device session
    */
-  // before: function (capabilities, specs) {
-  // },
+  before: async (capabilities) => {
+    // ToDo: execute the following command before
+    // npx web-ext build -s dist/ -a . -n web-extension-firefox.xpi
+    const browserName = (capabilities as Capabilities.Capabilities).browserName
+    if (browserName === 'firefox') {
+      const extensionPath = path.resolve(__dirname, `web-extension-firefox.xpi`)
+      const extension = fs.readFileSync(extensionPath)
+      await browser.installAddOn(extension.toString('base64'), true)
+    }
+  },
   /**
    * Runs before a WebdriverIO command gets executed.
    * @param {string} commandName hook command name
