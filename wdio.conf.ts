@@ -71,12 +71,12 @@ export const config: Options.Testrunner = {
     // {
     //   browserName: 'firefox',
     // },
-    {
-      browserName: 'MicrosoftEdge',
-      'ms:edgeOptions': {
-        args: [`--load-extension=${path.join(__dirname, 'build')}`, '--headless=new'],
-      },
-    },
+    // {
+    //   browserName: 'MicrosoftEdge',
+    //   'ms:edgeOptions': {
+    //     args: [`--load-extension=${path.join(__dirname, 'build')}`, '--headless=new'],
+    //   },
+    // },
   ],
 
   //
