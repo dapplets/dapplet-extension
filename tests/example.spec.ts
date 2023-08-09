@@ -1,7 +1,7 @@
-import path from 'path'
-import { createFixture } from 'playwright-webextext'
+import { expect, test } from './fixtures'
 
-const { test, expect } = createFixture(path.join(__dirname, '../build'))
+// import { createFixture } from 'playwright-webextext'
+// const { test, expect } = createFixture(path.join(__dirname, '../build'))
 
 test('example test', async ({ page }) => {
   await page.goto('https://example.com')

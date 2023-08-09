@@ -34,13 +34,15 @@ export default {
   projects: [
     // {
     //   name: 'chromium',
-    //   use: { ...devices['Desktop Chrome'], headless: false },
+    //   use: {
+    //     ...devices['Desktop Chrome'],
+    //   },
     // },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'], headless: false },
-    },
+    // {
+    //   name: 'firefox',
+    //   use: { ...devices['Desktop Firefox'], headless: false },
+    // },
 
     // {
     //   name: 'webkit',
@@ -58,14 +60,20 @@ export default {
     // },
 
     /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
+    {
+      name: 'Microsoft Edge',
+      use: {
+        ...devices['Desktop Edge'],
+        channel: 'msedge',
+      },
+    },
+    {
+      name: 'Google Chrome',
+      use: {
+        ...devices['Desktop Chrome'],
+        channel: 'chrome',
+      },
+    },
   ],
 
   /* Run your local dev server before starting the tests */
