@@ -65,7 +65,7 @@ export const config: Options.Testrunner = {
     {
       browserName: 'chrome',
       'goog:chromeOptions': {
-        args: [`--load-extension=${path.join(__dirname, 'build')}`],
+        args: [`--load-extension=${path.join(__dirname, 'build')}`, '--headless=new'],
       },
     },
     // {
@@ -74,7 +74,7 @@ export const config: Options.Testrunner = {
     {
       browserName: 'MicrosoftEdge',
       'ms:edgeOptions': {
-        args: [`--load-extension=${path.join(__dirname, 'build')}`],
+        args: [`--load-extension=${path.join(__dirname, 'build')}`, '--headless=new'],
       },
     },
   ],
