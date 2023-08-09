@@ -35,11 +35,11 @@
 
 .item > div {
   margin: 0;
-  border-radius: 200px 0 0 200px;
+  border-radius: 22px 0 0 22px;
 }
 
 .item:last-child > div {
-  border-radius: 200px 0 140px 200px;
+  border-radius: 22px 0 14px 22px;
 }
 
 .dropdownLabel {
@@ -62,7 +62,7 @@
 
 .dropdownLabel.isOpen > div:first-child {
   filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 20%));
-  border-radius: 200px 140px 0 200px;
+  border-radius: 22px 14px 0 22px;
 }
 
 .delimiterSpan {
