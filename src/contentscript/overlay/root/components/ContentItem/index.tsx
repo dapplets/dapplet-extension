@@ -28,8 +28,6 @@ interface IContentItemProps {
   isActive: boolean
   overlayManager: OverlayManager
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  module?: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSettingsModule?: any
   // className: string
 }
