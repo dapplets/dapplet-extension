@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test'
+import { devices } from '@playwright/test'
 
 /**
  * Read environment variables from file.
@@ -9,7 +9,7 @@ import { defineConfig, devices } from '@playwright/test'
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-export default defineConfig({
+export default {
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -32,15 +32,15 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-
     // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
+    //   name: 'chromium',
+    //   use: { ...devices['Desktop Chrome'], headless: false },
     // },
+
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'], headless: false },
+    },
 
     // {
     //   name: 'webkit',
@@ -74,4 +74,4 @@ export default defineConfig({
   //   url: 'http://127.0.0.1:3000',
   //   reuseExistingServer: !process.env.CI,
   // },
-})
+}
