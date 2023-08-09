@@ -15,6 +15,8 @@ export default defineConfig({
       })
     },
     video: false,
+    viewportWidth: 1920,
+    viewportHeight: 1080,
   },
   chromeWebSecurity: false,
   includeShadowDom: true,
