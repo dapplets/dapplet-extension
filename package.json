@@ -30,7 +30,7 @@
     "@fontsource/montserrat": "^4.5.14",
     "@fontsource/roboto": "^4.5.8",
     "@metamask/providers": "^11.0.0",
-    "@playwright/test": "^1.26.0",
+    "@playwright/test": "^1.36.2",
     "@rjsf/core": "^5.10.0",
     "@rjsf/utils": "^5.10.0",
     "@rjsf/validator-ajv8": "^5.10.0",
