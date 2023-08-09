@@ -5,10 +5,10 @@ const dappletIdToActivate = 'test-common-dapplet.dapplet-base.eth'
 const dappletNameToActivate = 'Test Common Adapter'
 const devServerUrl = 'http://localhost:3000/dapplet.json'
 
-describe('Test Common dapplet', () => {
+describe(dappletNameToActivate, () => {
   qase(
     144,
-    it('Test Common dapplet', () => {
+    it(dappletNameToActivate, () => {
       // open overlay
       cy.openDappletsOverlay(urlToOpen)
 
