@@ -64,7 +64,7 @@
         "https://testnet.mynearwallet.com/*"
       ],
       "js": [
-        "documentstart.js"
+        "mnw-patch-cs.js"
       ],
       "run_at": "document_start",
       "all_frames": true
@@ -76,7 +76,8 @@
         "callback.html",
         "sandbox.html",
         "inpage.js",
-        "worker.js"
+        "worker.js",
+        "mnw-patch-inpage.js"
       ],
       "matches": [
         "*://*/*"
