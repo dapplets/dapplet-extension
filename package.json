@@ -23,7 +23,7 @@
     "test:da": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/dapplet-actions\" --headed --browser chrome",
     "test:wa": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/wallets\" --headed --browser chrome",
     "test:notify": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/notifications\" --headed --browser chrome",
-    "test:demo": "concurrently -c \"yellow,magenta\" -n \"test-dapplets,cypress\" \"npm run test-dapplets\" \"npx cypress run --spec \"cypress/e2e/demo\" --headed --browser chrome\" --kill-others",
+    "test:demo": "concurrently -c \"yellow,magenta\" -n \"test-dapplets,cypress\" \"npm run test-dapplets\" \"npm test\" --kill-others",
     "postinstall": "patch-package"
   },
   "devDependencies": {
