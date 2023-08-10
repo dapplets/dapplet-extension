@@ -36,10 +36,11 @@ export interface SettingsOverlayProps {
   setOpenWallet: () => void
   connectedDescriptors: []
   selectedWallet: string
+  initModules: () => void
 }
 
 export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
-  const { setOpenWallet, connectedDescriptors, selectedWallet } = props
+  const { setOpenWallet, connectedDescriptors, selectedWallet, initModules } = props
   const [activeTab, setActiveTab] = useState(SettingsTabs.SETTINGS)
   const [activeTaDappletsDetails, setActiveTabDappletsDetails] = useState(DappletsDetails.MAININFO)
   const [activeTabUnderConstructionDetails, setActiveTabUnderConstructionDetails] = useState(
@@ -158,6 +159,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
                 setDappletsDetail={memorizedSetDappletsDetail}
                 setUnderConstruction={memorizedSetUnderConstruction}
                 setUnderConstructionDetails={memorizedSetUnderConstructionDetails}
+                initModules={initModules}
               />
             )}
           </div>
