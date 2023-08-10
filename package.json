@@ -79,7 +79,6 @@
     "jszip": "^3.10.1",
     "lit": "^2.7.5",
     "normalize.css": "^8.0.1",
-    "playwright-webextext": "^0.0.3",
     "postcss-scss": "^4.0.6",
     "prettier": "^2.8.7",
     "prettier-plugin-organize-imports": "^3.2.2",
