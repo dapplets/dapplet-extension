@@ -39,9 +39,7 @@ export const Notifications = () => {
   useEffect(() => {
     const handleUpdateNotifications = async () => {
       const notifications = await getNotifications()
-      setEvent(
-        notifications && notifications.filter((x) => x.status === NotificationStatus.Highlighted)
-      )
+      setEvent(notifications)
     }
 
     EventBus.on('notifications_updated', handleUpdateNotifications)

@@ -287,10 +287,9 @@ export const ConnectedAccount = () => {
       >
         <div className={styles.caHeaderTop}>
           <h3>Accounts connected to:</h3>
-          {/* <DropdownPreferredCANetwork /> */}
         </div>
-        <div style={{ display: 'flex' }}>
-          <div style={{ width: '64%' }}>
+        <div className={styles.header}>
+          <div>
             <DropdownCAListReceiver
               values={walletsReceivers}
               setter={setConnectedAccountsListReceiver}

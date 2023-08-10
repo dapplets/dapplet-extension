@@ -113,10 +113,7 @@ if (environment === EnvType.BACKGROUND) {
       })
     },
   })
-} else if (environment === EnvType.CONTENT_SCRIPT) {
-  // ToDo: CONTENT_FRAME was excluded because it conflicts with cypress
-  // || environment === EnvType.CONTENT_FRAME
-
+} else if (environment === EnvType.CONTENT_SCRIPT || environment === EnvType.CONTENT_FRAME) {
   // Connect to the background
   register({
     addListener: browser.runtime.onMessage.addListener,

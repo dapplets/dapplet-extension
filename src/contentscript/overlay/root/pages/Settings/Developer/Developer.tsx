@@ -22,7 +22,9 @@ export interface DeveloperProps {
   setOpenWallet: () => void
   connectedDescriptors: []
   selectedWallet: string
+  initModules: () => void
 }
+
 export const Developer: FC<DeveloperProps> = memo(function Developer(props: DeveloperProps) {
   const {
     setDappletsDetail,
@@ -35,6 +37,7 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
     setOpenWallet,
     connectedDescriptors,
     selectedWallet,
+    initModules,
   } = props
 
   const isLocalhost = true
@@ -68,7 +71,8 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
     const registries = await getRegistries()
 
     setRegistries(registries.filter((r) => r.isDev === true))
-  }, [memorizedSetModules])
+    initModules()
+  }, [initModules, memorizedSetModules])
 
   const memorizedUpdateData = useCallback(async () => {
     setLoadButton(true)

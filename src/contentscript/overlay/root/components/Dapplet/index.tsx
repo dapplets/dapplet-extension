@@ -124,7 +124,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                     className={isActive ? 'active-switch' : 'not-active-switch'}
                     checked={isActive}
                     onChange={(e) => {
-                      onSwitchChange(dapplet, !isActive, index, e['shiftKey'], loadingHome)
+                      onSwitchChange(dapplet, index, e['shiftKey'], loadingHome)
                       setLoadHome(true)
                     }}
                   />

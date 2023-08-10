@@ -17,7 +17,7 @@ import browser from 'webextension-polyfill'
 import ManifestDTO from '../../../background/dto/manifestDTO'
 import { AnalyticsGoals } from '../../../background/services/analyticsService'
 import { Bus } from '../../../common/bus'
-import { DAPPLETS_STORE_URL } from '../../../common/constants'
+import { DAPPLETS_STORE_URL, ModuleTypes } from '../../../common/constants'
 import * as EventBus from '../../../common/global-event-bus'
 import { groupBy } from '../../../common/helpers'
 import { ReactComponent as Notification } from './assets/newIcon/bell.svg'
@@ -118,7 +118,9 @@ interface S {
   isMiniWallets: boolean
   connectedDescriptors: []
   selectedWallet: string
-  module: any
+  modules: any
+  isLoadingListDapplets: boolean
+  isNoContentScript: boolean
 }
 
 class _App extends React.Component<P, S> {
@@ -136,7 +138,9 @@ class _App extends React.Component<P, S> {
     isMiniWallets: false,
     connectedDescriptors: null,
     selectedWallet: null,
-    module: null,
+    modules: null,
+    isLoadingListDapplets: false,
+    isNoContentScript: false,
   }
 
   async componentDidMount() {
@@ -172,6 +176,9 @@ class _App extends React.Component<P, S> {
     EventBus.on('dapplet_deactivated', this.handleDappletDeactivated)
 
     this.setState({ isDevMode })
+    this.initModules()
+    EventBus.on('context_started', this.initModules)
+    EventBus.on('context_finished', this.initModules)
   }
 
   componentDidUpdate(prevProps) {
@@ -189,6 +196,8 @@ class _App extends React.Component<P, S> {
   componentWillUnmount() {
     this.props.overlayManager.onActiveOverlayChanged = null
     EventBus.off('dapplet_deactivated', this.handleDappletDeactivated)
+    EventBus.off('context_started', this.initModules)
+    EventBus.off('context_finished', this.initModules)
   }
 
   getTabs = (): ToolbarTab[] => {
@@ -436,9 +445,9 @@ class _App extends React.Component<P, S> {
     })
   }
 
-  setDropdownListValue = (value: string) => {
-    this.setState({ dropdownListValue: value })
-  }
+  // setDropdownListValue = (value: string) => {
+  //   this.setState({ dropdownListValue: value })
+  // }
 
   setOpenWalletMini = () => {
     this.setState({
@@ -457,10 +466,42 @@ class _App extends React.Component<P, S> {
     })
   }
 
-  setModule = (module: []) => {
-    this.setState({
-      module: module,
-    })
+  setModule = (modules: any[]) => {
+    this.setState({ modules })
+  }
+
+  initModules = async () => {
+    try {
+      this.setState({ isLoadingListDapplets: true })
+      const { getThisTab, getCurrentContextIds, getFeaturesByHostnames } = await initBGFunctions(
+        browser
+      )
+      const currentTab = await getThisTab()
+      const contextIds = await getCurrentContextIds(currentTab)
+      const features: ManifestDTO[] = contextIds
+        ? await getFeaturesByHostnames(contextIds, this.state.dropdownListValue)
+        : []
+      const newDappletsList = features
+        .filter((f) => f.type === ModuleTypes.Feature)
+        .map((f) => ({
+          ...f,
+          isLoading: false,
+          isActionLoading: false,
+          isHomeLoading: false,
+          error: null,
+          versions: [],
+        }))
+      this.setModule(newDappletsList)
+
+      newDappletsList.map((x) => {
+        if (x.isActive) this.getTabsForDapplet(x)
+      })
+    } catch (err) {
+      console.error(err)
+      this.setState({ isNoContentScript: true })
+    } finally {
+      this.setState({ isLoadingListDapplets: false })
+    }
   }
 
   getNewButtonTab = (parametersFilter: string) => {
@@ -478,7 +519,7 @@ class _App extends React.Component<P, S> {
         <OverlayTab
           key={NewTabs.id}
           {...newTab}
-          isActive={activeTabId === NewTabs.id}
+          isActiveTab={activeTabId === NewTabs.id}
           navigate={this.props.navigate!}
           activeTabMenuId={activeTabMenuId}
           onCloseClick={() => this.handleCloseTabClick(NewTabs)}
@@ -533,7 +574,7 @@ class _App extends React.Component<P, S> {
               isOpenWallet={s.isOpenWallet}
               navigate={this.props.navigate!}
               pathname={pathname}
-              module={s.module}
+              modules={s.modules}
               overlays={overlays}
               selectedWallet={this.state.selectedWallet}
               connectedDescriptors={this.state.connectedDescriptors}
@@ -619,17 +660,20 @@ class _App extends React.Component<P, S> {
                     search={s.search}
                     overlays={overlays}
                     onUserSettingsClick={this.handleUserSettingsClick}
-                    setDropdownListValue={this.setDropdownListValue}
+                    // setDropdownListValue={this.setDropdownListValue}
                     dropdownListValue={s.dropdownListValue}
                     getTabsForDapplet={this.getTabsForDapplet}
                     handleCloseTabClick={this.handleCloseTabClick}
                     tabs={this.getTabs()}
+                    modules={s.modules}
                     setModule={this.setModule}
                     pathname={pathname}
                     navigate={this.props.navigate!}
                     classNameBlock={
                       s.isOpenSearch && pathname === '/system/dapplets' ? styles.newHeight : null
                     }
+                    isLoadingListDapplets={s.isLoadingListDapplets}
+                    isNoContentScript={s.isNoContentScript}
                   />
                 )}
 
@@ -640,6 +684,7 @@ class _App extends React.Component<P, S> {
                     selectedWallet={s.selectedWallet}
                     connectedDescriptors={s.connectedDescriptors}
                     setOpenWallet={this.setOpenWallet}
+                    initModules={this.initModules}
                   />
                 )}
 
@@ -652,7 +697,6 @@ class _App extends React.Component<P, S> {
                         isActive={pathname === `/${x.source ? x.source : x.id}/${x.id}`}
                         overlayManager={p.overlayManager}
                         key={x.id}
-                        module={s.module}
                         onSettingsModule={this.handleUserSettingsClick}
                       />
                     )
@@ -662,7 +706,7 @@ class _App extends React.Component<P, S> {
                   <UserSettings
                     navigation={p.navigate}
                     overlays={overlays}
-                    module={s.module}
+                    modules={s.modules}
                     dappletName={activeTabId}
                     registryUrl={menu.props!.registryUrl}
                   />
