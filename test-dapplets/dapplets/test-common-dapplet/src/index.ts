@@ -16,7 +16,7 @@ export default class ViewportFeature {
             tooltip,
             img: EXAMPLE_IMG,
             exec: () => {
-              console.log('ctx', ctx)
+              Core.notify('PASS')
             },
           },
         })

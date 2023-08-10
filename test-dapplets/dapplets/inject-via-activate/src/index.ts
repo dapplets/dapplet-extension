@@ -3,16 +3,16 @@ import {} from '../../../../lib'
 @Injectable
 export default class Dapplet {
   async activate(
-    @Inject('test-twitter-adapter')
+    @Inject('test-common-adapter')
     adapter: any
   ): Promise<void> {
     const { button } = adapter.exports
     adapter.attachConfig({
-      POST: () =>
+      BODY: () =>
         button({
           DEFAULT: {
             label: 'TEST',
-            exec: () => Core.alert('PASS'),
+            exec: () => Core.notify('PASS'),
           },
         }),
     })

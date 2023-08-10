@@ -6,7 +6,7 @@ export const test = base.extend<{
   extensionId: string
 }>({
   context: async ({}, use) => {
-    const pathToExtension = path.join(__dirname, '../build')
+    const pathToExtension = path.join(__dirname, '../../../build')
     const context = await chromium.launchPersistentContext('', {
       headless: false,
       args: [
@@ -18,14 +18,7 @@ export const test = base.extend<{
     await context.close()
   },
   extensionId: async ({ context }, use) => {
-    /*
-    // for manifest v2:
-    let [background] = context.backgroundPages()
-    if (!background)
-      background = await context.waitForEvent('backgroundpage')
-    */
-
-    // for manifest v3:
+    // MV3
     let [background] = context.serviceWorkers()
     if (!background) background = await context.waitForEvent('serviceworker')
 
@@ -33,4 +26,5 @@ export const test = base.extend<{
     await use(extensionId)
   },
 })
+
 export const expect = test.expect

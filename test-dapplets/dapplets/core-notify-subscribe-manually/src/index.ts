@@ -2,7 +2,7 @@ import {} from '../../../../lib'
 
 @Injectable
 export default class DemoDapplet {
-  @Inject('test-twitter-adapter')
+  @Inject('test-common-adapter')
   public adapter: any
 
   private subscription
@@ -14,7 +14,7 @@ export default class DemoDapplet {
 
     const { button } = this.adapter.exports
     this.adapter.attachConfig({
-      POST: () => [
+      BODY: () => [
         button({
           DEFAULT: {
             label: 'TEST',
@@ -28,7 +28,7 @@ export default class DemoDapplet {
                 actions: [
                   {
                     action: 'ok',
-                    title: 'OK',
+                    title: 'Ok',
                   },
                 ],
               })
@@ -45,7 +45,7 @@ export default class DemoDapplet {
 
   handleNotificationAction({ payload }) {
     if (payload.key === 'value') {
-      Core.alert('PASS')
+      Core.notify('PASS')
     }
   }
 }

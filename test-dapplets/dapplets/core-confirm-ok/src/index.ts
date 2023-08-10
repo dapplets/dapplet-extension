@@ -1,4 +1,5 @@
 import {} from '../../../../lib'
+import MAIN_IMG from './Black_Icon2.svg'
 
 @Injectable
 export default class DemoDapplet {
@@ -8,12 +9,14 @@ export default class DemoDapplet {
   async activate(): Promise<void> {
     const { button } = this.adapter.exports
     this.adapter.attachConfig({
-      BODY: () => [
+      BODY: (ctx) => [
         button({
           DEFAULT: {
-            label: 'Notify',
+            label: 'confirm',
+            img: MAIN_IMG,
             exec: async () => {
-              await Core.notify('PASS')
+              const result = await Core.confirm('Click OK to continue')
+              Core.notify(result ? 'PASS' : 'FAIL')
             },
           },
         }),

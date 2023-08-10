@@ -3,7 +3,7 @@ import MAIN_IMG from './Black_Icon2.svg'
 
 @Injectable
 export default class DemoDapplet {
-  @Inject('test-twitter-adapter')
+  @Inject('test-common-adapter')
   public adapter: any
 
   // current user from twitter
@@ -16,27 +16,14 @@ export default class DemoDapplet {
         // Save reference to the global context
         Object.assign(this._globalContext, global)
       },
-      POST: (ctx) => [
+      BODY: (ctx) => [
         button({
           DEFAULT: {
             label: 'alert',
             img: MAIN_IMG,
             exec: async () => {
-              await Core.alert('ATTENTION!!!')
-              console.log(ctx)
-            },
-          },
-        }),
-        button({
-          DEFAULT: {
-            label: 'confirm',
-            img: MAIN_IMG,
-            exec: async () => {
-              const answer = await Core.confirm(
-                'BE OR NOT TO BE OR NOT TO BE OR NOT TO BE OR NOT TO BE?'
-              )
-              console.log('answer:', answer ? 'yes' : 'no')
-              console.log(ctx)
+              await Core.alert('Click OK to continue')
+              await Core.notify('PASS')
             },
           },
         }),

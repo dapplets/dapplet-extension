@@ -70,6 +70,7 @@ export const ModalLogin = ({
 
   return (
     <div
+      data-testid="profile-modal-login"
       onClick={() => {
         setNotVisible(true)
         setTimeout(() => {

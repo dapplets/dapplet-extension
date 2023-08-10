@@ -1,5 +1,5 @@
 {
-  "name": "test-common-dapplet.dapplet-base.eth",
+  "name": "test-common-dapplet",
   "version": "0.1.0",
   "description": "Test Common Adapter",
   "main": "build/index.js",

@@ -2,7 +2,7 @@ import {} from '../../../../lib'
 
 @Injectable
 export default class Dapplet {
-  @Inject('test-twitter-adapter')
+  @Inject('test-common-adapter')
   public adapter: any
 
   async activate(): Promise<void> {
