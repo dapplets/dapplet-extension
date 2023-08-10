@@ -1,4 +1,4 @@
-import {} from '../../../../lib'
+import {} from '../../../../../lib'
 
 @Injectable
 export default class DemoDapplet {

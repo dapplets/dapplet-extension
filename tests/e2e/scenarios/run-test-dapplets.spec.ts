@@ -26,6 +26,9 @@ for (const dappletName of dapplets) {
     switch (dappletName) {
       case 'core-alert':
       case 'core-confirm-ok':
+        // ToDo: don't use locator here, move them into Page Object Models
+        //       when testing website will be implemented
+        await page.locator('.dapplet-widget').locator(':scope > *').first().click()
         await page.getByRole('button', { name: 'Ok' }).click()
         await expect(page.getByText('PASS').first()).toBeVisible()
         break
@@ -34,23 +37,32 @@ for (const dappletName of dapplets) {
       case 'core-notify-subscribe-manually':
         const overlay = new Overlay(page)
         await overlay.clickNotifications()
+        await page.locator('.dapplet-widget').locator(':scope > *').first().click()
         await page.getByRole('button', { name: 'Ok' }).click()
         await expect(page.getByText('PASS').first()).toBeVisible()
         break
 
       case 'core-confirm-cancel':
+        await page.locator('.dapplet-widget').locator(':scope > *').first().click()
         await page.getByRole('button', { name: 'Cancel' }).click()
         await expect(page.getByText('PASS').first()).toBeVisible()
         break
 
       case 'server-interaction':
-        const before = Number(await page.locator('.dapplet-widget').textContent())
+        await page.waitForTimeout(2000) // wait websocket message
+        const before = await page
+          .locator('.dapplet-widget')
+          .locator(':scope > *')
+          .first()
+          .textContent()
+
         await page.locator('.dapplet-widget').locator(':scope > *').first().click()
-        const incrementedValue = (before + 1).toString()
+        const incrementedValue = (Number(before) + 1).toString()
         expect(page.locator('.dapplet-widget', { hasText: incrementedValue })).toBeVisible()
         break
 
       default:
+        await page.locator('.dapplet-widget').locator(':scope > *').first().click()
         await expect(page.getByText('PASS').first()).toBeVisible()
         break
     }

@@ -1,4 +1,4 @@
-import {} from '../../../../lib'
+import {} from '../../../../../lib'
 import BLACK_IMG from './images/Black_Icon3.svg'
 import MAIN_IMG from './images/Red_Icon3.svg'
 import WHITE_IMG from './images/White_Icon3.svg'

@@ -1,4 +1,4 @@
-import {} from '../../../../lib'
+import {} from '../../../../../lib'
 import MAIN_IMG from './Black_Icon2.svg'
 
 @Injectable

@@ -17,10 +17,7 @@ export const test = ({ devServerUrl, dappletName }: TestableDappletParams) =>
       await enableDevServer(devServerUrl)
       await activateDapplet(dappletName)
 
-      // widget exists
-      await expect(page.locator('.dapplet-widget')).toBeVisible()
-
-      await page.locator('.dapplet-widget').locator(':scope > *').first().click()
+      // execute test
       await use(undefined)
 
       await deactivateDapplet(dappletName)
