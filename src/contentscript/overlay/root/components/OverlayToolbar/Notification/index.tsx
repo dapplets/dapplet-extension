@@ -51,7 +51,7 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
       const notifications = await getNotifications()
       if (
         notifications &&
-        notifications.filter((x) => x.status === NotificationStatus.Default && x.id === payload.id)
+        notifications.filter((x) => x.status === NotificationStatus.Default && x.id === payload.id).length
       ) {
         notificationRef.current?.classList.add('remove_notification')
         setTimeout(() => {
