@@ -1,5 +1,4 @@
 import { expect, test as base } from '../fixtures/pass-fail-dapplet'
-import { Overlay } from '../pages/overlay'
 
 const devServerUrl = 'http://localhost:3000/dapplet.json'
 
@@ -33,11 +32,14 @@ for (const dappletName of dapplets) {
         await expect(page.getByText('PASS').first()).toBeVisible()
         break
 
-      case 'core-notify-subscribe-decorator':
-      case 'core-notify-subscribe-manually':
-        const overlay = new Overlay(page)
-        await overlay.clickNotifications()
+      case 'core-notify-subscribe-decorator': // ToDo: qase 15
+      case 'core-notify-subscribe-manually': // ToDo: qase 31
         await page.locator('.dapplet-widget').locator(':scope > *').first().click()
+        const floatingNotification = await page.getByTestId('notification-label')
+        await expect(floatingNotification).toContainText('Test Title')
+        await expect(floatingNotification).toContainText('Test Message')
+        await floatingNotification.getByText('show more').click() // opens notifications overlay
+        await expect(floatingNotification).not.toBeVisible()
         await page.getByRole('button', { name: 'Ok' }).click()
         await expect(page.getByText('PASS').first()).toBeVisible()
         break
