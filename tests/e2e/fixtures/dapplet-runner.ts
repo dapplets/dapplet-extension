@@ -5,13 +5,50 @@ import { Settings } from '../pages/settings'
 import { test as base } from './browser'
 
 type DappletRunnerFixtures = {
+  skipOnboarding(): Promise<void>
   enableDevServer(devServerUrl: string): Promise<void>
-  activateDapplet(dappletName: string): Promise<void>
-  deactivateDapplet(dappletName: string): Promise<void>
+  activateDapplet(dappletName: string, registryUrl: string): Promise<void>
+  deactivateDapplet(dappletName: string, registryUrl: string): Promise<void>
+  enableDevServerViaUI(devServerUrl: string): Promise<void>
+  activateDappletViaUI(dappletName: string): Promise<void>
+  deactivateDappletViaUI(dappletName: string): Promise<void>
 }
 
 export const test = base.extend<DappletRunnerFixtures>({
-  enableDevServer: async ({ page }, use) => {
+  skipOnboarding: async ({ background }, use) => {
+    await use(async () => {
+      await background.evaluate(() => globalThis.dapplets.setIsFirstInstallation(false))
+    })
+  },
+  enableDevServer: async ({ background }, use) => {
+    await use(async (devServerUrl) => {
+      await background.evaluate(
+        (devServerUrl) => globalThis.dapplets.addRegistry(devServerUrl, true),
+        devServerUrl
+      )
+      await background.evaluate(
+        (devServerUrl) => globalThis.dapplets.enableRegistry(devServerUrl),
+        devServerUrl
+      )
+    })
+  },
+  activateDapplet: async ({ background }, use) => {
+    await use(async (name, registryUrl) => {
+      await background.evaluate((params) => globalThis.dapplets.activateDapplet(params), {
+        name,
+        registryUrl,
+      })
+    })
+  },
+  deactivateDapplet: async ({ background }, use) => {
+    await use(async (name, registryUrl) => {
+      await background.evaluate((params) => globalThis.dapplets.deactivateDapplet(params), {
+        name,
+        registryUrl,
+      })
+    })
+  },
+  enableDevServerViaUI: async ({ page }, use) => {
     await use(async (devServerUrl) => {
       const overlay = new Overlay(page)
       const settings = new Settings(page)
@@ -27,7 +64,7 @@ export const test = base.extend<DappletRunnerFixtures>({
       await overlay.clickToggle() // collapse overlay
     })
   },
-  activateDapplet: async ({ page }, use) => {
+  activateDappletViaUI: async ({ page }, use) => {
     await use(async (dappletName) => {
       const overlay = new Overlay(page)
       const dapplets = new Dapplets(page)
@@ -37,7 +74,7 @@ export const test = base.extend<DappletRunnerFixtures>({
       await overlay.clickToggle()
     })
   },
-  deactivateDapplet: async ({ page }, use) => {
+  deactivateDappletViaUI: async ({ page }, use) => {
     await use(async (dappletName) => {
       const overlay = new Overlay(page)
       const dapplets = new Dapplets(page)

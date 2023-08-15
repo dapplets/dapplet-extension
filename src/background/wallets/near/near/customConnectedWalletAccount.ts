@@ -50,6 +50,7 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
     const requestId = generateGuid()
     const callbackUrl = browser.runtime.getURL(`callback.html?request_id=${requestId}`)
 
+    // ToDo: replace currentWindow with lastFocusedWindow
     const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true })
 
     let callbackTab = null
