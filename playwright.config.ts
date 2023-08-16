@@ -75,10 +75,10 @@ export default {
       port: 3000,
       reuseExistingServer: !process.env.CI,
     },
-    {
-      command: 'npm run modules:server-interaction',
-      port: 8081,
-      reuseExistingServer: !process.env.CI,
-    },
+    // {
+    //   command: 'npm run modules:server-interaction',
+    //   port: 8081,
+    //   reuseExistingServer: !process.env.CI,
+    // },
   ],
 }
