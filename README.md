@@ -2,7 +2,7 @@
 
 # Dapplet Browser Extension
 
-Dapplets Extension is a part of web infrastructure for running decentralized applications on top of other people's websites. Using Dapplets Extension, a user gets access to web3 functionality within the framework of familiar web2-sites. Community-developed dapplets run on sites like Twitter, Youtube, Github, extending their functionality by introducing mechanisms for use and sharing tokens between users. 
+Dapplets Extension is a part of web infrastructure for running decentralized applications on top of other people's websites. Using Dapplets Extension, a user gets access to web3 functionality within the framework of familiar web2-sites. Community-developed dapplets run on sites like Twitter, Youtube, Github, extending their functionality by introducing mechanisms for use and sharing tokens between users.
 
 These dapplets are stored in decentralized repositories and are unstoppable - no one can remove or disable them, and no one can stop you from running dapplets in a browser.
 
@@ -11,7 +11,6 @@ Dapplets provide tools to decentralize business processes and enable developers 
 ## Downloads
 
 [Dapplets Extension](https://chrome.google.com/webstore/detail/dapplets/pjjnaojpjhgbhpfffnjleidmdbajagdj) - Google Extension Store
-
 
 ## Getting Started
 
