@@ -1,0 +1,42 @@
+{
+  "themes": {
+    "DARK": "boolean(//header[@data-darkmode=true])",
+    "LIGHT": "boolean(//header[@data-darkmode=false])"
+  },
+  "contexts": {
+    "POST": {
+      "containerSelector": "div[data-testid=posts-container]",
+      "contextSelector": "div[data-testid=post]",
+      "widgets": {
+        "button": {
+          "styles": "styles/post/button.css",
+          "insertionPoint": "div[data-testid=post-buttons-area] > *:last-child"
+        }
+      },
+      "contextBuilder": {
+        "id": "substring-after(string(.//@href), 'post/')",
+        "text": "string(.//*[@data-testid='post-text'])",
+        "authorFullname": "string(.//*[@data-testid='post-fullname'])",
+        "authorUsername": "string(.//*[@data-testid='post-username'])",
+        "authorImg": "string(.//img/@src)"
+      }
+    },
+    "PROFILE": {
+      "containerSelector": "#root",
+      "contextSelector": "div[data-testid=profile]",
+      "widgets": {
+        "button": {
+          "styles": "styles/profile/button.css",
+          "insertionPoint": "div[data-testid=profile-buttons-area] > *:last-child",
+          "insert": "end"
+        }
+      },
+      "contextBuilder": {
+        "id": "substring-after(string(.//*[@data-testid='profile-username']), '@')",
+        "authorFullname": "string(.//*[@data-testid='profile-fullname'])",
+        "authorUsername": "substring-after(string(.//*[@data-testid='profile-username']), '@')",
+        "authorImg": "string(.//*[(@data-testid='profile-avatar')]/@src)"
+      }
+    }
+  }
+}
