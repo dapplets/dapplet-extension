@@ -1,7 +1,7 @@
 {
   "themes": {
-    "DARK": "boolean(//header[@data-darkmode=true])",
-    "LIGHT": "boolean(//header[@data-darkmode=false])"
+    "DARK": "boolean(//header[@data-darkmode='true'])",
+    "LIGHT": "boolean(//header[@data-darkmode='false'])"
   },
   "contexts": {
     "POST": {

@@ -6,10 +6,7 @@
   "title": "Test E2E Adapter",
   "description": "Parser config for Dapplets e2e Test Website",
   "main": "index.json",
-  "contextIds": [
-    "https://dapplets-e2e.netlify.app",
-    "dapplets-e2e.netlify.app"
-  ],
+  "contextIds": ["dapplets-e2e.netlify.app"],
   "dependencies": {},
   "interfaces": {
     "test-virtual-adapter": "0.1.0"
