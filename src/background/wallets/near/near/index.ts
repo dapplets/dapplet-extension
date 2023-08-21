@@ -128,6 +128,7 @@ export default class implements NearWallet {
     // ToDo: why this function became async?
     const expectedAccountId = await nearWallet.getAccountId()
 
+    // ToDo: replace currentWindow with lastFocusedWindow
     const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true })
     const currentTabId = currentTab.id
 

@@ -1,0 +1,16 @@
+{
+  "name": "demo-e2e-dapplet",
+  "version": "0.2.0",
+  "description": "Demonstration of adapters capabilities",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "Demo e2e Dapplet",
+  "icon": "src/images/Red_Icon3.png",
+  "contextIds": [
+    "test-e2e-adapter"
+  ],
+  "dependencies": {
+    "test-e2e-adapter": "0.1.0"
+  }
+}

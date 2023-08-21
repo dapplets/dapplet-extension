@@ -1,0 +1,13 @@
+{
+  "name": "failing-dapplet",
+  "version": "0.1.0",
+  "description": "The dapplet is failing to load",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "Failing Dapplet",
+  "contextIds": ["test-common-adapter"],
+  "dependencies": {
+    "test-common-adapter": "0.1.0"
+  }
+}

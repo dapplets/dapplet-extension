@@ -473,6 +473,17 @@ browser.action.onClicked.addListener(({ id: tabId }) => {
   analyticsService.track({ idgoal: AnalyticsGoals.ExtensionIconClicked })
 })
 
+// E2E testing functions
+globalThis.dapplets = {
+  activateDapplet: featureService.activateDappletE2E.bind(featureService),
+  deactivateDapplet: featureService.deactivateDappletE2E.bind(featureService),
+  addRegistry: globalConfigService.addRegistry.bind(globalConfigService),
+  removeRegistry: globalConfigService.removeRegistry.bind(globalConfigService),
+  enableRegistry: globalConfigService.enableRegistry.bind(globalConfigService),
+  disableRegistry: globalConfigService.disableRegistry.bind(globalConfigService),
+  setIsFirstInstallation: globalConfigService.setIsFirstInstallation.bind(globalConfigService),
+}
+
 // ToDo: remove or restore this code, it was commented to remove downloads permission before publishing
 // Set predefined configuration when extension is installed
 // browser.runtime.onInstalled.addListener(async (details) => {

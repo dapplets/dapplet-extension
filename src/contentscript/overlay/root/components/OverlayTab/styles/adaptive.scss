@@ -1,0 +1,45 @@
+@import '../../../assets/styles/color.variables';
+
+@media (min-width: 320px) and (max-width: 640px) {
+  .tab {
+    display: flex;
+    justify-content: space-between;
+
+    width: max-content;
+    max-width: none;
+    height: 52px;
+    margin: 0;
+
+    background: #fff;
+    border-radius: 10px;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .item {
+    margin-top: 0;
+
+    &:not(:last-child) {
+      margin: 0;
+    }
+
+    &:nth-child(2) {
+      margin: 0;
+    }
+  }
+
+  .isOpenWallet {
+    &::before {
+      background-color: rgb(255 255 255 / 0%);
+      border-radius: 10px;
+    }
+  }
+
+  .tabNotActive {
+    width: auto;
+  }
+}

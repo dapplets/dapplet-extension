@@ -1,0 +1,13 @@
+{
+  "name": "inject-via-activate",
+  "version": "0.1.0",
+  "description": "Inject via activate",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "Inject via activate",
+  "contextIds": ["test-common-adapter"],
+  "dependencies": {
+    "test-common-adapter": "0.1.0"
+  }
+}

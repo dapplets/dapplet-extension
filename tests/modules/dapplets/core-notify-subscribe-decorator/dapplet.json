@@ -1,0 +1,13 @@
+{
+  "name": "core-notify-subscribe-decorator",
+  "version": "0.1.0",
+  "description": "Testing of Core.notify() + subscribe using decorator",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "Notify and decorator",
+  "contextIds": ["test-common-adapter"],
+  "dependencies": {
+    "test-common-adapter": "0.1.0"
+  }
+}

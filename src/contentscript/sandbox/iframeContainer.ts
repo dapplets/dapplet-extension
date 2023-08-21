@@ -18,7 +18,7 @@ export class IFrameContainer {
     this._iframe = document.createElement('iframe')
     this._iframe.src = sandboxIframeUrl
     this._iframe.style.display = 'none'
-    window.addEventListener('message', this._sandboxIframeListener)
+    window.top.addEventListener('message', this._sandboxIframeListener)
     document.body.appendChild(this._iframe)
   }
 

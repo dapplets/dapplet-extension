@@ -1,0 +1,13 @@
+{
+  "name": "inject-via-constructor",
+  "version": "0.1.0",
+  "description": "Inject via constructor",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "Inject via constructor",
+  "contextIds": ["test-common-adapter"],
+  "dependencies": {
+    "test-common-adapter": "0.1.0"
+  }
+}

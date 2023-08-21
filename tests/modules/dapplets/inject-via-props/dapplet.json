@@ -1,0 +1,13 @@
+{
+  "name": "inject-via-props",
+  "version": "0.1.0",
+  "description": "Inject via props",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "Inject via props",
+  "contextIds": ["test-common-adapter"],
+  "dependencies": {
+    "test-common-adapter": "0.1.0"
+  }
+}

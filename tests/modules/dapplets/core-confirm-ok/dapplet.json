@@ -1,0 +1,14 @@
+{
+  "name": "core-confirm-ok",
+  "version": "0.1.0",
+  "description": "Testing of Core.confirm()",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "Test Alerts",
+  "icon": "src/target.png",
+  "contextIds": ["test-common-adapter"],
+  "dependencies": {
+    "test-common-adapter": "0.1.0"
+  }
+}

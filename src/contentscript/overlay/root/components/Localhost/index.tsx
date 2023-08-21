@@ -38,7 +38,7 @@ export const Localhost: FC<LocalhostProps> = (props) => {
   }, [])
 
   return (
-    <div className={styles.localhost}>
+    <div className={styles.localhost} data-testid="dev-server">
       <div className={styles.hostBlock}>
         <button
           ref={nodeBtn}

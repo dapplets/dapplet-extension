@@ -13,7 +13,7 @@ import styles from './UserSettings.module.scss'
 export interface UserSettingsProps {
   dappletName: string
   registryUrl: string
-  module?: any
+  modules?: any
   overlays?: any
   navigation?: any
 }
@@ -21,7 +21,7 @@ export interface UserSettingsProps {
 export const UserSettings = ({
   dappletName,
   registryUrl,
-  module,
+  modules,
   overlays,
   navigation,
 }: UserSettingsProps): ReactElement => {
@@ -52,7 +52,7 @@ export const UserSettings = ({
     overlays.filter((x) => x.source === f.name).map((x) => navigation!(`/${f.name}/${x.id}`))
   }
 
-  const modules = module.filter((x) => x.name === mi.name)
+  const hasActionHandler = modules.find((x) => x.name === mi.name)?.isActionHandler
 
   return (
     <div className={styles.userSettingsWrapper}>
@@ -66,7 +66,7 @@ export const UserSettings = ({
             title={mi.title}
           ></DappletTitle>
         </div>
-        {modules.length > 0 && modules[0] && modules[0].isActionHandler ? (
+        {hasActionHandler && (
           <div className={styles.blockButtons}>
             <SquaredButton
               appearance="smail"
@@ -76,7 +76,7 @@ export const UserSettings = ({
               onClick={() => onOpenDappletAction(mi)}
             />
           </div>
-        ) : null}
+        )}
       </div>
 
       <SettingsPage

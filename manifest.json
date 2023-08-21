@@ -38,36 +38,21 @@
     "512": "icons/icon512.png"
   },
   "sandbox": {
-    "pages": [
-      "sandbox.html"
-    ]
+    "pages": ["sandbox.html"]
   },
   "content_security_policy": {
     "sandbox": "sandbox allow-scripts; script-src 'self' 'unsafe-inline' blob:"
   },
   "content_scripts": [
     {
-      "matches": [
-        "http://*/*",
-        "https://*/*"
-      ],
-      "js": [
-        "custom-elements.min.js",
-        "contentscript.js"
-      ],
-      "run_at": "document_idle",
-      "all_frames": true
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["custom-elements.min.js", "contentscript.js"],
+      "run_at": "document_idle"
     },
     {
-      "matches": [
-        "https://app.mynearwallet.com/*",
-        "https://testnet.mynearwallet.com/*"
-      ],
-      "js": [
-        "documentstart.js"
-      ],
-      "run_at": "document_start",
-      "all_frames": true
+      "matches": ["https://app.mynearwallet.com/*", "https://testnet.mynearwallet.com/*"],
+      "js": ["mnw-patch-cs.js"],
+      "run_at": "document_start"
     }
   ],
   "web_accessible_resources": [
@@ -76,24 +61,12 @@
         "callback.html",
         "sandbox.html",
         "inpage.js",
-        "worker.js"
+        "worker.js",
+        "mnw-patch-inpage.js"
       ],
-      "matches": [
-        "*://*/*"
-      ]
+      "matches": ["*://*/*"]
     }
   ],
-  "permissions": [
-    "tabs",
-    "activeTab",
-    "storage",
-    "unlimitedStorage",
-    "scripting",
-    "offscreen"
-  ],
-  "host_permissions": [
-    "*://localhost/*",
-    "http://*/*",
-    "https://*/*"
-  ]
+  "permissions": ["tabs", "activeTab", "storage", "unlimitedStorage", "scripting", "offscreen"],
+  "host_permissions": ["*://localhost/*", "http://*/*", "https://*/*"]
 }

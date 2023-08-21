@@ -28,6 +28,8 @@ interface State {
 }
 
 export class LoginConfirmations extends React.Component<Props, State> {
+  private _mounted = false
+
   constructor(props) {
     super(props)
 
@@ -39,7 +41,12 @@ export class LoginConfirmations extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
+    this._mounted = true
     await this.loadData()
+  }
+
+  componentWillUnmount(): void {
+    this._mounted = false
   }
 
   async loadData() {
@@ -50,11 +57,13 @@ export class LoginConfirmations extends React.Component<Props, State> {
       this.props.data.loginRequest
     )
 
-    this.setState({
-      descriptors,
-      confirmations,
-      loading: false,
-    })
+    if (this._mounted) {
+      this.setState({
+        descriptors,
+        confirmations,
+        loading: false,
+      })
+    }
   }
 
   async selectLoginConfirmation(wallet: string, chain: string, confirmationId: string) {

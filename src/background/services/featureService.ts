@@ -445,6 +445,56 @@ export default class FeatureService {
     return await this._setFeatureActive(name, version, hostnames, false, order, registryUrl, tabId)
   }
 
+  async activateDappletE2E({
+    name,
+    version,
+    hostnames,
+    order,
+    registryUrl,
+    tabId,
+  }: {
+    name: string
+    registryUrl: string
+    version?: string
+    hostnames?: string[]
+    order?: number
+    tabId?: number
+  }): Promise<void> {
+    if (!hostnames) hostnames = ['*']
+    if (!order) order = 0
+    if (!tabId) {
+      const [currentTab] = await browser.tabs.query({ active: true, lastFocusedWindow: true })
+      tabId = currentTab.id
+    }
+
+    await this._setFeatureActive(name, version, hostnames, true, order, registryUrl, tabId)
+  }
+
+  async deactivateDappletE2E({
+    name,
+    version,
+    hostnames,
+    order,
+    registryUrl,
+    tabId,
+  }: {
+    name: string
+    registryUrl: string
+    version?: string
+    hostnames?: string[]
+    order?: number
+    tabId?: number
+  }): Promise<void> {
+    if (!hostnames) hostnames = ['*']
+    if (!order) order = 0
+    if (!tabId) {
+      const [currentTab] = await browser.tabs.query({ active: true, lastFocusedWindow: true })
+      tabId = currentTab.id
+    }
+
+    await this._setFeatureActive(name, version, hostnames, false, order, registryUrl, tabId)
+  }
+
   async reloadFeature(
     name: string,
     version: string | undefined,

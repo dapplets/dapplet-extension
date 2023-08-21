@@ -17,6 +17,29 @@ function modifyManifest(buffer) {
 }
 
 function handleInsertStyles(element) {
+  // ToDo: the same function is in common/helpers.ts
+  const isE2ETestingEnvironment = (win) => {
+    // ToDo: find another way to determine Cypress
+
+    try {
+      // Reading of href can throw Error when cross-origin
+      const href = win.location.href
+
+      if (href.indexOf('cypress') !== -1) return true
+      if (href.indexOf('specs') !== -1) return true
+      if (href.indexOf('localhost:55618') !== -1) return true
+
+      return false
+    } catch (_) {
+      return false
+    }
+  }
+
+  // The similar code is in contentscript/index.ts
+  const IS_OVERLAY_IFRAME = window.name.indexOf('dapplet-overlay') !== -1
+  const IS_E2E_ENV = isE2ETestingEnvironment(window)
+  if (IS_OVERLAY_IFRAME || IS_E2E_ENV) return
+
   const extensionHostID = 'dapplets-overlay-manager'
   let extensionHost = document.getElementById(extensionHostID)
 

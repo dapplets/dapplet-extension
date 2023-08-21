@@ -179,7 +179,9 @@ async function init() {
   })
 
   jsonrpc.on('callBackground', (method: string, args: any[]) => {
-    if (method === 'wipeAllExtensionData' && !IS_E2E_IFRAME) {
+    const RESTRICTED_METHODS = ['wipeAllExtensionData', 'addRegistry', 'removeRegistry']
+
+    if (!IS_E2E_IFRAME && RESTRICTED_METHODS.includes(method)) {
       return Promise.reject('This function is for E2E testing only.')
     }
 

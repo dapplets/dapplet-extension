@@ -146,6 +146,7 @@ export function timeoutPromise<T>(ms: number, promise: Promise<T>, timeoutCallba
 
 export async function getCurrentTab(): Promise<browser.Tabs.Tab | null> {
   try {
+    // ToDo: replace currentWindow with lastFocusedWindow
     const tabs = await browser.tabs.query({ currentWindow: true, active: true })
     const tab = tabs[0]
 

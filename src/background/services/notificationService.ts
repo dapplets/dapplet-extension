@@ -9,8 +9,7 @@ import {
 } from '../../common/models/notification'
 import NotificationBrowserStorage from '../browserStorages/notificationBrowserStorage'
 
-// Add removing function
-// NotificationBrowserStorage - implements Repository pattern (read/add/remove)
+// ToDo: remove notifications_updated everywhere because it's too generic
 
 export class NotificationService {
   public notificationBrowserStorage = new NotificationBrowserStorage()
@@ -86,20 +85,27 @@ export class NotificationService {
       })
     )
 
+    EventBus.emit('notifications_viewed', ids)
     EventBus.emit('notifications_updated')
     await this._updateBadge()
   }
 
   async markAllNotificationsAsViewed(): Promise<void> {
-    const notification = await this.notificationBrowserStorage.getAll(
+    const notifications = await this.notificationBrowserStorage.getAll(
       (x) => x.status === NotificationStatus.Highlighted
     )
 
-    for (const i of notification) {
-      i.status = NotificationStatus.Default
-      await this.notificationBrowserStorage.update(i)
+    const viewedNotificationIds = []
+
+    for (const notification of notifications) {
+      if (notification.status !== NotificationStatus.Default) {
+        notification.status = NotificationStatus.Default
+        await this.notificationBrowserStorage.update(notification)
+        viewedNotificationIds.push(notification.id)
+      }
     }
 
+    EventBus.emit('notifications_viewed', viewedNotificationIds)
     EventBus.emit('notifications_updated')
     await this._updateBadge()
   }
@@ -116,6 +122,7 @@ export class NotificationService {
     await this.notificationBrowserStorage.update(notification)
     await this._updateBadge()
 
+    EventBus.emit('notifications_viewed', [notificationId])
     EventBus.emit('notifications_updated')
 
     browser.tabs.sendMessage(tabId, {

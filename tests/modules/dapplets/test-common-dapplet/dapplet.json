@@ -1,0 +1,18 @@
+{
+  "name": "test-common-dapplet",
+  "version": "0.1.0",
+  "description": "Test Common Adapter",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "Test Common Dapplet",
+  "icon": "src/icons/ex06.png",
+  "contextIds": ["test-common-adapter"],
+  "config": {
+    "schema": "config/schema.json",
+    "default": "config/default.json"
+  },
+  "dependencies": {
+    "test-common-adapter": "0.1.0"
+  }
+}
