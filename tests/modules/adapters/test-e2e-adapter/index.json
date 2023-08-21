@@ -21,7 +21,7 @@
         "id": "substring-after(string(.//@href), 'post/')",
         "text": "string(.//*[@data-testid='post-text'])",
         "authorFullname": "string(.//*[@data-testid='post-fullname'])",
-        "authorUsername": "string(.//*[@data-testid='post-username'])",
+        "authorUsername": "substring-after(string(.//*[@data-testid='post-username']), '@')",
         "authorImg": "string(.//img/@src)"
       }
     },
