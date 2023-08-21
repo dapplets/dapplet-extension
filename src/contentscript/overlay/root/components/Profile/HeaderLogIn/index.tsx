@@ -268,6 +268,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       </header>
 
       <ModalLogin
+        descriptors={descriptors}
         visible={isOpen}
         disconnectButtonClick={disconnectButtonClick}
         wallets={connectedDescriptors}
