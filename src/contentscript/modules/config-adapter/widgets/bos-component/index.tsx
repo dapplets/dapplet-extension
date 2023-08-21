@@ -6,7 +6,11 @@ import * as ReactDOM from 'react-dom'
 
 const networkId = 'mainnet'
 
-export function Component() {
+type TransferableProps = {
+  [key: string]: null | string | number | boolean
+}
+
+export function Component({ src, props }: { src: string; props: TransferableProps }) {
   const { initNear } = useInitNear()
 
   React.useEffect(() => {
@@ -28,11 +32,8 @@ export function Component() {
     <Widget
       src="near/widget/TosCheck"
       props={{
-        targetComponent: 'alsakhaev.near/widget/ExampleButton',
-        targetProps: {
-          componentAccountId: 'alsakhaev.near',
-          componentName: 'ExampleButton',
-        },
+        targetComponent: src,
+        targetProps: props,
         tosName: 'adminalpha.near/widget/TosContent',
       }}
     />
@@ -40,10 +41,13 @@ export function Component() {
 }
 
 export class BosComponent extends HTMLElement {
+  public src: string
+  public props: TransferableProps
+
   connectedCallback() {
     const mountPoint = document.createElement('div')
     this.attachShadow({ mode: 'open' }).appendChild(mountPoint)
 
-    ReactDOM.render(<Component />, mountPoint)
+    ReactDOM.render(<Component src={this.src} props={this.props} />, mountPoint)
   }
 }
