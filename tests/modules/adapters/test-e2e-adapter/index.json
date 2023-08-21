@@ -11,6 +11,10 @@
         "button": {
           "styles": "styles/post/button.css",
           "insertionPoint": "div[data-testid=post-buttons-area] > *:last-child"
+        },
+        "bos": {
+          "styles": "styles/post/bos.css",
+          "insertionPoint": "div[data-testid=post-buttons-area] > *:last-child"
         }
       },
       "contextBuilder": {
@@ -27,6 +31,11 @@
       "widgets": {
         "button": {
           "styles": "styles/profile/button.css",
+          "insertionPoint": "div[data-testid=profile-buttons-area] > *:last-child",
+          "insert": "end"
+        },
+        "bos": {
+          "styles": "styles/profile/bos.css",
           "insertionPoint": "div[data-testid=profile-buttons-area] > *:last-child",
           "insert": "end"
         }

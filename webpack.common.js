@@ -148,6 +148,7 @@ module.exports = {
       http: false,
       https: false,
       zlib: false,
+      'process/browser': false,
     },
   },
   plugins: [
