@@ -46,6 +46,10 @@ export class BosComponent extends HTMLElement {
     const stylesMountPoint = document.createElement('div')
     const componentMountPoint = document.createElement('div')
 
+    componentMountPoint.addEventListener('click', (e) => {
+      e.stopPropagation()
+    })
+
     shadowRoot.appendChild(stylesMountPoint)
     shadowRoot.appendChild(componentMountPoint)
 
