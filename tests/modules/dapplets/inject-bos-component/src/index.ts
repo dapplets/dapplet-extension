@@ -8,25 +8,14 @@ export default class Dapplet {
   async activate(): Promise<void> {
     const { bos } = this.adapter.exports
     this.adapter.attachConfig({
-      POST: (post) => [
+      POST: () => [
         bos({
           DEFAULT: {
-            src: 'alsakhaev.near/widget/ExampleButton',
-            props: {
-              label: post.authorUsername,
+            src: 'dapplets.near/widget/Button',
+            label: 'TEST',
+            onClick: () => {
+              Core.alert('PASS')
             },
-            exec: () => Core.alert('PASS'),
-          },
-        }),
-      ],
-      PROFILE: (profile) => [
-        bos({
-          DEFAULT: {
-            src: 'alsakhaev.near/widget/ExampleButton',
-            props: {
-              label: profile.authorUsername,
-            },
-            exec: () => Core.alert('PASS'),
           },
         }),
       ],

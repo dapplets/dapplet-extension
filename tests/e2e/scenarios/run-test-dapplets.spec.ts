@@ -14,6 +14,7 @@ const dapplets = [
   'inject-via-props',
   'server-interaction',
   'test-common-dapplet',
+  'inject-bos-component',
   // 'test-dynamic-dapplet', // ToDo: uncomment when dynamic context will be fixed
   // 'update-parsed-context', // ToDo: uncomment when testing website will be implemented
 ]

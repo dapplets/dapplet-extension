@@ -6,11 +6,7 @@ import * as ReactDOM from 'react-dom'
 
 const networkId = 'mainnet'
 
-type TransferableProps = {
-  [key: string]: null | string | number | boolean
-}
-
-export function Component({ src, props }: { src: string; props: TransferableProps }) {
+export function Component({ src, props }: { src: string; props: any }) {
   const { initNear } = useInitNear()
 
   React.useEffect(() => {
@@ -42,12 +38,21 @@ export function Component({ src, props }: { src: string; props: TransferableProp
 
 export class BosComponent extends HTMLElement {
   public src: string
-  public props: TransferableProps
 
   connectedCallback() {
     const mountPoint = document.createElement('div')
     this.attachShadow({ mode: 'open' }).appendChild(mountPoint)
 
-    ReactDOM.render(<Component src={this.src} props={this.props} />, mountPoint)
+    const { src, ...anotherProps } = this
+
+    const keysToSkip = ['__CE_state', '__CE_definition', '__CE_shadowRoot']
+
+    const props = Object.fromEntries(
+      Object.keys(anotherProps)
+        .filter((x) => !keysToSkip.includes(x))
+        .map((key) => [key, anotherProps[key]])
+    )
+
+    ReactDOM.render(<Component src={src} props={props} />, mountPoint)
   }
 }
