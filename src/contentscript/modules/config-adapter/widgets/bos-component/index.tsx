@@ -3,6 +3,7 @@ import { setupWalletSelector } from '@near-wallet-selector/core'
 import { EthersProviderContext, useInitNear, Widget } from 'near-social-vm'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
+import { StyleSheetManager } from 'styled-components'
 
 const networkId = 'mainnet'
 
@@ -40,8 +41,13 @@ export class BosComponent extends HTMLElement {
   public src: string
 
   connectedCallback() {
-    const mountPoint = document.createElement('div')
-    this.attachShadow({ mode: 'open' }).appendChild(mountPoint)
+    const shadowRoot = this.attachShadow({ mode: 'open' })
+
+    const stylesMountPoint = document.createElement('div')
+    const componentMountPoint = document.createElement('div')
+
+    shadowRoot.appendChild(stylesMountPoint)
+    shadowRoot.appendChild(componentMountPoint)
 
     const { src, ...anotherProps } = this
 
@@ -53,6 +59,11 @@ export class BosComponent extends HTMLElement {
         .map((key) => [key, anotherProps[key]])
     )
 
-    ReactDOM.render(<Component src={src} props={props} />, mountPoint)
+    ReactDOM.render(
+      <StyleSheetManager target={stylesMountPoint}>
+        <Component src={src} props={props} />
+      </StyleSheetManager>,
+      componentMountPoint
+    )
   }
 }
