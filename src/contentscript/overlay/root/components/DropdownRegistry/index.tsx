@@ -11,42 +11,30 @@ import styles from './DropdownRegistry.module.scss'
 export type DropdownRegistryProps = DetailedHTMLProps<
   HTMLAttributes<HTMLDivElement>,
   HTMLDivElement
->
+>&{
+  registries: any
+  loadRegistries: any
+  enableRegistry: any
+  removeRegistry: any
+  activeUrl : any
+}
 
 export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegistryProps) => {
-  const { ...anotherProps } = props
+  const { registries,loadRegistries,enableRegistry,removeRegistry,activeUrl, ...anotherProps } = props
   const [isOpen, setOpen] = useState(false)
   const [registryInput, setRegistryInput] = useState('')
   const [registryInputError, setRegistryInputError] = useState(null)
-  const [registries, setRegistries] = useState([])
 
-  useEffect(() => {
-    const init = async () => {
-      await loadRegistries()
-    }
-    init()
-    return () => {}
-  }, [])
 
-  const loadRegistries = async () => {
-    const { getRegistries } = await initBGFunctions(browser)
-    const registries = await getRegistries()
+  // useEffect(() => {
+  //   const init = async () => {
+  //     await loadRegistries()
+  //   }
+  //   init()
+  //   return () => {}
+  // }, [])
 
-    setRegistries(registries.filter((r) => r.isDev === false))
-  }
-
-  const removeRegistry = async (url: string) => {
-    const { removeRegistry } = await initBGFunctions(browser)
-    await removeRegistry(url)
-    loadRegistries()
-  }
-
-  const enableRegistry = async (url: string, x: (x) => void) => {
-    const { enableRegistry } = await initBGFunctions(browser)
-    await enableRegistry(url)
-    loadRegistries()
-    x(false)
-  }
+ 
 
   const visible = (hash: string): string => {
     if (hash.length > 38) {
@@ -74,10 +62,12 @@ export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegis
         }}
         tabIndex={0}
       >
-        {registries.map(
+        {/* {registries.map(
           (r, i) =>
-            r.isEnabled && (
-              <div key={i} className={styles.activeRegistry}>
+            r.isEnabled && ( */}
+              <div
+              //  key={i} 
+               className={styles.activeRegistry}>
                 <form
                   className={cn(styles.inputBlock)}
                   onSubmit={(e) => {
@@ -101,7 +91,7 @@ export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegis
                       !isValidUrl(registryInput) &&
                       !!registries.find((r) => r.url === !registryInput)
                     }
-                    placeholder={r.url}
+                    placeholder={activeUrl}
                     value={registryInput}
                     onChange={(e) => {
                       setRegistryInput(e.target.value)
@@ -117,8 +107,8 @@ export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegis
                   </span>
                 </form>
               </div>
-            )
-        )}
+            {/* )
+        )} */}
 
         {isOpen && (
           <div className={styles.registriesList}>

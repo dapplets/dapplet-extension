@@ -64,7 +64,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const inputOfFocusSwarm = useRef<HTMLInputElement>()
   const inputOfFocusEtn = useRef<HTMLInputElement>()
   const inputOfFocusAgentName = useRef<HTMLInputElement>()
-
+  const [registries, setRegistries] = useState([])
   useEffect(() => {
     const init = async () => {
       await checkUpdates()
@@ -78,6 +78,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       await loadUserAgentName()
       await loadIpfsGateway()
       await loadTargetStorages()
+      await loadRegistries()
     }
     init()
 
@@ -298,7 +299,25 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     await setUserAgentName('')
     loadUserAgentName()
   }
+  const loadRegistries = async () => {
+    const { getRegistries } = await initBGFunctions(browser)
+    const registries = await getRegistries()
 
+    setRegistries(registries.filter((r) => r.isDev === false))
+  }
+
+  const removeRegistry = async (url: string) => {
+    const { removeRegistry } = await initBGFunctions(browser)
+    await removeRegistry(url)
+    loadRegistries()
+  }
+
+  const enableRegistry = async (url: string, x: (x) => void) => {
+    const { enableRegistry } = await initBGFunctions(browser)
+    await enableRegistry(url)
+    loadRegistries()
+    x(false)
+  }
   return (
     <div className={styles.blockSettings}>
       <div className={styles.scrollBlock}>
@@ -407,7 +426,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
         <SettingWrapper className={styles.wrapperSettings} title="Parameters">
           <SettingItem title="Registries" component={<></>}>
-            <DropdownRegistry />
+          {registries.map(
+          (r, i) =>
+            r.isEnabled && (
+              <DropdownRegistry activeUrl={r.url} key={i} registries={registries} loadRegistries={loadRegistries} enableRegistry={enableRegistry} removeRegistry={removeRegistry} />
+
+            ))}
           </SettingItem>
           <SettingItem title="Prefered Overlay Storage" component={<></>}>
             <DropdownPreferedOverlayStorage />

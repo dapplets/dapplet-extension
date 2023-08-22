@@ -230,7 +230,7 @@ export default class GlobalConfigService {
       {
         url: 'test.v3.registry.dapplet-base.eth',
         isDev: false,
-        isEnabled: false,
+        isEnabled: true,
       },
       {
         url: 'dev-1627024020035-70641704943070',
