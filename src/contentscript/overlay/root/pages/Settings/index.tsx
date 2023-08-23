@@ -193,7 +193,6 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
             {activeTaDappletsDetails === DappletsDetails.MAININFO && (
               <DappletsMainInfo
                 ModuleInfo={ModuleInfo}
-                ModuleVersion={ModuleVersion}
                 setDappletsDetail={memorizedSetDappletsDetail}
                 setShowChildrenRegistry={memorizedSetShowChildrenRegistry}
               />

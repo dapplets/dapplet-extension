@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC } from 'react'
 import { HeaderLogIn } from './HeaderLogIn'
 import { LogInButton } from './LoginButtons'
 
@@ -29,15 +29,6 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
     setSelectedWallet,
   } = props
 
-  const [newProfile, setNewProfile] = useState([])
-  useEffect(() => {
-    const init = async () => {}
-
-    init()
-
-    return () => {}
-  }, [])
-
   return (
     <>
       {isWalletLength ? (
@@ -50,7 +41,6 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
             isMini={isMini}
             setOpen={setOpenWallet}
             isOpen={isOpenWallet}
-            newProfile={newProfile}
             isOverlay={isOverlay}
             setOpenWalletMini={setOpenWalletMini}
             // isOpenSearch={isOpenSearch}

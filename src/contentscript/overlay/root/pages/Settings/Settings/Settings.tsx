@@ -3,7 +3,6 @@ import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
 import browser from 'webextension-polyfill'
 import { StorageTypes } from '../../../../../../common/constants'
-import { isValidPostageStampId } from '../../../../../../common/helpers'
 import { ReactComponent as Delete } from '../../../assets/icons/mini-close.svg'
 import { Checkbox } from '../../../components/Checkbox'
 import { DropdownPreferedOverlayStorage } from '../../../components/DropdownPreferedOverlayStorage'
@@ -60,8 +59,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const regExpUserAgentName = new RegExp(/^[a-zA-Z0-9-_\.\s]{3,128}$/)
   const regExpUserAgentNameFirstSymbol = new RegExp(/^[a-zA-Z0-9]+$/)
   const inputOfFocusIPFS = useRef<HTMLInputElement>()
-  const inputOfFocusSwarmId = useRef<HTMLInputElement>()
-  const inputOfFocusSwarm = useRef<HTMLInputElement>()
   const inputOfFocusEtn = useRef<HTMLInputElement>()
   const inputOfFocusAgentName = useRef<HTMLInputElement>()
 
@@ -214,18 +211,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       const valueParse = getValidUserAgentName(userAgentNameInput.trimStart(), regExpUserAgentName)
       if (userAgentName.length > 128 || userAgentName.trimStart().length < 3) {
         setUserAgentNameInputError('Valid name length: 3-128 characters')
-        // setTimeout(() => {
-        //   setUserAgentNameInputError(null)
-        //   setUserAgentNameInput('')
-        // }, 3000)
+
         return
       }
       if (valueParseFirstSymbol === null) {
         setUserAgentNameInputError('Please start with a number or latin')
-        // setTimeout(() => {
-        //   setUserAgentNameInputError(null)
-        //   setUserAgentNameInput('')
-        // }, 3000)
+
         return
       }
       if (valueParse !== null) {
@@ -234,10 +225,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
         loadUserAgentName()
       } else {
         setUserAgentNameInputError('Please use numbers, latin or ".", "-", "_"')
-        // setTimeout(() => {
-        //   setUserAgentNameInputError(null)
-        //   setUserAgentNameInput('')
-        // }, 3000)
       }
     }
   }
@@ -289,7 +276,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     ref.current?.blur()
   }
   const setOnboarding = async () => {
-    const { setIsFirstInstallation, getIsFirstInstallation } = await initBGFunctions(browser)
+    const { setIsFirstInstallation } = await initBGFunctions(browser)
     await setIsFirstInstallation(true)
   }
 
@@ -457,7 +444,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
             />
           </SettingItem>
           {/* todo: hidden or the time being */}
-         {/* <SettingItem title="Swarm Gateway" component={<></>}>
+          {/* <SettingItem title="Swarm Gateway" component={<></>}>
             <InputPanelSettings
               isDynamycAdapter={false}
               isDefaultValueInput={swarmGatewayInputDefault}

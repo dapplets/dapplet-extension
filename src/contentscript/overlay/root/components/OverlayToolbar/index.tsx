@@ -69,10 +69,8 @@ export interface OverlayToolbarProps {
 
 export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
-  const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
   const noSystemTabs = p.tabs.filter((f) => f.title !== 'Dapplets')
   const [isShowTabs, onShowTabs] = useToggle(true)
-  const [isClick, onClick] = useToggle(false)
   const [newWidgets, setNewWidgets] = useState(widgets)
   const [pinnedActionButton, setPinnedActionButton] = useState(null)
   const [isVisibleAnimation, setVisibleAnimation] = useState(false)
@@ -82,7 +80,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [event, setEvent] = useState<Notify[]>([])
   const [payload, setPayload] = useState(null)
   const btnRef = useRef<HTMLDivElement>()
-  // const notificationRef = useRef<HTMLDivElement>()
   const [newNotifications, setNewNotifications] = useState([])
 
   useEffect(() => {
@@ -211,7 +208,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                     !isMenu && e.preventDefault()
                     !isMenu && e.stopPropagation()
                     widgetItem().state.action(widgetItem().state.ctx, widgetItem().state)
-                    onClick()
                   }}
                   hidden={widgetItem().state.hidden ? widgetItem().state.hidden : false}
                   disabled={widgetItem().state.disabled ? widgetItem().state.disabled : false}
@@ -362,16 +358,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   }
 
   return (
-    <div
-      ref={nodeOverlayToolbar}
-      className={cn(
-        styles.overlayToolbar,
-        {
-          [styles.mobileToolbar]: isNodeOverlayToolbar,
-        },
-        p.className
-      )}
-    >
+    <div ref={nodeOverlayToolbar} className={cn(styles.overlayToolbar, p.className)}>
       <div className={styles.inner}>
         <div className={cn(styles.tabs, {})}>
           <div

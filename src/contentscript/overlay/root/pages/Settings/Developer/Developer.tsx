@@ -46,7 +46,6 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
   const [registryInputError, setRegistryInputError] = useState(null)
   const [modules, _setModules] = useState([])
   const [isLoadButton, setLoadButton] = useState(false)
-  const [isLoadButtonLocalhost, setLoadButtonLocalhost] = useState(false)
   const [isLoadAdd, setLoadAdd] = useState(false)
   const [isUpdate, setUpdate] = useState(false)
   const [currentAccount, _setCurrentAccount] = useState(null)
@@ -140,23 +139,15 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
   }
 
   const enableRegistry = async (url: string) => {
-    setLoadButtonLocalhost(true)
     const { enableRegistry } = await initBGFunctions(browser)
     await enableRegistry(url)
     memorizedLoadRegistries()
-    setTimeout(() => {
-      setLoadButtonLocalhost(false)
-    }, 1500)
   }
 
   const disableRegistry = async (url: string) => {
-    setLoadButtonLocalhost(true)
     const { disableRegistry } = await initBGFunctions(browser)
     await disableRegistry(url)
     memorizedLoadRegistries()
-    setTimeout(() => {
-      setLoadButtonLocalhost(false)
-    }, 1500)
   }
 
   const groupedModules = groupBy(modules, (x) => x.module.registryUrl)
@@ -226,7 +217,6 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
                     label={r.url}
                     key={i}
                     closeHost={() => removeRegistry(r.url)}
-                    isLoadButtonLocalhost={isLoadButtonLocalhost}
                     onClickButtonLocalhost={() => {
                       ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
                         (r.isEnabled && r.error && disableRegistry(r.url)) ||

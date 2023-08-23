@@ -91,54 +91,6 @@ export const DevModule: FC<PropsDevModule> = memo(function DevModule(props: Prop
     if (currentAccount !== newCurrentAccount) setCurrentAccount(newCurrentAccount)
   }, [currentAccount, setCurrentAccount, targetChain])
 
-  const getModulesAdmins = async () => {
-    if (!targetRegistry || !mi.name) return
-    const { getAdmins } = await initBGFunctions(browser)
-    const authors: string[] = await getAdmins(targetRegistry, mi.name)
-
-    if (authors.length > 0) {
-      setAdmins(authors)
-    }
-  }
-
-  const _updateOwnership = async () => {
-    if (!targetRegistry || !mi.name) return
-    const { getOwnership } = await initBGFunctions(browser)
-    const owner = await getOwnership(targetRegistry, mi.name)
-
-    setOwner(owner)
-    setOwnerDev(owner)
-  }
-
-  const _updateDeploymentStatus = async () => {
-    setDeploymentStatus(DeploymentStatus.Unknown)
-
-    const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser)
-    const miF = await getModuleInfoByName(targetRegistry, mi.name)
-    const deployed = vi
-      ? await getVersionInfo(targetRegistry, mi.name, vi.branch, vi.version)
-      : true
-    const deploymentStatus = !miF
-      ? DeploymentStatus.NewModule
-      : deployed
-      ? DeploymentStatus.Deployed
-      : DeploymentStatus.NotDeployed
-
-    setDeploymentStatus(deploymentStatus)
-  }
-
-  const updateDataLocalhost = async () => {
-    const { getRegistries, getOwnership } = await initBGFunctions(browser)
-    const registries = await getRegistries()
-
-    const newRegistries = registries
-      .filter((r) => r.isDev === false && r.isEnabled !== false)
-      .map((x) => x.url)
-    const newOwner = await getOwnership(newRegistries[0], mi.name)
-
-    setOwnerDev(newOwner)
-  }
-
   const memorizedUpdateData = useCallback(async () => {
     const getModulesAdmins = async () => {
       if (!targetRegistry || !mi.name) return

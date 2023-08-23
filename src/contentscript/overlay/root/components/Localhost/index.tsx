@@ -10,7 +10,6 @@ export interface LocalhostProps {
   closeHost: () => void
   onClickButtonLocalhost: () => void
   label: string
-  isLoadButtonLocalhost?: boolean
 }
 
 export const Localhost: FC<LocalhostProps> = (props) => {
@@ -21,7 +20,6 @@ export const Localhost: FC<LocalhostProps> = (props) => {
     onClickButtonLocalhost,
     label,
     children,
-    isLoadButtonLocalhost,
   } = props
   const [isShowDescription, onShowDescription] = useToggle(true)
   const [isHeightLabel, onHeightLabel] = useState(false)

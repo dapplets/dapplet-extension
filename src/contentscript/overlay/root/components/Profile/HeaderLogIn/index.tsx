@@ -23,7 +23,6 @@ export interface HeaderLogInProps {
   isMini: boolean
   setOpen: () => void
   isOpen: boolean
-  newProfile: any
   isOverlay: boolean
   setOpenWalletMini: () => void
   // isOpenSearch: boolean
@@ -36,7 +35,6 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     isMini,
     setOpen,
     isOpen,
-    newProfile,
     isOverlay,
     setOpenWalletMini,
     // isOpenSearch,
@@ -47,7 +45,6 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
   const [selectedWallet, setSelectedWallet] = useState<string | null>(null)
   const connectedDescriptors = descriptors.filter((x) => x.connected)
-  const [isModal, setModal] = useState(false)
   const [isModalWallet, setModalWallet] = useState(false)
   const onCloseModalWallet = async () => {
     setModalWallet(false)

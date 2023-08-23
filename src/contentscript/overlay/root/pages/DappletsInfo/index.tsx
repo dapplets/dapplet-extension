@@ -18,17 +18,15 @@ import styles from './DappletsInfo.module.scss'
 export interface DappletsMainInfoProps {
   setDappletsDetail: (x) => void
   ModuleInfo: any
-  ModuleVersion: any
   setShowChildrenRegistry: (x) => void
 }
 
 export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
-  const { setDappletsDetail, ModuleInfo, ModuleVersion, setShowChildrenRegistry } = props
+  const { setDappletsDetail, ModuleInfo, setShowChildrenRegistry } = props
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
   const [message, setMessage] = useState(null)
-  const [owner, setOwner] = useState(null)
   const [currentAccount, setCurrentAccount] = useState(null)
   const [newOwner, setNewOwner] = useState('')
   const [newOwnerLoading, setNewOwnerLoading] = useState(false)
@@ -39,7 +37,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [newState, setNewState] = useState([])
   const [isDisabledPush, setDisabledPush] = useState(true)
   const [isDisabledAddOwner, setDisabledAddOwner] = useState(false)
-  const [isDisabledAddAdmin, setDisabledAddAdmin] = useState(false)
   const [isModal, setModal] = useState(false)
   const [isModalPush, setModalPush] = useState(false)
   const [isModalTransaction, setModalTransaction] = useState(false)
@@ -50,7 +47,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [addDisabled, setAddDisabled] = useState(false)
   const [addAdminDisabled, setAddAdminDisabled] = useState(false)
   const [editAdminsLoading, setEditAdminsLoading] = useState(false)
-  const [editAdminDone, setEditAdminDone] = useState(false)
   const [isLoad, setLoad] = useState(false)
   const node = useRef<HTMLButtonElement>()
   const nodeInput = useRef<HTMLInputElement>()
@@ -259,31 +255,22 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     const validValue = containsValue(admins, address)
     const valueParse = getNumIndex(address, regExpIndexEthereum)
     if (validValue || valueParse === null) {
-      setDisabledAddAdmin(true)
       setEditAdminsLoading(false)
       setAddAdminDisabled(false)
-      setTimeout(() => {
-        setDisabledAddAdmin(false)
-      }, 1000)
     } else {
       try {
         const { addAdmin } = await initBGFunctions(browser)
         await addAdmin(targetRegistry, mi.name, address)
 
-        setEditAdminDone(true)
         setVisibleAdmins(true)
         setEditAdminsLoading(false)
         setAddAdminDisabled(false)
-        // nodeBtnAdmin.current?.classList.remove('valid')
-        // nodeBtnAdmin.current?.classList.remove('valid')
         setEditAdmin('')
         await getAdmins()
       } catch (error) {
-        setEditAdminDone(true)
         setVisibleAdmins(false)
         setEditAdminsLoading(false)
         setAddAdminDisabled(false)
-        // nodeBtnAdmin.current?.classList.remove('valid')
       }
     }
   }
@@ -301,7 +288,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       nodeBtnAdmin.current?.classList.remove('valid')
     } finally {
       nodeBtnAdmin.current?.classList.remove('valid')
-      setEditAdminDone(true)
+
       setVisibleAdmins(false)
       setEditAdminsLoading(false)
       setAddAdminDisabled(false)
@@ -345,33 +332,15 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
         />
       ) : null}
       {!isNotNullCurrentAccount ? (
-        owner ? (
-          <Modal
-            classNameWrapper={styles.messageModalDefault}
-            visible={isNotAccountModal}
-            title={'The wrong wallet'}
-            content={
-              <>
-                <p>Change account to {owner}</p>
-
-                <br />
-                <p> Connect a new wallet</p>
-              </>
-            }
-            footer={''}
-            onClose={() => setNotAccountModal(false)}
-          />
-        ) : (
-          <Modal
-            classNameWrapper={styles.messageModalDefault}
-            visible={isNotAccountModal}
-            classNameContent={styles.modalContentOwnership}
-            title={'Wallet is not connected'}
-            content={'You can not deploy a module without a wallet. Connect a new wallet'}
-            footer={''}
-            onClose={() => setNotAccountModal(false)}
-          />
-        )
+        <Modal
+          classNameWrapper={styles.messageModalDefault}
+          visible={isNotAccountModal}
+          classNameContent={styles.modalContentOwnership}
+          title={'Wallet is not connected'}
+          content={'You can not deploy a module without a wallet. Connect a new wallet'}
+          footer={''}
+          onClose={() => setNotAccountModal(false)}
+        />
       ) : null}
 
       <div className={styles.mainInfoBlock}>
