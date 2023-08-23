@@ -40,34 +40,61 @@ export function Component({ src, props }: { src: string; props: any }) {
 export class BosComponent extends HTMLElement {
   public src: string
 
+  private _stylesMountPoint = document.createElement('div')
+  private _componentMountPoint = document.createElement('div')
+
   connectedCallback() {
     const shadowRoot = this.attachShadow({ mode: 'open' })
 
-    const stylesMountPoint = document.createElement('div')
-    const componentMountPoint = document.createElement('div')
-
-    componentMountPoint.addEventListener('click', (e) => {
+    // Prevent propagation of clicks from BOS-component to parent
+    this._componentMountPoint.addEventListener('click', (e) => {
       e.stopPropagation()
     })
 
-    shadowRoot.appendChild(stylesMountPoint)
-    shadowRoot.appendChild(componentMountPoint)
+    shadowRoot.appendChild(this._stylesMountPoint)
+    shadowRoot.appendChild(this._componentMountPoint)
 
+    const { props } = this._getCustomProps()
+
+    // ToDo: custom setter will be applied for initially declared properties only
+    Object.keys(props).forEach((propName) => {
+      this['_' + propName] = props[propName]
+      Object.defineProperty(this, propName, {
+        enumerable: true,
+        get: () => this['_' + propName],
+        set: (value) => {
+          this['_' + propName] = value
+
+          this._render()
+        },
+      })
+    })
+
+    this._render()
+  }
+
+  _getCustomProps(): { src: string; props: any } {
     const { src, ...anotherProps } = this
 
     const keysToSkip = ['__CE_state', '__CE_definition', '__CE_shadowRoot']
 
     const props = Object.fromEntries(
       Object.keys(anotherProps)
-        .filter((x) => !keysToSkip.includes(x))
+        .filter((key) => !keysToSkip.includes(key) && !key.startsWith('_'))
         .map((key) => [key, anotherProps[key]])
     )
 
+    return { src, props }
+  }
+
+  _render() {
+    const { src, props } = this._getCustomProps()
+
     ReactDOM.render(
-      <StyleSheetManager target={stylesMountPoint}>
+      <StyleSheetManager target={this._stylesMountPoint}>
         <Component src={src} props={props} />
       </StyleSheetManager>,
-      componentMountPoint
+      this._componentMountPoint
     )
   }
 }
