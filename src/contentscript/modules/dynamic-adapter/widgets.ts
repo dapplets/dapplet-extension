@@ -275,6 +275,8 @@ export class WidgetBuilder {
       const ctx = this.contextBuilder(el, parent)
       if (!ctx) return null
       ctx.parent = parent
+      const { host, hostname, href, origin, pathname, port, protocol } = document.location
+      ctx.location = { host, hostname, href, origin, pathname, port, protocol }
       return ctx
     } catch (err) {
       // ToDo: what need to do in this cases?
