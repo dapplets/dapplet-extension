@@ -266,6 +266,7 @@ export default class GlobalConfigService {
     config.devMode = true
     config.trustedUsers = [
       { account: 'listing.dapplet-base.eth' },
+      { account: 'bos.dapplet-base.eth' },
       { account: 'buidl.testnet' },
       { account: 'nik3ter.testnet' },
       { account: 'dapplets.testnet' },
