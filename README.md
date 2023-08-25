@@ -1,10 +1,8 @@
 ![dapplet-extension-1](https://user-images.githubusercontent.com/51093278/183035137-47c85142-7d10-47f4-b0c7-4a2ee2f67a15.png)
 
-# TEST TEST TEST
+# TEST
 
 # Dapplet Browser Extension
-
-# TEST TEST TEST
 
 Dapplets Extension is a part of web infrastructure for running decentralized applications on top of other people's websites. Using Dapplets Extension, a user gets access to web3 functionality within the framework of familiar web2-sites. Community-developed dapplets run on sites like Twitter, Youtube, Github, extending their functionality by introducing mechanisms for use and sharing tokens between users.
 
