@@ -2,13 +2,16 @@ import { html, LitElement } from 'lit'
 import { property } from 'lit/decorators.js'
 import { classMap } from 'lit/directives/class-map.js'
 import { styleMap } from 'lit/directives/style-map.js'
+import { AccountsWidget } from './accounts-widget'
 import description from './description'
 import { IAvatarBadgeState, IConnectedAccountUser } from './types'
+
+customElements.define('accounts-widget', AccountsWidget)
 
 class AvatarBadge extends LitElement implements IAvatarBadgeState {
   // public static override styles = styles
   public static widgetParamsDescription = description
-
+  private _accountsWidget
   @property() state: IAvatarBadgeState
   @property() insPointName: string
   @property() img?: string | null
@@ -42,6 +45,52 @@ class AvatarBadge extends LitElement implements IAvatarBadgeState {
 
   override render() {
     if (this.hidden || !(this.img || this.video)) return null
+  
+    if (this.accounts && this.username) {
+      const handleCloseAccounts = () => {
+        this.state.showAccounts = false
+      }
+      if (!this._accountsWidget) {
+        this._accountsWidget = document.createElement('accounts-widget')
+        const elementToInsertWidget = document.querySelector('main > div > div')
+        console.log(elementToInsertWidget, 'elementToInsertWidget')
+
+        elementToInsertWidget.append(this._accountsWidget, '_accountsWidget')
+        window.addEventListener('popstate', handleCloseAccounts)
+        window.addEventListener('click', (e) => {
+          if (e.target === this._accountsWidget) {
+            setTimeout(() => {
+              handleCloseAccounts()
+            }, 400)
+          } else {
+            handleCloseAccounts()
+          }
+        })
+      }
+      this._accountsWidget.username = this.username
+      this._accountsWidget.accounts = this.accounts
+      this._accountsWidget.showAccounts = this.showAccounts
+
+      const getDistanceFromTop = () => {
+        console.log(this.ctx)
+        console.log(this)
+
+        const elForRects = this.ctx.el.querySelector(
+          'div > div > div > div.css-1dbjc4n.r-18u37iz > div.css-1dbjc4n.r-1awozwy > div'
+        )
+        if (!elForRects) {
+          console.log(
+            'ATTENTION! getDistanceFromTop() in Twitter adapter -> AvatarBadge cannot find an element! elForRects:',
+            elForRects
+          )
+          return '0'
+        }
+        const rect = elForRects.getBoundingClientRect()
+        return `${rect.top + window.scrollY}px`
+      }
+
+      this._accountsWidget.top = this.insPointName === 'POST' && getDistanceFromTop()
+    }
 
     return html`<div
       class="avatar-badge"

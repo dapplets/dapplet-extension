@@ -23,3 +23,10 @@ export interface IConnectedAccountUser {
   origin: string
   accountActive: boolean
 }
+
+export interface IAccountsWidgetState {
+  username: string
+  accounts: IConnectedAccountUser[]
+  showAccounts: boolean
+  top: string
+}
