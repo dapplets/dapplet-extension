@@ -468,10 +468,37 @@ browser.runtime.onMessage.addListener((message, sender) => {
   }
 })
 
-browser.action.onClicked.addListener(({ id: tabId }) => {
+const overlayPopupOpen = (tabId) => {
   overlayService.openPopupOverlay('dapplets', tabId)
   analyticsService.track({ idgoal: AnalyticsGoals.ExtensionIconClicked })
+}
+
+browser.tabs.onActivated.addListener(async (activeInfo) => {
+  const infoActivaTab = await browser.tabs.get(activeInfo.tabId)
+
+  if (!infoActivaTab) return
+
+  if (infoActivaTab.url.includes('chrome:')) {
+    const popupUrl = browser.runtime.getURL('popup.html')
+
+    await browser.action.setPopup({ tabId: activeInfo.tabId, popup: popupUrl })
+    browser.action.onClicked.removeListener(({ id: tabId }) => {
+      overlayPopupOpen(tabId)
+    })
+  } else {
+    await chrome.action.setPopup({ tabId: infoActivaTab.id, popup: '' })
+
+    browser.action.onClicked.addListener(({ id: tabId }) => {
+      overlayPopupOpen(tabId)
+    })
+  }
 })
+
+// browser.action.onClicked.addListener(({ id: tabId }) => {
+//   console.log(tabId,'onClicked');
+
+//   overlayPopupOpen(tabId)
+// })
 
 // E2E testing functions
 globalThis.dapplets = {

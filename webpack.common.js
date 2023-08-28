@@ -75,6 +75,7 @@ module.exports = {
     worker: path.join(__dirname, 'src/worker/index.ts'),
     sandbox: path.join(__dirname, 'src/sandbox/index.ts'),
     offscreen: path.join(__dirname, 'src/offscreen/index.ts'),
+    popup: path.join(__dirname, 'src/popup/index.ts'),
   },
   output: {
     path: path.join(__dirname, 'build'),
@@ -166,6 +167,10 @@ module.exports = {
         {
           from: 'src/sandbox/index.html',
           to: 'sandbox.html',
+        },
+        {
+          from: 'src/popup/index.html',
+          to: 'popup.html',
         },
       ],
     }),
