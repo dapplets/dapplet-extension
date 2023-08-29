@@ -80,7 +80,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
 
   const refresh = async () => {
     const { getWalletDescriptors, getDefaultWalletFor } = await initBGFunctions(browser)
-    const descriptors = await getWalletDescriptors()
+    const descriptorsRefresh = await getWalletDescriptors()
     const selectedWallet = await getDefaultWalletFor(
       DefaultSigners.EXTENSION,
       ChainTypes.ETHEREUM_GOERLI
@@ -89,12 +89,12 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     setSelectedWallet(selectedWallet)
     setSelectWallet(selectedWallet)
 
-    setDescriptors(descriptors)
+    setDescriptors(descriptorsRefresh)
     !isOpen &&
       // && !isOpenSearch
       setOpenWalletMini()
-    if (descriptors.length > 0) {
-      const connectedDescriptors = descriptors.filter((x) => x.connected)
+    if (descriptorsRefresh.length > 0) {
+      const connectedDescriptors = descriptorsRefresh.filter((x) => x.connected)
 
       if (connectedDescriptors.length > 0) {
         const newDescriptors = connectedDescriptors?.find((x) => x.type === selectedWallet)
