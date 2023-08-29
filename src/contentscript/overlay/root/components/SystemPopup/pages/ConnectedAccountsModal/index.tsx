@@ -48,6 +48,7 @@ const ModalCAUserButton = ({ user }: { user: IConnectedAccountUser }) => (
 
 const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   const { data, onCloseClick, bus } = props
+
   const {
     accountToChangeStatus,
     condition,
@@ -301,7 +302,9 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
       <Modal
         isWaiting={isWaiting}
         title={'Add your NEAR account ID'}
-        content={`Add your NEAR account ID to your ${socialNetworkToConnect} username. This is done so the Oracle can confirm your ownership of the ${socialNetworkToConnect} account`}
+        content={`Add your NEAR account ID to your ${socialNetworkToConnect} username ${
+          selectedFirstUser.origin === 'github' ? ' and refresh browser page' : null
+        }. This is done so the Oracle can confirm your ownership of the ${socialNetworkToConnect} account`}
         onClose={onCloseClick}
         onConfirm={async () => {
           bus.publish('ready')
