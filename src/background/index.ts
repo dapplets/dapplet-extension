@@ -468,8 +468,8 @@ browser.runtime.onMessage.addListener((message, sender) => {
   }
 })
 
-const overlayPopupOpen = (tabId) => {
-  overlayService.openPopupOverlay('dapplets', tabId)
+const overlayPopupOpen = (tab: browser.Tabs.Tab) => {
+  overlayService.openPopupOverlay('dapplets', tab.id)
   analyticsService.track({ idgoal: AnalyticsGoals.ExtensionIconClicked })
 }
 
@@ -478,27 +478,30 @@ browser.tabs.onActivated.addListener(async (activeInfo) => {
 
   if (!infoActivaTab) return
 
-  if (infoActivaTab.url.includes('chrome:')) {
+  if (!infoActivaTab.url.startsWith('https://') && !infoActivaTab.url.startsWith('http://')) {
     const popupUrl = browser.runtime.getURL('popup.html')
 
     await browser.action.setPopup({ tabId: activeInfo.tabId, popup: popupUrl })
-    browser.action.onClicked.removeListener(({ id: tabId }) => {
-      overlayPopupOpen(tabId)
-    })
+    browser.action.onClicked.removeListener(overlayPopupOpen)
   } else {
-    await chrome.action.setPopup({ tabId: infoActivaTab.id, popup: '' })
+    await browser.action.setPopup({ tabId: infoActivaTab.id, popup: '' })
 
-    browser.action.onClicked.addListener(({ id: tabId }) => {
-      overlayPopupOpen(tabId)
-    })
+    browser.action.onClicked.addListener(overlayPopupOpen)
   }
 })
 
-// browser.action.onClicked.addListener(({ id: tabId }) => {
-//   console.log(tabId,'onClicked');
+browser.tabs.onUpdated.addListener((tabId: number, changeInfo: object, tab: browser.Tabs.Tab) => {
+  if (!tab.url.startsWith('https://') && !tab.url.startsWith('http://')) {
+    const popupUrl = browser.runtime.getURL('popup.html')
 
-//   overlayPopupOpen(tabId)
-// })
+    browser.action.setPopup({ tabId: tab.id, popup: popupUrl })
+    browser.action.onClicked.removeListener(overlayPopupOpen)
+  } else {
+    browser.action.setPopup({ tabId: tab.id, popup: '' })
+
+    browser.action.onClicked.addListener(overlayPopupOpen)
+  }
+})
 
 // E2E testing functions
 globalThis.dapplets = {

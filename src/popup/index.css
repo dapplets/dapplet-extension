@@ -22,11 +22,20 @@ header {
 svg {
     margin-right: 5px;
 }
-section{
+div{
     font-family: Segoe UI;
     font-size: 12px;
     font-style: normal;
     font-weight: 400;
     line-height: 149%;
     color: #747376;
+}
+a{
+    font-family: Segoe UI;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 149%;
+    color: #588ca3;
+    text-decoration-line: underline;
 }
