@@ -11,7 +11,7 @@ export class State<T> {
   public state: T
   private _cache: any = {}
   public changedHandler: (newValues: any) => void
-  public id: string
+  public id: string // ID is used for lookup $ function and E2E-tests
 
   constructor(private config: WidgetConfig<T>, public readonly ctx: any) {
     const me = this

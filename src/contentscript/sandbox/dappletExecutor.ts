@@ -128,6 +128,7 @@ export abstract class DappletExecutor {
           }, {})
 
           const factory = widgetFactory({
+            id: widget.lookupId,
             DEFAULT: {
               ...widget.stateValues,
               ...callbacks,
