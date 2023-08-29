@@ -1,7 +1,7 @@
 name: Artifact Upload
 on:
   pull_request:
-    branches: [master, develop]
+    branches: [master, testing, develop]
 jobs:
   create-artifact:
     env:
