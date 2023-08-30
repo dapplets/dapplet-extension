@@ -1,6 +1,6 @@
 import cn from 'classnames'
 import { useFormikContext } from 'formik'
-import React, { useRef } from 'react'
+import React, { ReactNode, useRef } from 'react'
 import { ReactComponent as Folder } from '../../../assets/icons/tokenomics/folder.svg'
 import { ReactComponent as Plus } from '../../../assets/icons/tokenomics/plus.svg'
 import { ReactComponent as Refresh } from '../../../assets/icons/tokenomics/refresh.svg'
@@ -59,9 +59,10 @@ const IconField = ({ label, disabled }: IconFieldProps) => {
       data-testid="create-token-icon-field-error-message"
       className={cn(styles.errorMessage, styles.iconErrorMessage)}
     >
-      {errors.icon}
+      {errors.icon as ReactNode}
     </div>
   )
+
   const getIcon = (x: boolean | undefined, handleClick: any) => {
     return () => {
       !x && handleClick()

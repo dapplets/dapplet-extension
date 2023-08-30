@@ -6,7 +6,9 @@ export interface UnderConstructionProps {
   isShowChildren?: boolean
   label: string
   setShowChildrenUnderConstraction: (x) => void
+  children?: React.ReactNode
 }
+
 export const UnderConstruction: FC<UnderConstructionProps> = (props) => {
   const { setShowChildrenUnderConstraction, isShowChildren, label, children } = props
 

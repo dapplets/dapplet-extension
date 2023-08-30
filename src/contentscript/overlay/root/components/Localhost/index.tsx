@@ -11,6 +11,7 @@ export interface LocalhostProps {
   onClickButtonLocalhost: () => void
   label: string
   isLoadButtonLocalhost?: boolean
+  children?: React.ReactNode
 }
 
 export const Localhost: FC<LocalhostProps> = (props) => {

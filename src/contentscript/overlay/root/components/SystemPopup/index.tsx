@@ -105,6 +105,10 @@ export class SystemPopup extends React.Component<Props, State> {
   }
 }
 
-const BlurBox: React.FC = ({ children }) => {
+type BlurBoxProps = {
+  children?: React.ReactNode
+}
+
+const BlurBox: React.FC<BlurBoxProps> = ({ children }) => {
   return <div className={styles['dapplets-popup-container']}>{children}</div>
 }

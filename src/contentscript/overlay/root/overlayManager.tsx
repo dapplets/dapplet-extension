@@ -1,6 +1,6 @@
 import INNER_STYLE from '!raw-loader!./overlayManager.css'
 import * as React from 'react'
-import * as ReactDOM from 'react-dom'
+import { createRoot, Root } from 'react-dom/client'
 import { Bus } from '../../../common/bus'
 import { JsonRpc } from '../../../common/jsonrpc'
 import { IOverlayManager, OverlayConfig } from '../interfaces'
@@ -18,7 +18,7 @@ export class OverlayManager implements IOverlayManager {
   public activeOverlay: Overlay = null
   public onActiveOverlayChanged: (newOverlay: Overlay | null) => void | null = null
 
-  private _root = null
+  private _root: Root = null
 
   private _tabsRegistry: {
     overlay: Overlay
@@ -43,10 +43,10 @@ export class OverlayManager implements IOverlayManager {
 
       shadowRoot.appendChild(container)
 
-      this._root = container
+      this._root = createRoot(container)
     } else {
       this._panel = extensionHost
-      this._root = extensionHost.shadowRoot.getElementById('app')
+      this._root = createRoot(extensionHost.shadowRoot.getElementById('app'))
     }
 
     const styles = document.createElement('style')
@@ -230,14 +230,13 @@ export class OverlayManager implements IOverlayManager {
   }
 
   private _render() {
-    ReactDOM.render(
+    this._root.render(
       <App
         hidden={this._panel.classList.contains(HiddenOverlayClass)}
         overlayManager={this}
         onToggle={this.toggle.bind(this)}
         systemPopupEventBus={this.systemPopupEventBus}
-      />,
-      this._root
+      />
     )
   }
 }
