@@ -7,6 +7,14 @@ import { Locator } from './locator'
 import { Context, DappletConfig, IWidget, IWidgetBuilderConfig } from './types'
 import { WidgetBuilder } from './widgets'
 
+function composeTestId(ctxName: string, ctxId: string, widgetId: string): string {
+  if (ctxName && ctxId && widgetId) {
+    return `${ctxName}/${ctxId}/${widgetId}`
+  } else {
+    return null
+  }
+}
+
 export interface IDynamicAdapter extends IContentAdapter {
   configure(config: { [contextName: string]: IWidgetBuilderConfig }, adapterName: string): void
   createWidgetFactory<T>(
@@ -295,12 +303,18 @@ export class DynamicAdapter implements IDynamicAdapter {
         webcomponent.ctx = context.parsed
         webcomponent.state = state.state
 
+        // ID is used for lookup $ function and E2E-tests
+        const testId = composeTestId(builder.contextName, context.parsed.id, state.id)
+        if (testId) {
+          webcomponent.setAttribute('data-testid', testId)
+        }
+
         widget = {
           el: webcomponent,
           insPointName: builder.contextName, // for DemoDapplet
           state: state.state, // for WidgetBuilder.findWidget()
           unmount: () => {
-            webcomponent && webcomponent.remove()
+            webcomponent && webcomponent?.remove()
           },
         }
 

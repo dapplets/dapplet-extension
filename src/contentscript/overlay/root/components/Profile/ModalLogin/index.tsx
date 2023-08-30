@@ -20,6 +20,7 @@ interface ModalLoginProps {
   disconnectButtonClick: (x: any, y: any) => void
   connectWallet?: () => void
   refresh?: () => void
+  descriptors: WalletDescriptor[]
 }
 
 export const ModalLogin = ({
@@ -30,6 +31,7 @@ export const ModalLogin = ({
   disconnectButtonClick,
   connectWallet,
   refresh,
+  descriptors,
 }: ModalLoginProps) => {
   const [isNotVisible, setNotVisible] = useState(false)
   const [value, setValue] = useState('')
@@ -172,7 +174,7 @@ export const ModalLogin = ({
                 </div>
               </div>
             ))}
-          {connectWallet && wallets.length < 4 && (
+          {connectWallet && wallets.length < descriptors.length && (
             <div
               className={styles.addWallet}
               onClick={connectWallet}
