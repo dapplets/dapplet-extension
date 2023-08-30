@@ -150,6 +150,7 @@ module.exports = {
       zlib: false,
       'process/browser': false,
     },
+    modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
   },
   plugins: [
     new CopyWebpackPlugin({

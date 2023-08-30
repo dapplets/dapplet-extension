@@ -15,6 +15,6 @@ export class EventBus {
   }
 
   destroy() {
-    this.destroy$.next()
+    this.destroy$.next(true) // true is here because ts requires some value
   }
 }
