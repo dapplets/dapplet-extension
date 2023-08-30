@@ -303,6 +303,12 @@ export class DynamicAdapter implements IDynamicAdapter {
         webcomponent.ctx = context.parsed
         webcomponent.state = state.state
 
+        // For BOS-components
+        if (Widget.stylesByContext[builder.contextName]) {
+          const cssAsString = Widget.stylesByContext[builder.contextName]
+          webcomponent.styles = cssAsString
+        }
+
         // ID is used for lookup $ function and E2E-tests
         const testId = composeTestId(builder.contextName, context.parsed.id, state.id)
         if (testId) {

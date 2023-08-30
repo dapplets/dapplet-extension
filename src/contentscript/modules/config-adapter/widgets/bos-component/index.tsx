@@ -33,13 +33,20 @@ export function Component({ src, props }: { src: string; props: any }) {
         targetProps: props,
         tosName: 'adminalpha.near/widget/TosContent',
       }}
+      overrides={
+        {
+          // 'dapplets.near/widget/LevelOne': 'dapplets.near/widget/Override',
+        }
+      }
     />
   )
 }
 
 export class BosComponent extends HTMLElement {
   public src: string
+  public styles: string
 
+  private _adapterStylesMountPoint = document.createElement('style')
   private _stylesMountPoint = document.createElement('div')
   private _componentMountPoint = document.createElement('div')
   private _root = createRoot(this._componentMountPoint)
@@ -54,6 +61,12 @@ export class BosComponent extends HTMLElement {
 
     shadowRoot.appendChild(this._componentMountPoint)
     shadowRoot.appendChild(this._stylesMountPoint)
+
+    // Apply styles from parser config
+    if (this.styles) {
+      this._adapterStylesMountPoint.innerHTML = this.styles
+      shadowRoot.appendChild(this._adapterStylesMountPoint)
+    }
 
     const { props } = this._getCustomProps()
 

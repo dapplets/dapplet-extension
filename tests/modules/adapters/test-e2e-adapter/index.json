@@ -14,7 +14,7 @@
         },
         "bos": {
           "styles": "styles/post/bos.css",
-          "insertionPoint": "div[data-testid=post-buttons-area] > *:last-child"
+          "insertionPoint": "a[data-testid=post-action-area]"
         }
       },
       "contextBuilder": {

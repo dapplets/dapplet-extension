@@ -15,6 +15,7 @@ const dapplets = [
   'server-interaction',
   'test-common-dapplet',
   'inject-bos-component',
+  'inject-nested-bos-component',
   // 'test-dynamic-dapplet', // ToDo: uncomment when dynamic context will be fixed
   // 'update-parsed-context', // ToDo: uncomment when testing website will be implemented
 ]
@@ -70,6 +71,12 @@ for (const dappletName of dapplets) {
         await page.locator('.dapplet-widget').locator(':scope > *').first().click()
         const incrementedValue = (Number(before) + 1).toString()
         expect(page.locator('.dapplet-widget', { hasText: incrementedValue })).toBeVisible()
+        break
+
+      case 'inject-nested-bos-component':
+        await expect(page.getByText('dapplets.near/widget/LevelOne').first()).toBeVisible()
+        await expect(page.getByText('dapplets.near/widget/LevelTwo').first()).toBeVisible()
+        await expect(page.getByText('dapplets.near/widget/LevelThree').first()).toBeVisible()
         break
 
       default:

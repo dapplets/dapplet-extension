@@ -1,0 +1,13 @@
+{
+  "name": "inject-nested-bos-component",
+  "version": "0.1.0",
+  "description": "Inject nested BOS component",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "Inject nested BOS component",
+  "contextIds": ["test-e2e-adapter"],
+  "dependencies": {
+    "test-e2e-adapter": "0.1.0"
+  }
+}
