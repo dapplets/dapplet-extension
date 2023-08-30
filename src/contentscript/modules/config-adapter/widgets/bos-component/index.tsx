@@ -52,8 +52,8 @@ export class BosComponent extends HTMLElement {
       e.stopPropagation()
     })
 
-    shadowRoot.appendChild(this._stylesMountPoint)
     shadowRoot.appendChild(this._componentMountPoint)
+    shadowRoot.appendChild(this._stylesMountPoint)
 
     const { props } = this._getCustomProps()
 
