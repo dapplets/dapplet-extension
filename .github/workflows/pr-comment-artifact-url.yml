@@ -2,9 +2,9 @@ name: Comment Artifact URL on PR
 on:
   workflow_run:
     types:
-      - "completed"
+      - 'completed'
     workflows:
-      - "Artifact Upload"
+      - 'Artifact Upload'
 jobs:
   comment-on-pr:
     if: github.event.workflow_run.conclusion == 'success'
@@ -25,7 +25,7 @@ jobs:
           PREVIOUS_SUITE_ID=$(jq -r '.check_suite_id' <<< "$WORKFLOW_RUN_EVENT_OBJ")
           echo "Previous Suite ID: $PREVIOUS_SUITE_ID"
           echo "PREVIOUS_SUITE_ID=$PREVIOUS_SUITE_ID" >> "$GITHUB_ENV"
-          
+
           ARTIFACT_ID=$(gh api "/repos/$OWNER/$REPO/actions/artifacts" \
             --jq ".artifacts.[] |
             select(.workflow_run.id==${PREVIOUS_JOB_ID}) |
@@ -49,9 +49,9 @@ jobs:
 
       - name: Update Comment
         env:
-          JOB_PATH: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ env.PREVIOUS_JOB_ID }}"
+          JOB_PATH: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ env.PREVIOUS_JOB_ID }}'
           HEAD_SHA: ${{ env.HEAD_SHA }}
-          SUITES_PATH: "${{ github.server_url }}/${{ github.repository_owner }}/${{ github.event.repository.name }}/suites"
+          SUITES_PATH: '${{ github.server_url }}/${{ github.repository_owner }}/${{ github.event.repository.name }}/suites'
           PREVIOUS_SUITE_ID: ${{ env.PREVIOUS_SUITE_ID }}
           ARTIFACT_ID: ${{ env.ARTIFACT_ID }}
         uses: peter-evans/create-or-update-comment@v2
@@ -67,11 +67,9 @@ jobs:
             Please note that files only stay for around 90 days!
 
             | Name      | Link
-            --------------------------------------------------------------------
+            | :-------- | :--
             | Commit    | ${{ env.HEAD_SHA }}
-
             | Logs      | ${{ env.JOB_PATH }}
-
             | Extension Build | ${{ env.SUITES_PATH }}/${{ env.PREVIOUS_SUITE_ID }}/artifacts/${{ env.ARTIFACT_ID }}
 
             [badge]: https://img.shields.io/badge/Build-Success!-3fb950?logo=github&style=for-the-badge
