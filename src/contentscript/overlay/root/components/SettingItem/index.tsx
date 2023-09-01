@@ -5,7 +5,7 @@ import styles from './SettingItem.module.scss'
 export interface SettingItemProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   title: string
-  component: ReactElement
+  component?: ReactElement
   isShowAdditionalSettings?: boolean
   isVisibleAdditionalSettings?: boolean
   onShowAdditionalSettings?: () => void

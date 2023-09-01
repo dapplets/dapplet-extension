@@ -1,14 +1,19 @@
 // near-social-vm
 import { setupWalletSelector } from '@near-wallet-selector/core'
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { EthersProviderContext, useInitNear, Widget } from 'near-social-vm'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import { StyleSheetManager } from 'styled-components'
+import browser from 'webextension-polyfill'
+import * as EventBus from '../../../../../common/global-event-bus'
 
 const networkId = 'mainnet'
 
 export function Component({ src, props }: { src: string; props: any }) {
   const { initNear } = useInitNear()
+  const [overrides, setOverrides] = React.useState<{ [widgetSrc: string]: string }>({})
+  const [isLoading, setIsLoading] = React.useState(true)
 
   React.useEffect(() => {
     initNear &&
@@ -21,7 +26,25 @@ export function Component({ src, props }: { src: string; props: any }) {
       })
   }, [initNear])
 
-  if (!EthersProviderContext.Provider) {
+  const loadOverrides = React.useCallback(() => {
+    ;(async () => {
+      const { getBosOverrides } = await initBGFunctions(browser)
+      const overrides = await getBosOverrides()
+      setOverrides(overrides)
+      setIsLoading(false)
+    })()
+  }, [])
+
+  React.useEffect(() => {
+    loadOverrides()
+  }, [loadOverrides])
+
+  React.useEffect(() => {
+    EventBus.on('bos_overrides_changed', loadOverrides)
+    return () => EventBus.off('bos_overrides_changed', loadOverrides)
+  }, [loadOverrides])
+
+  if (!EthersProviderContext.Provider || isLoading) {
     return null
   }
 
@@ -33,11 +56,9 @@ export function Component({ src, props }: { src: string; props: any }) {
         targetProps: props,
         tosName: 'adminalpha.near/widget/TosContent',
       }}
-      overrides={
-        {
-          // 'dapplets.near/widget/LevelOne': 'dapplets.near/widget/Override',
-        }
-      }
+      autoConfirm
+      enableDataSrcAttribute
+      overrides={overrides}
     />
   )
 }

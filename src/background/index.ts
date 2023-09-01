@@ -256,6 +256,8 @@ browser.runtime.onMessage.addListener(
     getAllUserSettings: (moduleName) => globalConfigService.getAllUserSettings(moduleName),
     setAllUserSettings: (moduleName, values) =>
       globalConfigService.setAllUserSettings(moduleName, values),
+    setBosOverrides: globalConfigService.setBosOverrides.bind(globalConfigService),
+    getBosOverrides: globalConfigService.getBosOverrides.bind(globalConfigService),
 
     // ENS
     resolveName: (name) => ensService.resolveName(name),

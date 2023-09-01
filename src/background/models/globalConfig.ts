@@ -73,4 +73,8 @@ export class GlobalConfig extends Base {
   preferredConnectedAccountsNetwork: NearNetworks = null
 
   pinnedDappletActions: { dappletName: string; widgetPinId: string }[] = []
+
+  bosOverrides: {
+    [widgetSrc: string]: string
+  } = {}
 }

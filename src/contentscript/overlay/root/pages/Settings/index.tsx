@@ -7,6 +7,7 @@ import { DappletsMainInfo } from '../DappletsInfo'
 import { Tokenomics } from '../Tokenomics'
 import { UnderConstruction } from '../UnderConstruction'
 import { UnderConstructionInfo } from '../UnderConstructionInfo'
+import { Bos } from './Bos/Bos'
 import { Developer } from './Developer/Developer'
 import { SettingsList } from './Settings/Settings'
 import styles from './Settings/Settings.module.scss'
@@ -14,6 +15,7 @@ import styles from './Settings/Settings.module.scss'
 enum SettingsTabs {
   // MAIN = 0,
   SETTINGS = 0,
+  BOS = 1,
   DEVELOPER = 2,
 }
 export enum DappletsDetails {
@@ -123,6 +125,11 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
               onClick={() => setActiveTab(SettingsTabs.SETTINGS)}
               isActive={activeTab === SettingsTabs.SETTINGS}
             />
+            <SettingTitle
+              title="BOS"
+              onClick={() => setActiveTab(SettingsTabs.BOS)}
+              isActive={activeTab === SettingsTabs.BOS}
+            />
             {devMode && (
               <SettingTitle
                 title="Developer"
@@ -146,6 +153,8 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
                 setErrorReporting={setErrorReporting}
               />
             )}
+
+            {activeTab === SettingsTabs.BOS && <Bos />}
 
             {activeTab === SettingsTabs.DEVELOPER && (
               <Developer

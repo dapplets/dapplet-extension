@@ -1,0 +1,133 @@
+@import '../../../assets/styles/fonts';
+@import '../../../assets/styles/color.variables';
+@import '../../../assets/styles/null';
+@import './adaptive';
+
+// ToDo: deduplicate code
+
+.blockSettings {
+  overflow: hidden;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+
+  width: 100%;
+  height: calc(100% - 90px);
+}
+
+.scrollBlock {
+  direction: rtl;
+  overflow: hidden;
+  overflow-y: scroll;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+
+  width: 100%;
+  height: calc(100% - 120px);
+  padding: 15px 0 0 15px;
+
+  &::-webkit-scrollbar {
+    cursor: pointer;
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    margin-bottom: 13px;
+    background: rgb(244 244 244);
+    background: linear-gradient(
+      90deg,
+      rgb(244 244 244 / 0%) 10%,
+      rgb(227 227 227 / 100%) 50%,
+      rgb(244 244 244 / 0%) 90%
+    );
+  }
+
+  &::-webkit-scrollbar-thumb {
+    width: 4px;
+    height: 2px;
+    margin-bottom: 13px;
+
+    background: $primary;
+    border-radius: 2px;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
+  }
+}
+
+.scrollBlock > * {
+  direction: ltr;
+}
+
+.wrapperSettings {
+  margin: 0 0 30px !important;
+}
+
+.btnCreate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 228px;
+  height: 33px;
+  padding: 0 10px;
+
+  font-family: Roboto, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 100%;
+  color: $pure-white;
+  text-align: center;
+  text-transform: uppercase;
+
+  background: $primary;
+  border-radius: 4px;
+
+  &:hover {
+    background: $primary-hover;
+  }
+
+  &:active {
+    background: $primary-pressed;
+  }
+
+  &:disabled {
+    cursor: default;
+    background: $primary-hover;
+  }
+}
+
+.bottomContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.forkButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 65px;
+  height: 23px;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+  color: $primary;
+
+  background-color: $pure-white;
+  border: 1px solid $primary;
+  border-radius: 4px;
+
+  &:hover {
+    color: $primary-hover;
+    border-color: $primary-hover;
+  }
+
+  &:active {
+    color: $primary-pressed;
+    border-color: $primary-pressed;
+  }
+}
