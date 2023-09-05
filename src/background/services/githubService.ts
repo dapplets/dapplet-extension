@@ -2,18 +2,19 @@
 import { Cacheable } from 'caching-decorator'
 import { ethers } from 'ethers'
 import { clean, gt } from 'semver'
-import GlobalConfigService from './globalConfigService'
 import browser from 'webextension-polyfill'
+import GlobalConfigService from './globalConfigService'
 export default class GithubService {
   constructor(private _globalConfigService: GlobalConfigService) {}
 
   @Cacheable({ ttl: 60 * 60 * 1000 })
   async getNewExtensionVersion() {
-    const IS_DEV_MODE = !('update_url' in browser.runtime.getManifest());
+    const IS_DEV_MODE = !('update_url' in browser.runtime.getManifest())
+    if (IS_DEV_MODE) return null
     const url = 'https://api.github.com/repos/dapplets/dapplet-extension/releases/latest'
     const resp = await fetch(url)
     const json = await resp.json()
-    return gt(json.name, EXTENSION_VERSION) && !IS_DEV_MODE ? clean(json.name) : null
+    return gt(json.name, EXTENSION_VERSION) ? clean(json.name) : null
     // return gt(json.name, '0.50.0') ? clean(json.name) : null
   }
 
