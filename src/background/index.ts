@@ -514,6 +514,7 @@ globalThis.dapplets = {
   setIsFirstInstallation: globalConfigService.setIsFirstInstallation.bind(globalConfigService),
 }
 
+
 // ToDo: remove or restore this code, it was commented to remove downloads permission before publishing
 // Set predefined configuration when extension is installed
 // browser.runtime.onInstalled.addListener(async (details) => {
