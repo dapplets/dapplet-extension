@@ -473,35 +473,22 @@ const overlayPopupOpen = (tab: browser.Tabs.Tab) => {
   analyticsService.track({ idgoal: AnalyticsGoals.ExtensionIconClicked })
 }
 
-browser.tabs.onActivated.addListener(async (activeInfo) => {
-  const infoActivaTab = await browser.tabs.get(activeInfo.tabId)
+const updateAction = async (tabId: number) => {
+  const tab = await browser.tabs.get(tabId)
 
-  if (!infoActivaTab) return
-
-  if (!infoActivaTab.url.startsWith('https://') && !infoActivaTab.url.startsWith('http://')) {
-    const popupUrl = browser.runtime.getURL('popup.html')
-
-    await browser.action.setPopup({ tabId: activeInfo.tabId, popup: popupUrl })
-    browser.action.onClicked.removeListener(overlayPopupOpen)
-  } else {
-    await browser.action.setPopup({ tabId: infoActivaTab.id, popup: '' })
-
+  if (tab?.url.startsWith('https://') || tab?.url.startsWith('http://')) {
+    await browser.action.setPopup({ tabId, popup: '' })
     browser.action.onClicked.addListener(overlayPopupOpen)
-  }
-})
-
-browser.tabs.onUpdated.addListener((tabId: number, changeInfo: object, tab: browser.Tabs.Tab) => {
-  if (!tab.url.startsWith('https://') && !tab.url.startsWith('http://')) {
-    const popupUrl = browser.runtime.getURL('popup.html')
-
-    browser.action.setPopup({ tabId: tab.id, popup: popupUrl })
-    browser.action.onClicked.removeListener(overlayPopupOpen)
   } else {
-    browser.action.setPopup({ tabId: tab.id, popup: '' })
-
-    browser.action.onClicked.addListener(overlayPopupOpen)
+    // if it's a system tab
+    const popupUrl = browser.runtime.getURL('popup.html')
+    await browser.action.setPopup({ tabId, popup: popupUrl })
+    browser.action.onClicked.removeListener(overlayPopupOpen)
   }
-})
+}
+
+browser.tabs.onActivated.addListener(({ tabId }) => updateAction(tabId))
+browser.tabs.onUpdated.addListener((tabId) => updateAction(tabId))
 
 // E2E testing functions
 globalThis.dapplets = {
@@ -513,7 +500,6 @@ globalThis.dapplets = {
   disableRegistry: globalConfigService.disableRegistry.bind(globalConfigService),
   setIsFirstInstallation: globalConfigService.setIsFirstInstallation.bind(globalConfigService),
 }
-
 
 // ToDo: remove or restore this code, it was commented to remove downloads permission before publishing
 // Set predefined configuration when extension is installed
