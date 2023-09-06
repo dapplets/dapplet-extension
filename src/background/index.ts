@@ -468,10 +468,27 @@ browser.runtime.onMessage.addListener((message, sender) => {
   }
 })
 
-browser.action.onClicked.addListener(({ id: tabId }) => {
-  overlayService.openPopupOverlay('dapplets', tabId)
+const overlayPopupOpen = (tab: browser.Tabs.Tab) => {
+  overlayService.openPopupOverlay('dapplets', tab.id)
   analyticsService.track({ idgoal: AnalyticsGoals.ExtensionIconClicked })
-})
+}
+
+const updateAction = async (tabId: number) => {
+  const tab = await browser.tabs.get(tabId)
+
+  if (tab?.url.startsWith('https://') || tab?.url.startsWith('http://')) {
+    await browser.action.setPopup({ tabId, popup: '' })
+    browser.action.onClicked.addListener(overlayPopupOpen)
+  } else {
+    // if it's a system tab
+    const popupUrl = browser.runtime.getURL('popup.html')
+    await browser.action.setPopup({ tabId, popup: popupUrl })
+    browser.action.onClicked.removeListener(overlayPopupOpen)
+  }
+}
+
+browser.tabs.onActivated.addListener(({ tabId }) => updateAction(tabId))
+browser.tabs.onUpdated.addListener((tabId) => updateAction(tabId))
 
 // E2E testing functions
 globalThis.dapplets = {
@@ -483,7 +500,6 @@ globalThis.dapplets = {
   disableRegistry: globalConfigService.disableRegistry.bind(globalConfigService),
   setIsFirstInstallation: globalConfigService.setIsFirstInstallation.bind(globalConfigService),
 }
-
 
 // ToDo: remove or restore this code, it was commented to remove downloads permission before publishing
 // Set predefined configuration when extension is installed
