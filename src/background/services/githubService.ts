@@ -9,8 +9,10 @@ export default class GithubService {
 
   @Cacheable({ ttl: 60 * 60 * 1000 })
   async getNewExtensionVersion() {
-    const IS_DEV_MODE = !('update_url' in browser.runtime.getManifest())
-    if (IS_DEV_MODE) return null
+    // Skip update checking if the extension is installed from the store
+    const isFromStore = 'update_url' in browser.runtime.getManifest()
+    if (isFromStore) return null
+
     const url = 'https://api.github.com/repos/dapplets/dapplet-extension/releases/latest'
     const resp = await fetch(url)
     const json = await resp.json()
