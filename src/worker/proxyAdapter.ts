@@ -137,6 +137,7 @@ export class ProxyAdapter {
           widgetId: widget.widgetId,
           widgetName: widget.widgetName,
           listeningEvents,
+          lookupId: widget.state.id, // ID is used for lookup $ function and E2E-tests
           // contextName,
           // contextId: ctxRef.id,
           stateValues: JSON.parse(JSON.stringify(stateValues)), // remove callbacks and another references
