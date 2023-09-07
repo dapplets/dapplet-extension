@@ -193,7 +193,7 @@
 }
 .item {
   flex-direction: column;
-  padding-left: 12px;
+  padding-left: 24px;
   align-items: flex-start;
   width: 100%;
   background: #fff;
@@ -206,8 +206,8 @@
   &::before {
     content: '';
     position: absolute;
-    left: 2px;
-    top: 50%;
+    left: 6px;
+    top: 45%;
     display: inline-block;
     width: 8px;
     height: 8px;
