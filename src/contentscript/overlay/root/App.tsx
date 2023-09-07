@@ -558,9 +558,13 @@ class _App extends React.Component<P, S> {
 
     return (
       <>
-        <MultitablePanel />
+        <MultitablePanel
+          onToggleClick={this.props.onToggle}
+          navigate={this.props.navigate!}
+          pathname={pathname}
+        />
         <SystemPopup bus={p.systemPopupEventBus} />
-        
+
         <div className={cn(styles.overlay)}>
           <div className={styles.wrapper}>
             <OverlayToolbar
@@ -581,7 +585,7 @@ class _App extends React.Component<P, S> {
               selectedWallet={this.state.selectedWallet}
               connectedDescriptors={this.state.connectedDescriptors}
             />
-        
+
             <Onboarding />
             <div className={styles.inner}>
               <header className={styles.header}>
@@ -722,7 +726,6 @@ class _App extends React.Component<P, S> {
             </div>
           </div>
         </div>
-       
       </>
     )
   }

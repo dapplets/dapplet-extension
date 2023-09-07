@@ -35,8 +35,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     )
     setMutations(mutations)
   }
-  console.log(mutations)
-  console.log(mutationsEnable)
 
   const enableMutation = async (id: string, x: (x) => void) => {
     const { setMutation } = await initBGFunctions(browser)
@@ -68,10 +66,10 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
   return (
     <div
       className={cn(styles.wrapper)}
-      // onBlur={() => {
-      //   setOpen(false)
-      // }}
-      // tabIndex={0}
+      onBlur={() => {
+        setOpen(false)
+      }}
+      tabIndex={0}
     >
       {mutationsEnable && (
         <div className={cn(styles.inputBlock)}>
@@ -80,10 +78,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
               {visibleDescription(mutationsEnable[0].description)}
             </div>
             <div className={cn(styles.inputRegistries, styles.author)}>
-              {mutationsEnable[0].id.split('/')[1]}{' '}
-              <span className={cn(styles.authorAddress)}>
-                {visible(mutationsEnable[0].id.split('/')[0], 15)}
-              </span>{' '}
+              {mutationsEnable[0].id}{' '}
             </div>
           </div>
 
@@ -107,19 +102,15 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                   enableMutation(r.id, setOpen)
                 }}
                 key={i}
-                className={cn(styles.inputBlock, styles.item,{
-                    [styles.enable]: r.id === mutationsEnable[0].id
+                className={cn(styles.inputBlock, styles.item, {
+                  [styles.enable]: r.id === mutationsEnable[0].id,
                 })}
               >
                 <span className={cn(styles.inputRegistries, styles.description)}>
                   {visibleDescription(r.description)}
                 </span>
                 <div className={cn(styles.inputRegistries, styles.author)}>
-                  {r.id.split('/')[1]}
-                  {'  '}
-                  <span className={cn(styles.authorAddress)}>
-                    {visible(r.id.split('/')[0], 15)}
-                  </span>{' '}
+                  {visibleDescription(r.id)}
                 </div>
               </div>
             ))}

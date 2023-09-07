@@ -51,7 +51,6 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  width: 24px;
 
   animation-name: rotate-is-close;
   animation-duration: 0.2s;
@@ -90,9 +89,9 @@
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
-  svg {
-    transform: translateX(-13px);
-  }
+  // svg {
+  //   transform: translateX(-13px);
+  // }
 }
 
 .registriesList {
@@ -200,7 +199,7 @@
   border-radius: 4px;
   cursor: pointer;
   position: relative;
-  .inputRegistries{
+  .inputRegistries {
     background: #fff;
   }
   &::before {
@@ -220,7 +219,7 @@
   &::before {
     background: #34d31a;
   }
-  .inputRegistries{
-    background: #f7f7f7
+  .inputRegistries {
+    background: #f7f7f7;
   }
 }

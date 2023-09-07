@@ -43,7 +43,7 @@ export interface SettingsOverlayProps {
 
 export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
   const { setOpenWallet, connectedDescriptors, selectedWallet, initModules } = props
-  const [activeTab, setActiveTab] = useState(SettingsTabs.SETTINGS)
+  const [activeTab, setActiveTab] = useState(SettingsTabs.BOS)
   const [activeTaDappletsDetails, setActiveTabDappletsDetails] = useState(DappletsDetails.MAININFO)
   const [activeTabUnderConstructionDetails, setActiveTabUnderConstructionDetails] = useState(
     UnderConstructionDetails.INFO
