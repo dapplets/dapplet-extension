@@ -8510,9 +8510,9 @@ near-api-js@^0.39.0:
     text-encoding-utf-8 "^1.0.2"
     tweetnacl "^1.0.1"
 
-"near-social-vm@github:NearSocial/VM#2.3.2":
+"near-social-vm@github:dapplets/near-social-vm":
   version "2.3.2"
-  resolved "https://codeload.github.com/NearSocial/VM/tar.gz/901945dddea1e9e81f42e9d60b00ac9d3c1e9909"
+  resolved "https://codeload.github.com/dapplets/near-social-vm/tar.gz/4ccc1ea125b91d96d87000459cb5ddea4ec39c12"
   dependencies:
     "@braintree/sanitize-url" "6.0.0"
     "@radix-ui/react-accordion" "^1.1.1"
