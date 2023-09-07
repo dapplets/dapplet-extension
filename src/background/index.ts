@@ -260,6 +260,8 @@ browser.runtime.onMessage.addListener(
       globalConfigService.setAllUserSettings(moduleName, values),
     setBosOverrides: globalConfigService.setBosOverrides.bind(globalConfigService),
     getBosOverrides: globalConfigService.getBosOverrides.bind(globalConfigService),
+    getMutation: globalConfigService.getMutation.bind(globalConfigService),
+    setMutation: globalConfigService.setMutation.bind(globalConfigService),
 
     // ENS
     resolveName: (name) => ensService.resolveName(name),
@@ -325,7 +327,7 @@ browser.runtime.onMessage.addListener(
 
     // BOS Mutations Service
     getAllMutations: mutationRegistryService.getAllMutations.bind(mutationRegistryService),
-    getMutation: mutationRegistryService.getMutation.bind(mutationRegistryService),
+    getMutationById: mutationRegistryService.getMutationById.bind(mutationRegistryService),
     getMutationsByAuthor:
       mutationRegistryService.getMutationsByAuthor.bind(mutationRegistryService),
     createMutation: mutationRegistryService.createMutation.bind(mutationRegistryService),

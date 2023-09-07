@@ -7,11 +7,19 @@ export type InputProps = {
   value: string
   error?: string
   placeholder?: string
+  disabled?: boolean
   onChange: (value: string) => void
   onError?: (error: string) => void
 }
 
-export const Input: React.FC<InputProps> = ({ value, error, placeholder, onChange, onError }) => {
+export const Input: React.FC<InputProps> = ({
+  value,
+  error,
+  placeholder,
+  disabled,
+  onChange,
+  onError,
+}) => {
   const inputRef = useRef<HTMLInputElement>()
 
   return (
@@ -31,6 +39,7 @@ export const Input: React.FC<InputProps> = ({ value, error, placeholder, onChang
       >
         <input
           spellCheck={false}
+          disabled={disabled}
           className={cn(styles.inputDefault, {})}
           placeholder={placeholder}
           ref={inputRef}
@@ -43,7 +52,9 @@ export const Input: React.FC<InputProps> = ({ value, error, placeholder, onChang
             onError?.(null)
           }}
         />
-        {value && <Delete onClick={() => onChange('')} className={styles.deleteUserAgentName} />}
+        {value && !disabled && (
+          <Delete onClick={() => onChange('')} className={styles.deleteUserAgentName} />
+        )}
       </form>
       {error ? <div className={styles.errorMessage}>{error}</div> : null}
     </>

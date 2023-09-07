@@ -77,4 +77,6 @@ export class GlobalConfig extends Base {
   bosOverrides: {
     [widgetSrc: string]: string
   } = {}
+
+  mutation: string = null
 }

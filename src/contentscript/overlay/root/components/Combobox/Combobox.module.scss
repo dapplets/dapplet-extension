@@ -1,0 +1,269 @@
+@import '../../assets/styles/null';
+@import '../../assets/styles/fonts';
+@import '../../assets/styles/color.variables';
+@import '../../assets/styles/animate';
+
+.wrapper {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: auto;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
+  color: $main-grey;
+
+  background: #ebebeb;
+  border-radius: 10px;
+}
+
+.activeRegistry {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.activeLink {
+  display: inline-block;
+  background: #dad9d9;
+}
+
+.openList {
+  cursor: pointer;
+
+  display: block;
+
+  width: 24px;
+  height: 24px;
+
+  animation-name: rotate-is-close;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    fill: none !important;
+
+    path {
+      fill: none !important;
+      stroke: #919191;
+    }
+
+    &:hover {
+      fill: none !important;
+
+      path {
+        fill: none !important;
+        stroke: $content-black;
+      }
+    }
+
+    &:active {
+      fill: none !important;
+
+      path {
+        fill: none !important;
+      }
+    }
+  }
+}
+
+.isOpen {
+  animation-name: rotate-is-open;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+}
+
+.delimiterSpan {
+  display: flex;
+  justify-content: flex-start;
+  width: 97%;
+}
+
+.registriesList {
+  position: absolute;
+  z-index: 3;
+  top: -1px;
+  left: -1px;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100.5%;
+  padding-top: 1px;
+
+  background: #ebebeb;
+  border-radius: 10px;
+
+  animation-name: list-visible;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+
+  div:last-child {
+    border-radius: 0 0 10px 10px;
+  }
+}
+
+.inputBlock {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 6.5px 13px;
+}
+
+.inputRegistries {
+  display: inline-block;
+
+  width: 97.5%;
+  height: 21px;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
+  color: $main-grey;
+
+  background: inherit;
+}
+
+.errorInput {
+  border: 1px solid $primary;
+
+  input {
+    color: $primary;
+  }
+}
+
+.errorMessage {
+  display: flex;
+
+  width: 100%;
+
+  font-family: Roboto, sans-serif;
+  font-weight: 400;
+  color: #d9304f;
+
+  animation-name: open-error;
+  animation-duration: 3s;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.inputBlockandError {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.itemRegistries {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6.5px 13px;
+
+  &:hover {
+    background: $stroke-color;
+  }
+
+  &:active {
+    background: #dad9d9;
+  }
+}
+
+.registrieslink {
+  cursor: pointer;
+}
+
+.deleteUsersContainer {
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 25px;
+  height: 25px;
+}
+
+.deleteRegistryes {
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 20px;
+  height: 20px;
+
+  background: #f5f5f5;
+  border-radius: 100px;
+  box-shadow: 0 2px 2px rgb(0 0 0 / 10%);
+
+  transition: 0.5s all;
+
+  // ToDo: looks that the code below is duplicated
+
+  svg {
+    fill: none !important;
+
+    path {
+      fill: none !important;
+      stroke: #919191;
+    }
+
+    &:hover {
+      transform: scale(1.5);
+      fill: none !important;
+
+      path {
+        fill: none !important;
+      }
+    }
+
+    &:active {
+      fill: none !important;
+
+      path {
+        fill: none !important;
+      }
+    }
+  }
+
+  &:hover {
+    width: 25px;
+    height: 25px;
+    transition: 0.5s all;
+  }
+
+  &:active {
+    transition: 0.5s all;
+  }
+}
+
+:focus::input-placeholder {
+  color: transparent;
+}
+
+:focus::placeholder {
+  color: transparent;
+}
+
+:focus:placeholder {
+  color: transparent;
+}
+
+:focus:input-placeholder {
+  color: transparent;
+}
