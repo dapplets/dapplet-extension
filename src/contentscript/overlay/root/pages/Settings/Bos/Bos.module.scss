@@ -67,7 +67,7 @@
   align-items: center;
   justify-content: center;
 
-  width: 228px;
+  width: 128px;
   height: 33px;
   padding: 0 10px;
 
@@ -96,10 +96,50 @@
   }
 }
 
-.bottomContainer {
+.btnPreview {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  width: 128px;
+  height: 33px;
+  padding: 0 10px;
+
+  font-family: Roboto, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 100%;
+  color: $primary;
+  text-align: center;
+  text-transform: uppercase;
+
+  background-color: $pure-white;
+  border: 1px solid $primary;
+  border-radius: 4px;
+
+  &:hover {
+    color: $primary-hover;
+    border-color: $primary-hover;
+  }
+
+  &:active {
+    color: $primary-pressed;
+    border-color: $primary-pressed;
+  }
+
+  &:disabled {
+    cursor: default;
+    color: $primary-hover;
+    border-color: $primary-hover;
+  }
+}
+
+.bottomContainer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+
   padding: 10px 0;
 }
 

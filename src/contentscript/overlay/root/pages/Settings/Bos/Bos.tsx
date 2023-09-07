@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { FC, useEffect, useState } from 'react'
 import browser from 'webextension-polyfill'
+import * as EventBus from '../../../../../../common/global-event-bus'
 import { ChainTypes, DefaultSigners, MutationRecord } from '../../../../../../common/types'
 import { Input } from '../../../components/Input'
 import { SettingItem } from '../../../components/SettingItem'
@@ -80,6 +81,10 @@ export const Bos: FC = () => {
     })
   }
 
+  function handlePreviewClick() {
+    EventBus.emit('bos_mutation_preview', mutation.overrides)
+  }
+
   function hanldeInputChange(fromSrc: string, toSrc: string) {
     setMutation((mut) => ({ ...mut, overrides: { ...mut.overrides, [fromSrc]: toSrc } }))
     setIsEdited(true)
@@ -151,6 +156,9 @@ export const Bos: FC = () => {
           </SettingWrapper>
         ) : null}
         <div className={styles.bottomContainer}>
+          <button className={styles.btnPreview} disabled={!isEdited} onClick={handlePreviewClick}>
+            Preview
+          </button>
           <button className={styles.btnCreate} disabled={!isEdited} onClick={handleSaveClick}>
             Save
           </button>

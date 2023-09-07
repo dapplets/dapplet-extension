@@ -45,6 +45,11 @@ export function Component({ src, props }: { src: string; props: any }) {
     return () => EventBus.off('bos_mutation_changed', loadOverrides)
   }, [loadOverrides])
 
+  React.useEffect(() => {
+    EventBus.on('bos_mutation_preview', setOverrides)
+    return () => EventBus.off('bos_mutation_preview', setOverrides)
+  }, [])
+
   if (!EthersProviderContext.Provider || isLoading) {
     return null
   }
