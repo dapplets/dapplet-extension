@@ -2,8 +2,9 @@
   position: fixed;
   z-index: 2147483647;
   top: 0;
-  left: 100%;
-
+  /* todo uncomment after boss hack */
+  /* left: 100%; */
+  left: 95%;
   /* -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none; */
@@ -52,7 +53,8 @@
   .dapplets-overlay-frame {
     transform: translateX(-100%);
     width: 470px !important;
-    transition: transform 0.15s cubic-bezier(0.55, 0, 0.2, 0.8);
+     /* todo uncomment after boss hack */
+    /* transition: transform 0.15s cubic-bezier(0.55, 0, 0.2, 0.8); */
   }
 }
 

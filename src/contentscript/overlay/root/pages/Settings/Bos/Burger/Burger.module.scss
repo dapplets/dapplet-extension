@@ -1,0 +1,15 @@
+@import '../../../../assets/styles/fonts';
+@import '../../../../assets/styles/color.variables';
+@import '../../../../assets/styles/null';
+
+.wrapper{
+    width: 34px;
+    height: 34px;
+    background: inherit;
+   transition: all ease 0.2s;
+    &:hover{
+        transform: scale(1.2);
+        opacity: 0.3;
+        transition: all ease 0.2s;
+    }
+}

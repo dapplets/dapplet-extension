@@ -1,0 +1,28 @@
+@import '../../../../assets/styles/fonts';
+@import '../../../../assets/styles/color.variables';
+@import '../../../../assets/styles/null';
+.layout{
+  position: fixed;
+  top: 0;
+//  transition: all ease 0.2s;
+  width: 100vw;
+  height: 1px;
+  z-index: -1;
+}
+.wrapper {
+  margin: 0 auto;
+  position: relative;
+  // z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 284px;
+  height: 57px;
+  padding: 10px;
+  border-radius: 0px 0px 4px 4px;
+  border-left: 1px solid #D5DAE2 ;
+  border-right: 1px solid #D5DAE2;
+  border-bottom: 1px solid #D5DAE2;
+  background: $pure-white;
+}

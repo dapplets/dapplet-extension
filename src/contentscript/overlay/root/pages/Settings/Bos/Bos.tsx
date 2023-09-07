@@ -31,7 +31,10 @@ export const Bos: FC = () => {
 
   useEffect(() => {
     ;(async () => {
-      const { getBosOverrides } = await initBGFunctions(browser)
+      const { getBosOverrides,getAllMutations } = await initBGFunctions(browser)
+      const x = await getAllMutations()
+      console.log(x);
+      
       const overrides = await getBosOverrides()
       setOverrides(overrides)
     })()
