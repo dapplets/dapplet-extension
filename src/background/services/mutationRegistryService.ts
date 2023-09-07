@@ -14,14 +14,14 @@ export default class MutationRegistryService {
     })
 
   private async _getContract() {
-    const contractNetwork = 'testnet'
+    const contractNetwork = 'mainnet'
     switch (contractNetwork) {
-      case 'testnet':
+      case 'mainnet':
         if (!this._testnetContract) {
-          const contractAddress = 'dev-1694040644977-75002385830517'
+          const contractAddress = 'mutations.dapplets.near'
           const near_account = await this._walletService.near_getAccount(
             DefaultSigners.EXTENSION,
-            ChainTypes.NEAR_TESTNET
+            ChainTypes.NEAR_MAINNET
           )
           this._testnetContract = this._createContract(near_account, contractAddress)
         }

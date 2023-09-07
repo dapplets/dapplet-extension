@@ -34,7 +34,7 @@ export const Bos: FC = () => {
       const { getMutation, getMutationById, getAddress } = await initBGFunctions(browser)
       const mutationId = await getMutation()
       const mutation = await getMutationById(mutationId)
-      const currentAccount = await getAddress(DefaultSigners.EXTENSION, ChainTypes.NEAR_TESTNET)
+      const currentAccount = await getAddress(DefaultSigners.EXTENSION, ChainTypes.NEAR_MAINNET)
       // ToDo: why getAddress returns 0x0000000000000000000000000000000000000000 ???
       setCurrentAccount(
         currentAccount === '0x0000000000000000000000000000000000000000' ? null : currentAccount
