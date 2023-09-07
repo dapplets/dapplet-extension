@@ -223,3 +223,20 @@
     background: #f7f7f7;
   }
 }
+.labelBlock {
+  display: flex;
+  height: 13px;
+  width: 49px;
+
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  font-family: Segoe UI, sans-serif;
+  color: $pure-white;
+  background: #db504a;
+  border-radius: 10px;
+  margin-top: 3px;
+  font-size: 8px;
+  font-weight: 700;
+  // line-height: normal;
+}

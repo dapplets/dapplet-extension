@@ -112,6 +112,9 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                 <div className={cn(styles.inputRegistries, styles.author)}>
                   {visibleDescription(r.id)}
                 </div>
+                {r.id === 'alsakhaev.testnet/test-mutation' ? (
+                  <div className={styles.labelBlock}>Popular</div>
+                ) : null}
               </div>
             ))}
         </div>
