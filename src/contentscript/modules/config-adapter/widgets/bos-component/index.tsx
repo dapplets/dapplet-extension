@@ -28,9 +28,10 @@ export function Component({ src, props }: { src: string; props: any }) {
 
   const loadOverrides = React.useCallback(() => {
     ;(async () => {
-      const { getBosOverrides } = await initBGFunctions(browser)
-      const overrides = await getBosOverrides()
-      setOverrides(overrides)
+      const { getMutation, getMutationById } = await initBGFunctions(browser)
+      const mutationId = await getMutation()
+      const mutation = await getMutationById(mutationId)
+      setOverrides(mutation?.overrides ?? {})
       setIsLoading(false)
     })()
   }, [])
@@ -40,8 +41,8 @@ export function Component({ src, props }: { src: string; props: any }) {
   }, [loadOverrides])
 
   React.useEffect(() => {
-    EventBus.on('bos_overrides_changed', loadOverrides)
-    return () => EventBus.off('bos_overrides_changed', loadOverrides)
+    EventBus.on('bos_mutation_changed', loadOverrides)
+    return () => EventBus.off('bos_mutation_changed', loadOverrides)
   }, [loadOverrides])
 
   if (!EthersProviderContext.Provider || isLoading) {

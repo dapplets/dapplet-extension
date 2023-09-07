@@ -895,6 +895,7 @@ export default class GlobalConfigService {
   }
 
   async setMutation(mutation: string) {
-    return this.updateConfig((c) => (c.mutation = mutation))
+    await this.updateConfig((c) => (c.mutation = mutation))
+    EventBus.emit('bos_mutation_changed')
   }
 }

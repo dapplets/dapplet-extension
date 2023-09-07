@@ -61,8 +61,8 @@ export const Bos: FC = () => {
         await updateMutation(mutation)
       } else if (formStatus === FormStatus.Create) {
         await createMutation(mutation)
-        await setMutation(mutation.id)
       }
+      await setMutation(mutation.id)
       setIsEdited(false)
     } catch (err) {
       setIsEdited(true)
@@ -142,7 +142,7 @@ export const Bos: FC = () => {
               >
                 <Input
                   placeholder={'Enter widget source to override'}
-                  value={mutation.overrides[fromSrc]}
+                  value={mutation.overrides[fromSrc] ?? ''}
                   onChange={(toSrc) => hanldeInputChange(fromSrc, toSrc)}
                   disabled={formStatus == FormStatus.View}
                 />
