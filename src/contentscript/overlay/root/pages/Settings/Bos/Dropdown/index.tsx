@@ -11,7 +11,7 @@ export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HT
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
   const { ...anotherProps } = props
   const [isOpen, setOpen] = useState(false)
-  const [mutationsInput, setMutationsInput] = useState('')
+  const [mutationsEnable, setMutationsEnable] = useState(null)
 
   const [mutations, setMutations] = useState([])
 
@@ -24,18 +24,26 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
   }, [])
 
   const loadMutation = async () => {
-    const { getAllMutations } = await initBGFunctions(browser)
+    const { getAllMutations, getMutation } = await initBGFunctions(browser)
     const mutations = await getAllMutations()
+    const mutationsEnable = await getMutation()
+    if (!mutationsEnable || !mutations) return
+    console.log(mutationsEnable.split('/')[1], 'mutationsEnable')
 
+    setMutationsEnable(
+      mutations.filter((x) => x.id.split('/')[1] === mutationsEnable.split('/')[1])
+    )
     setMutations(mutations)
   }
+  console.log(mutations)
+  console.log(mutationsEnable)
 
-  //   const enableMutation = async (url: string, x: (x) => void) => {
-  //     const { enableMutation } = await initBGFunctions(browser)
-  //     await enableMutation(url)
-  //     loadMutation()
-  //     x(false)
-  //   }
+  const enableMutation = async (id: string, x: (x) => void) => {
+    const { setMutation } = await initBGFunctions(browser)
+    await setMutation(id)
+    loadMutation()
+    x(false)
+  }
 
   const visible = (hash: string, length: number): string => {
     if (hash.length > length) {
@@ -43,6 +51,15 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
       const lastCharacters = hash.substring(hash.length - 0, hash.length - 5)
 
       return `${firstCharacters}...${lastCharacters}`
+    } else {
+      return hash
+    }
+  }
+  const visibleDescription = (hash: string): string => {
+    if (hash.length > 25) {
+      const firstCharacters = hash.substring(0, 25)
+
+      return `${firstCharacters}...`
     } else {
       return hash
     }
@@ -56,13 +73,17 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
       // }}
       // tabIndex={0}
     >
-      {mutations.map((r, i) => (
-        <div key={i} className={cn(styles.inputBlock)}>
+      {mutationsEnable && (
+        <div className={cn(styles.inputBlock)}>
           <div className={cn(styles.topBlock)}>
-            <div className={cn(styles.inputRegistries, styles.description)}>{r.description}</div>
+            <div className={cn(styles.inputRegistries, styles.description)}>
+              {visibleDescription(mutationsEnable[0].description)}
+            </div>
             <div className={cn(styles.inputRegistries, styles.author)}>
-              Vestibulum by{' '}
-              <span className={cn(styles.authorAddress)}>{visible(r.authorId, 15)}</span>{' '}
+              {mutationsEnable[0].id.split('/')[1]}{' '}
+              <span className={cn(styles.authorAddress)}>
+                {visible(mutationsEnable[0].id.split('/')[0], 15)}
+              </span>{' '}
             </div>
           </div>
 
@@ -73,28 +94,35 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
             <DropdownIcon />
           </span>
         </div>
-      ))}
+      )}
 
       {isOpen && (
         <div className={styles.registriesList}>
           <div className={styles.label}>Available mutations</div>
 
-          {mutations.map((r, i) => (
-            <div key={i} className={cn(styles.inputBlock,styles.item)}>
-              <span
-                className={cn(styles.inputRegistries, styles.description)}
+          {mutations.length &&
+            mutations.map((r, i) => (
+              <div
                 onClick={() => {
-                  // enableMutation(r.authorId, setOpen)
+                  enableMutation(r.id, setOpen)
                 }}
+                key={i}
+                className={cn(styles.inputBlock, styles.item,{
+                    [styles.enable]: r.id === mutationsEnable[0].id
+                })}
               >
-                {r.description}
-              </span>
-              <div className={cn(styles.inputRegistries, styles.author)}>
-              Vestibulum by{' '}
-              <span className={cn(styles.authorAddress)}>{visible(r.authorId, 15)}</span>{' '}
-            </div>
-            </div>
-          ))}
+                <span className={cn(styles.inputRegistries, styles.description)}>
+                  {visibleDescription(r.description)}
+                </span>
+                <div className={cn(styles.inputRegistries, styles.author)}>
+                  {r.id.split('/')[1]}
+                  {'  '}
+                  <span className={cn(styles.authorAddress)}>
+                    {visible(r.id.split('/')[0], 15)}
+                  </span>{' '}
+                </div>
+              </div>
+            ))}
         </div>
       )}
     </div>
