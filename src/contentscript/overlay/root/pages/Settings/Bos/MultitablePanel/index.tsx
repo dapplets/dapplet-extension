@@ -3,11 +3,14 @@ import React, { FC, useEffect } from 'react'
 import { Burger } from '../Burger'
 import { Dropdown } from '../Dropdown'
 import styles from './MultitablePanel.module.scss'
-
-export const MultitablePanel: FC = () => {
-  useEffect(() => {
-    console.log(window.innerWidth)
-  }, [window.innerWidth])
+interface MultitablePanelProps {
+  navigate?: any
+  pathname?: string
+  onToggleClick: () => void
+}
+export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
+  const { navigate, pathname, onToggleClick } = props
+  useEffect(() => {}, [window.innerWidth])
 
   return (
     <div
@@ -24,7 +27,7 @@ export const MultitablePanel: FC = () => {
       className={cn(styles.layout)}
     >
       <div className={cn(styles.wrapper)}>
-        <Burger />
+        <Burger onToggleClick={onToggleClick} navigate={navigate} pathname={pathname} />
         <Dropdown />
       </div>
     </div>
