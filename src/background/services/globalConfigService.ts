@@ -36,7 +36,6 @@ const EXPORTABLE_PROPERTIES = [
   'connectedAccountsTestnetContractAddress',
   'connectedAccountsMainnetContractAddress',
   'preferredConnectedAccountsNetwork',
-  'bosOverrides',
   'mutation',
 ]
 
@@ -75,7 +74,6 @@ export default class GlobalConfigService {
           this.getInitialConfig().preferredConnectedAccountsNetwork
       if (!config.pinnedDappletActions)
         config.pinnedDappletActions = this.getInitialConfig().pinnedDappletActions
-      if (!config.bosOverrides) config.bosOverrides = this.getInitialConfig().bosOverrides
       if (!config.mutation) config.mutation = this.getInitialConfig().mutation
     }
 
@@ -866,27 +864,6 @@ export default class GlobalConfigService {
     }
 
     return false
-  }
-
-  async setBosOverrides(overrides: { [widgetSrc: string]: string }) {
-    for (const key in overrides) {
-      if (!overrides[key]) {
-        delete overrides[key]
-      }
-    }
-
-    await this.updateConfig((c) => (c.bosOverrides = overrides))
-    EventBus.emit('bos_overrides_changed')
-  }
-
-  async getBosOverrides() {
-    const overrides = await this.get().then((x) => x.bosOverrides)
-    for (const key in overrides) {
-      if (!overrides[key]) {
-        delete overrides[key]
-      }
-    }
-    return overrides
   }
 
   async getMutation() {
