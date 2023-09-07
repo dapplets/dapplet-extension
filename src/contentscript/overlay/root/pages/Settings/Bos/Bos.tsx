@@ -15,15 +15,17 @@ enum FormStatus {
   Edit,
 }
 
+const EMPTY_MUTATION = {
+  id: '',
+  description: '',
+  overrides: {},
+}
+
 export const Bos: FC = () => {
   const [formStatus, setFormStatus] = useState<FormStatus>(FormStatus.View)
   const [isEdited, setIsEdited] = useState(false)
   const [currentAccount, setCurrentAccount] = useState(null)
-  const [mutation, setMutation] = useState<MutationRecord>({
-    id: '',
-    description: '',
-    overrides: {},
-  })
+  const [mutation, setMutation] = useState<MutationRecord>(EMPTY_MUTATION)
 
   const inViewComponents = useVisibleBosComponents()
 
@@ -37,7 +39,7 @@ export const Bos: FC = () => {
       setCurrentAccount(
         currentAccount === '0x0000000000000000000000000000000000000000' ? null : currentAccount
       )
-      setMutation(mutation)
+      setMutation(mutation ?? EMPTY_MUTATION)
     })()
   }, [])
 
