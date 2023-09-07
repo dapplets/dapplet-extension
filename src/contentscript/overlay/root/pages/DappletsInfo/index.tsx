@@ -70,7 +70,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     init()
 
     return () => {}
-  }, [mi, newState, targetChain])
+  }, [])
 
   const _updateData = async () => {
     const { getRegistries, getContextIds, getTargetStorages } = await initBGFunctions(browser)
