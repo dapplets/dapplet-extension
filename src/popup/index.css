@@ -2,39 +2,47 @@
     font-family:'Segoe UI';
     src: url("../contentscript/overlay/root/assets/fonts/Segoe_UI.ttf");
 }
+
 body {
-    width: 305px;
-    height: 80px;
     display: flex;
     flex-direction: column;
+
+    width: 305px;
+    height: 80px;
     padding: 6px;
 }
+
 header {
     display: flex;
-    align-items: center;
-    font-family: Segoe UI, sans-serif;
+    align-items: center; 
+
+    margin-bottom: 6px;
+
+    font-family: "Segoe UI", sans-serif;
     font-size: 14px;
     font-weight: 400;
     line-height: 149%;
-    color: #5AB5E8; 
-    margin-bottom: 6px;
+    color: #5AB5E8;
 }
+
 svg {
     margin-right: 5px;
 }
+
 div{
-    font-family: Segoe UI;
+    font-family: "Segoe UI";
     font-size: 12px;
-    font-style: normal;
     font-weight: 400;
+    font-style: normal;
     line-height: 149%;
     color: #747376;
 }
+
 a{
-    font-family: Segoe UI;
+    font-family: "Segoe UI";
     font-size: 12px;
-    font-style: normal;
     font-weight: 400;
+    font-style: normal;
     line-height: 149%;
     color: #588ca3;
     text-decoration-line: underline;
