@@ -74,7 +74,5 @@ export class GlobalConfig extends Base {
 
   pinnedDappletActions: { dappletName: string; widgetPinId: string }[] = []
 
-  bosOverrides: {
-    [widgetSrc: string]: string
-  } = {}
+  mutation: string = null
 }

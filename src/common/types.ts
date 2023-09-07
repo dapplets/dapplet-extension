@@ -290,14 +290,11 @@ export type BaseEvent = {
   type: string
 }
 
-export type MutationOverride = {
-  fromSrc: string
-  toSrc: string
-}
-
 export type MutationRecord = {
-  authorId: string
-  mutationId: string
+  id: string
   description: string
-  overrides: MutationOverride[]
+  isDraft?: boolean
+  overrides: {
+    [fromSrc: string]: string
+  }
 }

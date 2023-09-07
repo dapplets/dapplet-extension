@@ -1,103 +1,150 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { FC, useEffect, useState } from 'react'
 import browser from 'webextension-polyfill'
+import { ChainTypes, DefaultSigners, MutationRecord } from '../../../../../../common/types'
 import { Input } from '../../../components/Input'
 import { SettingItem } from '../../../components/SettingItem'
 import { SettingWrapper } from '../../../components/SettingWrapper'
 import styles from './Bos.module.scss'
+import { useVisibleBosComponents } from './useVisibleBosComponents'
 
-const EXCLUDED_COMPONENTS = ['near/widget/TosCheck']
+enum FormStatus {
+  View,
+  Create,
+  Edit,
+}
 
 export const Bos: FC = () => {
-  const [inViewComponents, setInViewComponents] = useState<string[]>([])
-  const [overrides, setOverrides] = useState<{ [widgetSrc: string]: string }>({})
+  const [formStatus, setFormStatus] = useState<FormStatus>(FormStatus.View)
   const [isEdited, setIsEdited] = useState(false)
+  const [currentAccount, setCurrentAccount] = useState(null)
+  const [mutation, setMutation] = useState<MutationRecord>({
+    id: '',
+    description: '',
+    overrides: {},
+  })
 
-  useEffect(() => {
-    const widgets = Array.from(document.querySelectorAll('.dapplet-widget'))
-    const bosComponents = widgets
-      .map((el) =>
-        Array.from(el.shadowRoot.querySelectorAll('*[data-bos-src]')).map((bos) =>
-          bos.getAttribute('data-bos-src')
-        )
-      )
-      .flat()
-    const uniqueIds = Array.from(new Set(bosComponents)).filter(
-      (comp) => !EXCLUDED_COMPONENTS.includes(comp)
-    )
-
-    setInViewComponents(uniqueIds)
-  }, [])
+  const inViewComponents = useVisibleBosComponents()
 
   useEffect(() => {
     ;(async () => {
-      const { getBosOverrides,getAllMutations } = await initBGFunctions(browser)
-      const x = await getAllMutations()
-      console.log(x);
-      
-      const overrides = await getBosOverrides()
-      setOverrides(overrides)
+      const { getMutation, getMutationById, getAddress } = await initBGFunctions(browser)
+      const mutationId = await getMutation()
+      const mutation = await getMutationById(mutationId)
+      const currentAccount = await getAddress(DefaultSigners.EXTENSION, ChainTypes.NEAR_TESTNET)
+      // ToDo: why getAddress returns 0x0000000000000000000000000000000000000000 ???
+      setCurrentAccount(
+        currentAccount === '0x0000000000000000000000000000000000000000' ? null : currentAccount
+      )
+      setMutation(mutation)
     })()
   }, [])
 
-  function handleForkClick(widgetSrc: string) {
+  useEffect(() => {
+    const [authorId] = mutation.id.split('/')
+    if (mutation.isDraft) {
+      setFormStatus(FormStatus.Create)
+    } else {
+      setFormStatus(authorId === currentAccount ? FormStatus.Edit : FormStatus.View)
+    }
+  }, [currentAccount, mutation])
+
+  function handleEditComponentClick(widgetSrc: string) {
     const url = 'https://near.org/near/widget/ComponentDetailsPage?src=' + widgetSrc
     window.open(url, '_blank')
   }
 
   async function handleSaveClick() {
-    const { setBosOverrides } = await initBGFunctions(browser)
-    await setBosOverrides(overrides)
-    setIsEdited(false)
+    try {
+      const { updateMutation, createMutation, setMutation } = await initBGFunctions(browser)
+      if (formStatus === FormStatus.Edit) {
+        await updateMutation(mutation)
+      } else if (formStatus === FormStatus.Create) {
+        await createMutation(mutation)
+      }
+      await setMutation(mutation.id)
+      setIsEdited(false)
+    } catch (err) {
+      setIsEdited(true)
+      console.error(err)
+    }
+  }
+
+  async function handleForkMutationClick() {
+    if (!currentAccount) return
+    setIsEdited(true)
+    setMutation((mut) => {
+      const [, mutationId] = mut.id.split('/')
+      const id = currentAccount + '/' + mutationId + '-Fork'
+      return { ...mut, id, isDraft: true }
+    })
   }
 
   function hanldeInputChange(fromSrc: string, toSrc: string) {
-    setOverrides((overrides) => ({ ...overrides, [fromSrc]: toSrc }))
+    setMutation((mut) => ({ ...mut, overrides: { ...mut.overrides, [fromSrc]: toSrc } }))
     setIsEdited(true)
   }
 
-  const outOfViewComponents = Object.keys(overrides).filter(
-    (src) => !inViewComponents.includes(src)
-  )
+  function handleIdInputChange(id: string) {
+    setMutation((mut) => ({ ...mut, id }))
+  }
+
+  function handleDescriptionInputChange(description: string) {
+    setMutation((mut) => ({ ...mut, description }))
+    setIsEdited(true)
+  }
+
+  const outOfView = inViewComponents.filter((x) => !Object.keys(mutation.overrides).includes(x))
+  const allOverrides = [...Object.keys(mutation.overrides), ...outOfView].sort()
 
   return (
     <div className={styles.blockSettings}>
       <div className={styles.scrollBlock}>
-        <SettingWrapper className={styles.wrapperSettings} title="In View">
-          {inViewComponents.map((widgetSrc, i) => (
-            <SettingItem
-              key={i}
-              title={widgetSrc}
-              component={
-                <button className={styles.forkButton} onClick={() => handleForkClick(widgetSrc)}>
+        <SettingWrapper className={styles.wrapperSettings} title="General">
+          <SettingItem
+            title="Current Mutation"
+            component={
+              currentAccount && formStatus !== FormStatus.Create ? (
+                <button className={styles.forkButton} onClick={() => handleForkMutationClick()}>
                   Fork
                 </button>
-              }
-            >
-              <Input
-                placeholder={'Enter widget source to override'}
-                value={overrides[widgetSrc] ?? ''}
-                onChange={(toSrc) => hanldeInputChange(widgetSrc, toSrc)}
-              />
-            </SettingItem>
-          ))}
+              ) : null
+            }
+          >
+            <Input
+              value={mutation.id}
+              onChange={handleIdInputChange}
+              disabled={formStatus !== FormStatus.Create}
+            />
+          </SettingItem>
+          <SettingItem title="Description">
+            <Input
+              value={mutation.description}
+              onChange={handleDescriptionInputChange}
+              disabled={formStatus == FormStatus.View}
+            />
+          </SettingItem>
         </SettingWrapper>
-        {outOfViewComponents.length > 0 ? (
-          <SettingWrapper className={styles.wrapperSettings} title="Out of View">
-            {outOfViewComponents.map((widgetSrc, i) => (
+        {allOverrides.length > 0 ? (
+          <SettingWrapper className={styles.wrapperSettings} title="Overrides">
+            {allOverrides.map((fromSrc, i) => (
               <SettingItem
                 key={i}
-                title={widgetSrc}
+                title={fromSrc}
                 component={
-                  <button className={styles.forkButton} onClick={() => handleForkClick(widgetSrc)}>
-                    Fork
+                  <button
+                    className={styles.forkButton}
+                    onClick={() => handleEditComponentClick(fromSrc)}
+                  >
+                    Edit
                   </button>
                 }
               >
                 <Input
                   placeholder={'Enter widget source to override'}
-                  value={overrides[widgetSrc] ?? ''}
-                  onChange={(toSrc) => hanldeInputChange(widgetSrc, toSrc)}
+                  value={mutation.overrides[fromSrc] ?? ''}
+                  onChange={(toSrc) => hanldeInputChange(fromSrc, toSrc)}
+                  disabled={formStatus == FormStatus.View}
                 />
               </SettingItem>
             ))}

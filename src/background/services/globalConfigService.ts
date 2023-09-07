@@ -36,7 +36,7 @@ const EXPORTABLE_PROPERTIES = [
   'connectedAccountsTestnetContractAddress',
   'connectedAccountsMainnetContractAddress',
   'preferredConnectedAccountsNetwork',
-  'bosOverrides',
+  'mutation',
 ]
 
 export default class GlobalConfigService {
@@ -74,7 +74,7 @@ export default class GlobalConfigService {
           this.getInitialConfig().preferredConnectedAccountsNetwork
       if (!config.pinnedDappletActions)
         config.pinnedDappletActions = this.getInitialConfig().pinnedDappletActions
-      if (!config.bosOverrides) config.bosOverrides = this.getInitialConfig().bosOverrides
+      if (!config.mutation) config.mutation = this.getInitialConfig().mutation
     }
 
     return config ?? this.getInitialConfig()
@@ -334,6 +334,7 @@ export default class GlobalConfigService {
     config.connectedAccountsMainnetContractAddress = 'connected-accounts.near'
     config.preferredConnectedAccountsNetwork = NearNetworks.Mainnet
     config.pinnedDappletActions = []
+    config.mutation = 'alsakhaev.near/test-mutation'
     return config
   }
 
@@ -865,24 +866,13 @@ export default class GlobalConfigService {
     return false
   }
 
-  async setBosOverrides(overrides: { [widgetSrc: string]: string }) {
-    for (const key in overrides) {
-      if (!overrides[key]) {
-        delete overrides[key]
-      }
-    }
-
-    await this.updateConfig((c) => (c.bosOverrides = overrides))
-    EventBus.emit('bos_overrides_changed')
+  async getMutation() {
+    const config = await this.get()
+    return config.mutation
   }
 
-  async getBosOverrides() {
-    const overrides = await this.get().then((x) => x.bosOverrides)
-    for (const key in overrides) {
-      if (!overrides[key]) {
-        delete overrides[key]
-      }
-    }
-    return overrides
+  async setMutation(mutation: string) {
+    await this.updateConfig((c) => (c.mutation = mutation))
+    EventBus.emit('bos_mutation_changed')
   }
 }
