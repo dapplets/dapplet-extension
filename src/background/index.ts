@@ -23,6 +23,7 @@ import FeatureService from './services/featureService'
 import GithubService from './services/githubService'
 import GlobalConfigService from './services/globalConfigService'
 import ModuleManagerService from './services/moduleManagerService'
+import MutationRegistryService from './services/mutationRegistryService'
 import { NotificationService } from './services/notificationService'
 import { OverlayService } from './services/overlayService'
 import ProxyService from './services/proxyService'
@@ -77,6 +78,7 @@ const underConstructionService = new UnderConstructionService(
   overlayService,
   storageAggregator
 )
+const mutationRegistryService = new MutationRegistryService(walletService)
 
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
@@ -320,6 +322,14 @@ browser.runtime.onMessage.addListener(
 
     // Analytics Service
     track: analyticsService.track.bind(analyticsService),
+
+    // BOS Mutations Service
+    getAllMutations: mutationRegistryService.getAllMutations.bind(mutationRegistryService),
+    getMutation: mutationRegistryService.getMutation.bind(mutationRegistryService),
+    getMutationsByAuthor:
+      mutationRegistryService.getMutationsByAuthor.bind(mutationRegistryService),
+    createMutation: mutationRegistryService.createMutation.bind(mutationRegistryService),
+    updateMutation: mutationRegistryService.updateMutation.bind(mutationRegistryService),
 
     // Helpers
     waitTab: (url) => waitTab(url),

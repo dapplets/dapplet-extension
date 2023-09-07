@@ -289,3 +289,15 @@ export type BaseEvent = {
   namespace: string
   type: string
 }
+
+export type MutationOverride = {
+  fromSrc: string
+  toSrc: string
+}
+
+export type MutationRecord = {
+  authorId: string
+  mutationId: string
+  description: string
+  overrides: MutationOverride[]
+}
