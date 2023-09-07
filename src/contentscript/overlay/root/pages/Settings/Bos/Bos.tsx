@@ -30,7 +30,7 @@ export const Bos: FC = () => {
   const inViewComponents = useVisibleBosComponents()
 
   useEffect(() => {
-    ;(async () => {
+    const load = async () => {
       const { getMutation, getMutationById, getAddress } = await initBGFunctions(browser)
       const mutationId = await getMutation()
       const mutation = await getMutationById(mutationId)
@@ -40,7 +40,12 @@ export const Bos: FC = () => {
         currentAccount === '0x0000000000000000000000000000000000000000' ? null : currentAccount
       )
       setMutation(mutation ?? EMPTY_MUTATION)
-    })()
+    }
+
+    load()
+
+    EventBus.on('bos_mutation_changed', load)
+    return () => EventBus.off('bos_mutation_changed', load)
   }, [])
 
   useEffect(() => {
