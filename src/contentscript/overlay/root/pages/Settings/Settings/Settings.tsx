@@ -3,7 +3,6 @@ import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
 import browser from 'webextension-polyfill'
 import { StorageTypes } from '../../../../../../common/constants'
-import { isValidPostageStampId } from '../../../../../../common/helpers'
 import { ReactComponent as Delete } from '../../../assets/icons/mini-close.svg'
 import { Checkbox } from '../../../components/Checkbox'
 import { DropdownPreferedOverlayStorage } from '../../../components/DropdownPreferedOverlayStorage'
@@ -457,7 +456,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
             />
           </SettingItem>
           {/* todo: hidden or the time being */}
-         {/* <SettingItem title="Swarm Gateway" component={<></>}>
+          {/* <SettingItem title="Swarm Gateway" component={<></>}>
             <InputPanelSettings
               isDynamycAdapter={false}
               isDefaultValueInput={swarmGatewayInputDefault}

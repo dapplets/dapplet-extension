@@ -54,8 +54,8 @@ export class OverlayService {
     )
   }
 
-  public  openPopupOverlay(path: string, tabId?: number) {
-    return  this._openOverlay('OPEN_POPUP_OVERLAY', { path }, tabId)
+  public openPopupOverlay(path: string, tabId?: number) {
+    return this._openOverlay('OPEN_POPUP_OVERLAY', { path }, tabId)
   }
 
   public openDappletHome(moduleName: string, tabId: number) {
