@@ -2,7 +2,11 @@ import * as nearAPI from 'near-api-js'
 import { ChainTypes, DefaultSigners, MutationRecord } from '../../common/types'
 import { WalletService } from './walletService'
 
-const EXCLUDED_MUTATION_IDS = ['dapplets.near/community', 'alsakhaev.near/nft-everywhere']
+const EXCLUDED_MUTATION_IDS = [
+  'dapplets.near/community',
+  'alsakhaev.near/nft-everywhere',
+  'alsakhaev.near/red-mutation',
+]
 
 export default class MutationRegistryService {
   _testnetContract: nearAPI.Contract
