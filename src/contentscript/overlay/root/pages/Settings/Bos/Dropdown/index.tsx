@@ -11,7 +11,7 @@ export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HT
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
   const { ...anotherProps } = props
   const [isOpen, setOpen] = useState(false)
-  const [mutationsEnable, setMutationsEnable] = useState(null)
+  const [selectedMutation, setSelectedMutation] = useState(null)
 
   const [mutations, setMutations] = useState([])
 
@@ -20,19 +20,15 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
       await loadMutation()
     }
     init()
-    return () => {}
   }, [])
 
   const loadMutation = async () => {
     const { getAllMutations, getMutation } = await initBGFunctions(browser)
     const mutations = await getAllMutations()
-    const mutationsEnable = await getMutation()
-    if (!mutationsEnable || !mutations) return
-    console.log(mutationsEnable.split('/')[1], 'mutationsEnable')
+    const selectedMutationId = await getMutation()
+    if (!selectedMutationId || !mutations) return
 
-    setMutationsEnable(
-      mutations.filter((x) => x.id.split('/')[1] === mutationsEnable.split('/')[1])
-    )
+    setSelectedMutation(mutations.find((mut) => mut.id === selectedMutationId))
     setMutations(mutations)
   }
 
@@ -43,19 +39,9 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     x(false)
   }
 
-  const visible = (hash: string, length: number): string => {
-    if (hash.length > length) {
-      const firstCharacters = hash.substring(0, 6)
-      const lastCharacters = hash.substring(hash.length - 0, hash.length - 5)
-
-      return `${firstCharacters}...${lastCharacters}`
-    } else {
-      return hash
-    }
-  }
   const visibleDescription = (hash: string): string => {
-    if (hash.length > 25) {
-      const firstCharacters = hash.substring(0, 25)
+    if (hash.length > 50) {
+      const firstCharacters = hash.substring(0, 50)
 
       return `${firstCharacters}...`
     } else {
@@ -71,25 +57,24 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
       }}
       tabIndex={0}
     >
-      {mutationsEnable && (
-        <div className={cn(styles.inputBlock)}>
-          <div className={cn(styles.topBlock)}>
-            <div className={cn(styles.inputRegistries, styles.description)}>
-              {visibleDescription(mutationsEnable[0].description)}
-            </div>
-            <div className={cn(styles.inputRegistries, styles.author)}>
-              {mutationsEnable[0].id}{' '}
-            </div>
-          </div>
-
-          <span
-            className={cn(styles.openList, { [styles.isOpen]: isOpen })}
-            onClick={() => setOpen(!isOpen)}
-          >
-            <DropdownIcon />
-          </span>
+      <div className={cn(styles.inputBlock)}>
+        <div className={cn(styles.topBlock)}>
+          {selectedMutation && (
+            <>
+              <div className={cn(styles.inputRegistries, styles.description)}>
+                {visibleDescription(selectedMutation.description)}
+              </div>
+              <div className={cn(styles.inputRegistries, styles.author)}>{selectedMutation.id}</div>
+            </>
+          )}
         </div>
-      )}
+        <span
+          className={cn(styles.openList, { [styles.isOpen]: isOpen })}
+          onClick={() => setOpen(!isOpen)}
+        >
+          <DropdownIcon />
+        </span>
+      </div>
 
       {isOpen && (
         <div className={styles.registriesList}>
@@ -103,7 +88,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                 }}
                 key={i}
                 className={cn(styles.inputBlock, styles.item, {
-                  [styles.enable]: r.id === mutationsEnable[0].id,
+                  [styles.enable]: r.id === selectedMutation?.id,
                 })}
               >
                 <span className={cn(styles.inputRegistries, styles.description)}>
@@ -112,7 +97,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                 <div className={cn(styles.inputRegistries, styles.author)}>
                   {visibleDescription(r.id)}
                 </div>
-                {r.id === 'dapplets.near/community' ? (
+                {r.id === 'dapplets.sputnik-dao.near/community' ? (
                   <div className={styles.labelBlock}>Popular</div>
                 ) : null}
               </div>

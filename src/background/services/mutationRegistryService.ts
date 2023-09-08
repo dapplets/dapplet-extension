@@ -2,6 +2,8 @@ import * as nearAPI from 'near-api-js'
 import { ChainTypes, DefaultSigners, MutationRecord } from '../../common/types'
 import { WalletService } from './walletService'
 
+const EXCLUDED_MUTATION_IDS = ['dapplets.near/community', 'alsakhaev.near/nft-everywhere']
+
 export default class MutationRegistryService {
   _testnetContract: nearAPI.Contract
 
@@ -34,13 +36,15 @@ export default class MutationRegistryService {
   public async getAllMutations(): Promise<MutationRecord[]> {
     const contract = await this._getContract()
     const mutations = await contract['get_all_mutations']()
-    return mutations.map((mutation) => ({
-      id: mutation[0] + '/' + mutation[1],
-      description: mutation[2].description,
-      overrides: Object.fromEntries(
-        mutation[2].overrides.map((override) => [override.from_src, override.to_src])
-      ),
-    }))
+    return mutations
+      .map((mutation) => ({
+        id: mutation[0] + '/' + mutation[1],
+        description: mutation[2].description,
+        overrides: Object.fromEntries(
+          mutation[2].overrides.map((override) => [override.from_src, override.to_src])
+        ),
+      }))
+      .filter((mutation) => !EXCLUDED_MUTATION_IDS.includes(mutation.id))
   }
 
   public async getMutationById(id: string): Promise<MutationRecord | null> {

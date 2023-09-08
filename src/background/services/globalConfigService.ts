@@ -334,7 +334,7 @@ export default class GlobalConfigService {
     config.connectedAccountsMainnetContractAddress = 'connected-accounts.near'
     config.preferredConnectedAccountsNetwork = NearNetworks.Mainnet
     config.pinnedDappletActions = []
-    config.mutation = 'dapplets.near/community'
+    config.mutation = 'dapplets.sputnik-dao.near/community'
     return config
   }
 

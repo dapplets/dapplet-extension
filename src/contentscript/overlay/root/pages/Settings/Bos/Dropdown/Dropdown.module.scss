@@ -4,50 +4,59 @@
 @import '../../../../assets/styles/animate';
 
 .wrapper {
-  width: 220px;
   position: relative;
-  border-radius: 4px 4px 0px 0px;
-  background: #f7f7f7;
-  height: 100%;
+
   display: flex;
   align-items: center;
+
+  width: 315px;
+  height: 100%;
+
+  background: #f7f7f7;
+  border-radius: 4px 4px 0 0;
 }
 
 .inputBlock {
-  width: 100%;
   display: flex;
   justify-content: space-between;
+  width: 100%;
   padding: 2px 6px;
 }
+
 .topBlock {
   display: flex;
   flex-direction: column;
 }
+
 .inputRegistries {
-  background: #f7f7f7;
   font-size: 12px;
   line-height: 149%;
+  background: #f7f7f7;
 }
+
 .description {
   color: #222;
 }
+
 .author {
-  color: rgba(34, 34, 34, 0.6);
   font-size: 10px;
   line-height: 100%;
+  color: rgb(34 34 34 / 60%);
 }
-.authorAddress {
-  color: #db504a;
-  font-family: Segoe UI;
-  font-size: 10px;
 
+.authorAddress {
+  font-family: "Segoe UI";
+  font-size: 10px;
   font-weight: 400;
   line-height: 100%;
+  color: #db504a;
   text-decoration-line: underline;
 }
+
 //
 .openList {
   cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -89,6 +98,7 @@
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
+
   // svg {
   //   transform: translateX(-13px);
   // }
@@ -97,15 +107,18 @@
 .registriesList {
   position: absolute;
   z-index: 3;
-  left: -1px;
-  background: #fff;
   top: 37px;
+  left: -1px;
+
   display: flex;
   flex-direction: column;
 
   width: 100.5%;
   padding: 6px;
   padding-top: 0;
+
+  background: #fff;
+  box-shadow: 0 4px 5px rgb(45 52 60 / 10%), 0 4px 20px rgb(11 87 111 / 15%);
 
   animation-name: list-visible;
   animation-duration: 0.2s;
@@ -119,41 +132,54 @@
   width: 100%;
   padding: 6.5px 13px;
 }
+
 .label {
+  position: relative;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   width: 100%;
   padding: 6.5px 13px;
-  position: relative;
-  color: #b7bcc4;
-  font-family: Segoe UI, sans-serif;
-  font-size: 6px;
 
+  font-family: "Segoe UI", sans-serif;
+  font-size: 6px;
   font-weight: 700;
   line-height: 100%;
+  color: #b7bcc4;
   text-transform: uppercase;
+
   &::before {
     content: '';
+
     position: absolute;
-    left: 6px;
     top: 8px;
+    left: 6px;
+
     display: inline-block;
-    border-radius: 10px;
+
     width: 60px;
     height: 1px;
+
     background: #b7bcc4;
+    border-radius: 10px;
   }
+
   &::after {
     content: '';
+
     position: absolute;
-    right: 6px;
     top: 8px;
+    right: 6px;
+
     display: inline-block;
-    border-radius: 10px;
+
     width: 60px;
     height: 1px;
+
     background: #b7bcc4;
+    border-radius: 10px;
   }
 }
 
@@ -175,6 +201,7 @@
 .registrieslink {
   cursor: pointer;
 }
+
 :focus::input-placeholder {
   color: transparent;
 }
@@ -190,53 +217,71 @@
 :focus:input-placeholder {
   color: transparent;
 }
+
 .item {
+  cursor: pointer;
+
+  position: relative;
+
   flex-direction: column;
-  padding-left: 24px;
   align-items: flex-start;
+
   width: 100%;
+  padding-left: 24px;
+
   background: #fff;
   border-radius: 4px;
-  cursor: pointer;
-  position: relative;
+
+  &::before {
+    content: '';
+
+    position: absolute;
+    top: 45%;
+    left: 6px;
+
+    display: inline-block;
+
+    width: 8px;
+    height: 8px;
+
+    background: #e7ecef;
+    border-radius: 4px;
+  }
+
   .inputRegistries {
     background: #fff;
   }
-  &::before {
-    content: '';
-    position: absolute;
-    left: 6px;
-    top: 45%;
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 4px;
-    background: #e7ecef;
-  }
 }
+
 .enable {
   background: #f7f7f7;
+
   &::before {
     background: #34d31a;
   }
+
   .inputRegistries {
     background: #f7f7f7;
   }
 }
+
 .labelBlock {
   display: flex;
-  height: 13px;
-  width: 49px;
-
-  justify-content: center;
   align-items: center;
-  text-transform: uppercase;
-  font-family: Segoe UI, sans-serif;
-  color: $pure-white;
-  background: #db504a;
-  border-radius: 10px;
+  justify-content: center;
+
+  width: 49px;
+  height: 13px;
   margin-top: 3px;
+
+  font-family: "Segoe UI", sans-serif;
   font-size: 8px;
   font-weight: 700;
+  color: $pure-white;
+  text-transform: uppercase;
+
+  background: #db504a;
+  border-radius: 10px;
+
   // line-height: normal;
 }
