@@ -1,7 +1,7 @@
 import { setupMessageListener } from 'chrome-extension-message-wrapper'
 import browser from 'webextension-polyfill'
 import { WebSocketProxy } from '../common/chrome-extension-websocket-wrapper'
-import { CONTEXT_ID_WILDCARD, ModuleTypes } from '../common/constants'
+import { CONTEXT_ID_WILDCARD, ModuleTypes, MUTATION_LINK_URL } from '../common/constants'
 import {
   checkUrlAvailability,
   getCurrentContextIds,
@@ -78,7 +78,7 @@ const underConstructionService = new UnderConstructionService(
   overlayService,
   storageAggregator
 )
-const mutationRegistryService = new MutationRegistryService(walletService)
+const mutationRegistryService = new MutationRegistryService(walletService, featureService)
 
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
@@ -330,6 +330,8 @@ browser.runtime.onMessage.addListener(
       mutationRegistryService.getMutationsByAuthor.bind(mutationRegistryService),
     createMutation: mutationRegistryService.createMutation.bind(mutationRegistryService),
     updateMutation: mutationRegistryService.updateMutation.bind(mutationRegistryService),
+    constructMutationLink:
+      mutationRegistryService.constructMutationLink.bind(mutationRegistryService),
 
     // Helpers
     waitTab: (url) => waitTab(url),
@@ -629,3 +631,60 @@ globalThis.dapplets = {
 //     browser.tabs.get(tabId).then(redirectFromProxyServer)
 //   )
 // }
+
+// Redirect from share link with mutations
+const mutationLinkListener = async (tabId: number) => {
+  const tab = await browser.tabs.get(tabId)
+
+  // Prevent concurrency
+  if (tab.status !== 'complete') return
+
+  if (tab?.url.startsWith(MUTATION_LINK_URL)) {
+    const url = new URL(tab.url)
+
+    // URL example:
+    // https://augm.link/?t=https://twitter.com/MrConCreator&m=dapplets.sputnik-dao.near/community&d=paywall-dapplet
+    if (url.pathname === '/') {
+      const redirectUrl = url.searchParams.get('t')
+      const mutationId = url.searchParams.get('m')
+      const dappletIds = url.searchParams.getAll('d')
+
+      if (!redirectUrl || !mutationId) return
+
+      const mutation = await mutationRegistryService.getMutationById(mutationId)
+
+      if (!mutation) return
+
+      await globalConfigService.setMutation(mutationId)
+
+      await browser.tabs.update(tabId, { url: redirectUrl, active: true })
+
+      const handler = async (_tabId: number, changeInfo: browser.Tabs.OnUpdatedChangeInfoType) => {
+        if (_tabId === tabId && changeInfo.status === 'complete') {
+          if (dappletIds.length > 0) {
+            await Promise.all(
+              dappletIds.map((name) => featureService.activateDappletE2E({ name, tabId }))
+            )
+          }
+
+          await overlayService.openPopupOverlay('dapplets', tabId)
+
+          browser.tabs.onUpdated.removeListener(handler)
+        }
+      }
+
+      browser.tabs.onUpdated.addListener(handler)
+    }
+  }
+}
+
+browser.runtime.onInstalled.addListener(async () => {
+  const serviceTabs = await browser.tabs.query({
+    url: `${new URL('/', MUTATION_LINK_URL).href}*`,
+  })
+
+  await Promise.all(serviceTabs.map((tab) => mutationLinkListener(tab.id)))
+})
+
+browser.tabs.onActivated.addListener(({ tabId }) => mutationLinkListener(tabId))
+browser.tabs.onUpdated.addListener((tabId) => mutationLinkListener(tabId))

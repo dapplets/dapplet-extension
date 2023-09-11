@@ -26,6 +26,7 @@ export const Bos: FC = () => {
   const [isEdited, setIsEdited] = useState(false)
   const [currentAccount, setCurrentAccount] = useState(null)
   const [mutation, setMutation] = useState<MutationRecord>(EMPTY_MUTATION)
+  const [isCopied, setIsCopied] = useState(false)
 
   const inViewComponents = useVisibleBosComponents()
 
@@ -57,9 +58,30 @@ export const Bos: FC = () => {
     }
   }, [currentAccount, mutation])
 
+  useEffect(() => {
+    let timer
+
+    if (isCopied) {
+      timer = setTimeout(() => setIsCopied(false), 3000)
+    }
+
+    return () => clearTimeout(timer)
+  }, [isCopied])
+
   function handleEditComponentClick(widgetSrc: string) {
     const url = 'https://near.org/near/widget/ComponentDetailsPage?src=' + widgetSrc
     window.open(url, '_blank')
+  }
+
+  async function handleShareClick() {
+    try {
+      const { constructMutationLink } = await initBGFunctions(browser)
+      const link = await constructMutationLink(mutation.id, window.location.href)
+      window.navigator.clipboard.writeText(link)
+      setIsCopied(true)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   async function handleSaveClick() {
@@ -163,6 +185,9 @@ export const Bos: FC = () => {
           </SettingWrapper>
         ) : null}
         <div className={styles.bottomContainer}>
+          <button className={styles.btnPreview} disabled={isEdited} onClick={handleShareClick}>
+            {isCopied ? 'Copied' : 'Copy Link'}
+          </button>
           <button className={styles.btnPreview} disabled={!isEdited} onClick={handlePreviewClick}>
             Preview
           </button>

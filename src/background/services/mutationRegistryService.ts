@@ -1,5 +1,7 @@
 import * as nearAPI from 'near-api-js'
+import { MUTATION_LINK_URL } from '../../common/constants'
 import { ChainTypes, DefaultSigners, MutationRecord } from '../../common/types'
+import FeatureService from './featureService'
 import { WalletService } from './walletService'
 
 const EXCLUDED_MUTATION_IDS = [
@@ -11,7 +13,7 @@ const EXCLUDED_MUTATION_IDS = [
 export default class MutationRegistryService {
   _testnetContract: nearAPI.Contract
 
-  constructor(private _walletService: WalletService) {}
+  constructor(private _walletService: WalletService, private _featureService: FeatureService) {}
 
   private _createContract = (near_account: nearAPI.Account, contractAddress: string) =>
     new nearAPI.Contract(near_account, contractAddress, {
@@ -115,5 +117,19 @@ export default class MutationRegistryService {
             .filter((x) => x.to_src)
         : null,
     })
+  }
+
+  // ToDo: move to separate service?
+  public async constructMutationLink(mutationId: string, targetUrl: string): Promise<string> {
+    const contextId = new URL(targetUrl).hostname
+    const activeModules = await this._featureService.getActiveModulesByHostnames([contextId])
+
+    const url = new URL(MUTATION_LINK_URL)
+    url.searchParams.set('t', targetUrl)
+    url.searchParams.set('m', mutationId)
+
+    activeModules.forEach((module) => url.searchParams.append('d', module.name))
+
+    return url.href
   }
 }
