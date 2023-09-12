@@ -45,8 +45,8 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
 
   const visible = (hash: string, length: number): string => {
     if (hash.length > length) {
-      const firstCharacters = hash.substring(0, 6)
-      const lastCharacters = hash.substring(hash.length - 0, hash.length - 5)
+      const firstCharacters = hash.substring(0, 15)
+      const lastCharacters = hash.substring(hash.length - 0, hash.length - 10)
 
       return `${firstCharacters}...${lastCharacters}`
     } else {
@@ -54,22 +54,24 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     }
   }
   const visibleDescription = (hash: string): string => {
-    if (hash.length > 25) {
-      const firstCharacters = hash.substring(0, 25)
+    if (hash.length > 15) {
+      const firstCharacters = hash.substring(0, 12)
 
       return `${firstCharacters}...`
     } else {
       return hash
     }
   }
+  console.log(mutationsEnable)
+  console.log(mutations)
 
   return (
     <div
       className={cn(styles.wrapper)}
-      onBlur={() => {
-        setOpen(false)
-      }}
-      tabIndex={0}
+      // onBlur={() => {
+      //   setOpen(false)
+      // }}
+      // tabIndex={0}
     >
       {mutationsEnable && (
         <div className={cn(styles.inputBlock)}>
@@ -77,8 +79,9 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
             <div className={cn(styles.inputRegistries, styles.description)}>
               {visibleDescription(mutationsEnable[0].description)}
             </div>
+            <span className={styles.descriptionOpasity}>&nbsp;by&nbsp;</span>
             <div className={cn(styles.inputRegistries, styles.author)}>
-              {mutationsEnable[0].id}{' '}
+              {visibleDescription(mutationsEnable[0].id)}{' '}
             </div>
           </div>
 
@@ -93,8 +96,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
 
       {isOpen && (
         <div className={styles.registriesList}>
-          <div className={styles.label}>Available mutations</div>
-
           {mutations.length &&
             mutations.map((r, i) => (
               <div
@@ -107,14 +108,18 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                 })}
               >
                 <span className={cn(styles.inputRegistries, styles.description)}>
-                  {visibleDescription(r.description)}
+                  {visibleDescription(r.id.split('/')[1])}
+                  <span className={styles.descriptionOpasity}>&nbsp;by&nbsp;</span>
+                  <span className={cn(styles.inputRegistries, styles.author)}>
+                    {visibleDescription(r.id.split('/')[0])}
+                  </span>
                 </span>
-                <div className={cn(styles.inputRegistries, styles.author)}>
-                  {visibleDescription(r.id)}
+                <div className={cn(styles.inputRegistries, styles.descriptionOpasity)}>
+                  {visible(r.description, 30)}
                 </div>
-                {r.id === 'alsakhaev.testnet/test-mutation' ? (
+                {/* {r.id === 'alsakhaev.testnet/test-mutation' ? (
                   <div className={styles.labelBlock}>Popular</div>
-                ) : null}
+                ) : null} */}
               </div>
             ))}
         </div>

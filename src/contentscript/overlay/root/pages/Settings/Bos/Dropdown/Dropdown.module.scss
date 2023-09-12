@@ -4,10 +4,10 @@
 @import '../../../../assets/styles/animate';
 
 .wrapper {
-  width: 220px;
+  width: 210px;
   position: relative;
   border-radius: 4px 4px 0px 0px;
-  background: #f7f7f7;
+  background: transparent;
   height: 100%;
   display: flex;
   align-items: center;
@@ -17,24 +17,37 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
-  padding: 2px 6px;
+  // padding: 2px 6px;
 }
 .topBlock {
   display: flex;
-  flex-direction: column;
 }
 .inputRegistries {
-  background: #f7f7f7;
+  background: transparent;
   font-size: 12px;
-  line-height: 149%;
+  // line-height: 149%;
+  line-height: 0;
+  font-family: Segoe UI, sans-serif;
 }
 .description {
-  color: #222;
+  color: #fff;
+  line-height: 0;
+  font-family: Segoe UI, sans-serif;
 }
 .author {
-  color: rgba(34, 34, 34, 0.6);
+  color: #49f4ff;
+  text-decoration: underline;
   font-size: 10px;
-  line-height: 100%;
+  line-height: 0;
+  // line-height: 100%;
+  font-family: Segoe UI, sans-serif;
+}
+.descriptionOpasity {
+  color: #fff;
+  opacity: 0.6;
+  line-height: 0;
+  font-size: 12px;
+  font-family: Segoe UI, sans-serif;
 }
 .authorAddress {
   color: #db504a;
@@ -97,27 +110,56 @@
 .registriesList {
   position: absolute;
   z-index: 3;
-  left: -1px;
-  background: #fff;
-  top: 37px;
+  left: -11px;
+  background: linear-gradient(180deg, #4285f4 0%, #234085 123.08%);
+  top: 20px;
   display: flex;
   flex-direction: column;
 
-  width: 100.5%;
-  padding: 6px;
-  padding-top: 0;
+  width: 211px;
+  padding: 10px;
 
   animation-name: list-visible;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
+
+  .description {
+    color: #fff;
+    line-height: 100%;
+    font-family: Segoe UI, sans-serif;
+  }
+  .author {
+    color: #49f4ff;
+    text-decoration: underline;
+    font-size: 10px;
+    line-height: 0;
+    line-height: 100%;
+    font-family: Segoe UI, sans-serif;
+  }
+  .descriptionOpasity {
+    color: #fff;
+    opacity: 0.6;
+    line-height: 149%;
+    font-size: 12px;
+    font-family: Segoe UI, sans-serif;
+  }
+  .authorAddress {
+    color: #db504a;
+    font-family: Segoe UI;
+    font-size: 10px;
+
+    font-weight: 400;
+    line-height: 100%;
+    text-decoration-line: underline;
+  }
 }
 
 .inputBlock {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 6.5px 13px;
+  padding-left: 10px;
 }
 .label {
   display: flex;
@@ -192,35 +234,38 @@
 }
 .item {
   flex-direction: column;
+  padding: 4px;
   padding-left: 24px;
   align-items: flex-start;
   width: 100%;
-  background: #fff;
+  background: transparent;
   border-radius: 4px;
   cursor: pointer;
   position: relative;
   .inputRegistries {
-    background: #fff;
+    background: transparent;
   }
   &::before {
     content: '';
     position: absolute;
     left: 6px;
-    top: 45%;
+    top: 35%;
     display: inline-block;
     width: 8px;
     height: 8px;
     border-radius: 4px;
-    background: #e7ecef;
+    background: #a0c2f9;
   }
 }
 .enable {
-  background: #f7f7f7;
+  border-radius: 4px;
+  border: 1px solid #a0c2f9;
+  background: #5699ff;
   &::before {
     background: #34d31a;
   }
   .inputRegistries {
-    background: #f7f7f7;
+    background: #a0c2f9;
   }
 }
 .labelBlock {

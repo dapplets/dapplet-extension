@@ -2,14 +2,15 @@
 @import '../../../../assets/styles/color.variables';
 @import '../../../../assets/styles/null';
 
-.wrapper{
-    width: 34px;
-    height: 34px;
-    background: inherit;
-   transition: all ease 0.2s;
-    &:hover{
-        transform: scale(1.2);
-        opacity: 0.3;
-        transition: all ease 0.2s;
-    }
+.wrapper {
+  width: 10px;
+  height: 7px;
+  margin-top: -10px;
+  background: transparent;
+  transition: all ease 0.2s;
+  &:hover {
+    margin-top: -15px;
+    transform: scale(1.2);
+    transition: all ease 0.2s;
+  }
 }
