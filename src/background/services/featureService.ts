@@ -454,7 +454,7 @@ export default class FeatureService {
     tabId,
   }: {
     name: string
-    registryUrl: string
+    registryUrl?: string
     version?: string
     hostnames?: string[]
     order?: number
@@ -462,9 +462,19 @@ export default class FeatureService {
   }): Promise<void> {
     if (!hostnames) hostnames = ['*']
     if (!order) order = 0
+
     if (!tabId) {
       const [currentTab] = await browser.tabs.query({ active: true, lastFocusedWindow: true })
       tabId = currentTab.id
+    }
+
+    if (!registryUrl) {
+      const registries = await this._globalConfigService.getRegistries()
+      const activeRegistry = registries.find((registry) => !registry.isDev && registry.isEnabled)
+      if (!activeRegistry) {
+        throw new Error('There is no active registries')
+      }
+      registryUrl = activeRegistry.url
     }
 
     await this._setFeatureActive(name, version, hostnames, true, order, registryUrl, tabId)

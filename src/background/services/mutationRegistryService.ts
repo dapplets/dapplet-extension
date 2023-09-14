@@ -1,11 +1,19 @@
 import * as nearAPI from 'near-api-js'
+import { MUTATION_LINK_URL } from '../../common/constants'
 import { ChainTypes, DefaultSigners, MutationRecord } from '../../common/types'
+import FeatureService from './featureService'
 import { WalletService } from './walletService'
+
+const EXCLUDED_MUTATION_IDS = [
+  'dapplets.near/community',
+  'alsakhaev.near/nft-everywhere',
+  'alsakhaev.near/red-mutation',
+]
 
 export default class MutationRegistryService {
   _testnetContract: nearAPI.Contract
 
-  constructor(private _walletService: WalletService) {}
+  constructor(private _walletService: WalletService, private _featureService: FeatureService) {}
 
   private _createContract = (near_account: nearAPI.Account, contractAddress: string) =>
     new nearAPI.Contract(near_account, contractAddress, {
@@ -14,14 +22,14 @@ export default class MutationRegistryService {
     })
 
   private async _getContract() {
-    const contractNetwork = 'testnet'
+    const contractNetwork = 'mainnet'
     switch (contractNetwork) {
-      case 'testnet':
+      case 'mainnet':
         if (!this._testnetContract) {
-          const contractAddress = 'dev-1694040644977-75002385830517'
+          const contractAddress = 'mutations.dapplets.near'
           const near_account = await this._walletService.near_getAccount(
             DefaultSigners.EXTENSION,
-            ChainTypes.NEAR_TESTNET
+            ChainTypes.NEAR_MAINNET
           )
           this._testnetContract = this._createContract(near_account, contractAddress)
         }
@@ -34,13 +42,15 @@ export default class MutationRegistryService {
   public async getAllMutations(): Promise<MutationRecord[]> {
     const contract = await this._getContract()
     const mutations = await contract['get_all_mutations']()
-    return mutations.map((mutation) => ({
-      id: mutation[0] + '/' + mutation[1],
-      description: mutation[2].description,
-      overrides: Object.fromEntries(
-        mutation[2].overrides.map((override) => [override.from_src, override.to_src])
-      ),
-    }))
+    return mutations
+      .map((mutation) => ({
+        id: mutation[0] + '/' + mutation[1],
+        description: mutation[2].description,
+        overrides: Object.fromEntries(
+          mutation[2].overrides.map((override) => [override.from_src, override.to_src])
+        ),
+      }))
+      .filter((mutation) => !EXCLUDED_MUTATION_IDS.includes(mutation.id))
   }
 
   public async getMutationById(id: string): Promise<MutationRecord | null> {
@@ -107,5 +117,19 @@ export default class MutationRegistryService {
             .filter((x) => x.to_src)
         : null,
     })
+  }
+
+  // ToDo: move to separate service?
+  public async constructMutationLink(mutationId: string, targetUrl: string): Promise<string> {
+    const contextId = new URL(targetUrl).hostname
+    const activeModules = await this._featureService.getActiveModulesByHostnames([contextId])
+
+    const url = new URL(MUTATION_LINK_URL)
+    url.searchParams.set('t', targetUrl)
+    url.searchParams.set('m', mutationId)
+
+    activeModules.forEach((module) => url.searchParams.append('d', module.name))
+
+    return url.href
   }
 }

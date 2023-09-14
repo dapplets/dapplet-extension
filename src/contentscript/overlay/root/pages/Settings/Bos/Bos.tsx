@@ -26,21 +26,27 @@ export const Bos: FC = () => {
   const [isEdited, setIsEdited] = useState(false)
   const [currentAccount, setCurrentAccount] = useState(null)
   const [mutation, setMutation] = useState<MutationRecord>(EMPTY_MUTATION)
+  const [isCopied, setIsCopied] = useState(false)
 
   const inViewComponents = useVisibleBosComponents()
 
   useEffect(() => {
-    ;(async () => {
+    const load = async () => {
       const { getMutation, getMutationById, getAddress } = await initBGFunctions(browser)
       const mutationId = await getMutation()
       const mutation = await getMutationById(mutationId)
-      const currentAccount = await getAddress(DefaultSigners.EXTENSION, ChainTypes.NEAR_TESTNET)
+      const currentAccount = await getAddress(DefaultSigners.EXTENSION, ChainTypes.NEAR_MAINNET)
       // ToDo: why getAddress returns 0x0000000000000000000000000000000000000000 ???
       setCurrentAccount(
         currentAccount === '0x0000000000000000000000000000000000000000' ? null : currentAccount
       )
       setMutation(mutation ?? EMPTY_MUTATION)
-    })()
+    }
+
+    load()
+
+    EventBus.on('bos_mutation_changed', load)
+    return () => EventBus.off('bos_mutation_changed', load)
   }, [])
 
   useEffect(() => {
@@ -52,9 +58,30 @@ export const Bos: FC = () => {
     }
   }, [currentAccount, mutation])
 
+  useEffect(() => {
+    let timer
+
+    if (isCopied) {
+      timer = setTimeout(() => setIsCopied(false), 3000)
+    }
+
+    return () => clearTimeout(timer)
+  }, [isCopied])
+
   function handleEditComponentClick(widgetSrc: string) {
     const url = 'https://near.org/near/widget/ComponentDetailsPage?src=' + widgetSrc
     window.open(url, '_blank')
+  }
+
+  async function handleShareClick() {
+    try {
+      const { constructMutationLink } = await initBGFunctions(browser)
+      const link = await constructMutationLink(mutation.id, window.location.href)
+      window.navigator.clipboard.writeText(link)
+      setIsCopied(true)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   async function handleSaveClick() {
@@ -158,6 +185,9 @@ export const Bos: FC = () => {
           </SettingWrapper>
         ) : null}
         <div className={styles.bottomContainer}>
+          <button className={styles.btnPreview} disabled={isEdited} onClick={handleShareClick}>
+            {isCopied ? 'Copied' : 'Copy Link'}
+          </button>
           <button className={styles.btnPreview} disabled={!isEdited} onClick={handlePreviewClick}>
             Preview
           </button>

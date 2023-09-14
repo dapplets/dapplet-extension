@@ -11,7 +11,7 @@ export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HT
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
   const { ...anotherProps } = props
   const [isOpen, setOpen] = useState(false)
-  const [mutationsEnable, setMutationsEnable] = useState(null)
+  const [selectedMutation, setSelectedMutation] = useState(null)
 
   const [mutations, setMutations] = useState([])
 
@@ -20,19 +20,15 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
       await loadMutation()
     }
     init()
-    return () => {}
   }, [])
 
   const loadMutation = async () => {
     const { getAllMutations, getMutation } = await initBGFunctions(browser)
     const mutations = await getAllMutations()
-    const mutationsEnable = await getMutation()
-    if (!mutationsEnable || !mutations) return
-    console.log(mutationsEnable.split('/')[1], 'mutationsEnable')
+    const selectedMutationId = await getMutation()
+    if (!selectedMutationId || !mutations) return
 
-    setMutationsEnable(
-      mutations.filter((x) => x.id.split('/')[1] === mutationsEnable.split('/')[1])
-    )
+    setSelectedMutation(mutations.find((mut) => mut.id === selectedMutationId))
     setMutations(mutations)
   }
 
@@ -62,8 +58,8 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
       return hash
     }
   }
-  console.log(mutationsEnable)
-  console.log(mutations)
+  // console.log(mutationsEnable)
+  // console.log(mutations)
 
   return (
     <div
@@ -73,15 +69,15 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
       // }}
       // tabIndex={0}
     >
-      {mutationsEnable && (
+      {selectedMutation && (
         <div className={cn(styles.inputBlock)}>
           <div className={cn(styles.topBlock)}>
             <div className={cn(styles.inputRegistries, styles.description)}>
-              {visibleDescription(mutationsEnable[0].description)}
+              {visibleDescription(selectedMutation.description)}
             </div>
             <span className={styles.descriptionOpasity}>&nbsp;by&nbsp;</span>
             <div className={cn(styles.inputRegistries, styles.author)}>
-              {visibleDescription(mutationsEnable[0].id)}{' '}
+              {visibleDescription(selectedMutation.id)}{' '}
             </div>
           </div>
 
@@ -104,7 +100,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                 }}
                 key={i}
                 className={cn(styles.inputBlock, styles.item, {
-                  [styles.enable]: r.id === mutationsEnable[0].id,
+                  [styles.enable]: r.id === selectedMutation.id,
                 })}
               >
                 <span className={cn(styles.inputRegistries, styles.description)}>
@@ -117,9 +113,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                 <div className={cn(styles.inputRegistries, styles.descriptionOpasity)}>
                   {visible(r.description, 30)}
                 </div>
-                {/* {r.id === 'alsakhaev.testnet/test-mutation' ? (
-                  <div className={styles.labelBlock}>Popular</div>
-                ) : null} */}
+              
               </div>
             ))}
         </div>
