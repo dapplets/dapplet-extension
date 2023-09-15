@@ -1,3 +1,5 @@
+import { Account, Optional, Transaction, VerifiedOwner } from '@near-wallet-selector/core'
+import { createAction } from '@near-wallet-selector/wallet-utils'
 import { ethers } from 'ethers'
 import * as nearAPI from 'near-api-js'
 import { Near } from 'near-api-js'
@@ -9,49 +11,150 @@ import { CacheMethod, waitTab } from '../../../../common/helpers'
 import * as walletIcons from '../../../../common/resources/wallets'
 import { NearNetworkConfig } from '../../../../common/types'
 import { truncateEthAddress } from '../../../../contentscript/overlay/root/helpers/truncateEthAddress'
-import { NearWallet } from '../interface'
+import {
+  BrowserWalletSignAndSendTransactionParams,
+  BrowserWalletSignInParams,
+  NearWallet,
+} from '../interface'
+import { CustomConnectedWalletAccount } from './customConnectedWalletAccount'
 import { CustomWalletConnection } from './customWalletConnection'
+import { WebExtensionKeyStorage } from './webExtensionKeyStorage'
 
+const LOCAL_STORAGE_KEY_SUFFIX = '_wallet_auth_key'
+
+/**
+ * Based on https://github.com/near/wallet-selector/blob/ab180d8117f6a811bfe825ff8ccbdec57d174dc0/packages/my-near-wallet/src/lib/my-near-wallet.ts
+ */
 export default class implements NearWallet {
-  private __nearWallet: CustomWalletConnection = null
   private _config: NearNetworkConfig
   private _lastUsageKey: string
 
-  private get _nearWallet() {
-    if (!this.__nearWallet) {
-      const near = new Near({
-        ...this._config,
-        deps: {
-          keyStore: new nearAPI.keyStores.BrowserLocalStorageKeyStore(),
-        },
-      })
-
-      this.__nearWallet = new CustomWalletConnection(near, this._config.networkId)
-    }
-
-    return this.__nearWallet
-  }
+  private _statePromise: Promise<{
+    wallet: CustomWalletConnection
+    keyStore: WebExtensionKeyStorage
+  }>
 
   constructor(config: NearNetworkConfig) {
     this._config = config
     this._lastUsageKey = `near_${config.networkId}_lastUsage`
+    this._statePromise = this._setupWalletState()
   }
 
+  // ToDo: For compatibility with GenericWallet interface. Need to be refactored.
   async getAddress(): Promise<string> {
-    return this._nearWallet.getAccountId()
+    const accounts = await this.getAccounts()
+    return accounts[0]?.accountId ?? ''
   }
 
+  // ToDo: For compatibility with GenericWallet interface. Need to be refactored.
   async getChainId() {
     return 0
   }
 
   async sendCustomRequest(method: string, params: any): Promise<any> {
-    const provider: JsonRpcProvider = this._nearWallet.account().connection.provider as any
+    const account = await this.getAccount()
+    const provider: JsonRpcProvider = account.connection.provider as any
     return provider.sendJsonRpc(method, params)
   }
 
-  async requestSignTransactions(transactions: any, callbackUrl: any) {
-    return this._nearWallet.requestSignTransactions(transactions, callbackUrl)
+  async signIn({
+    contractId,
+    methodNames,
+    successUrl,
+    failureUrl,
+  }: BrowserWalletSignInParams): Promise<Account[]> {
+    const _state = await this._statePromise
+    const existingAccounts = await this.getAccounts()
+
+    if (existingAccounts.length) {
+      return existingAccounts
+    }
+
+    await _state.wallet.requestSignIn({
+      contractId,
+      methodNames,
+      successUrl,
+      failureUrl,
+    })
+
+    return this.getAccounts()
+  }
+
+  async signOut(): Promise<void> {
+    const _state = await this._statePromise
+    if (_state.wallet.isSignedIn()) {
+      _state.wallet.signOut()
+    }
+  }
+
+  async getAccount(): Promise<CustomConnectedWalletAccount> {
+    const _state = await this._statePromise
+    return _state.wallet.account()
+  }
+
+  async getAccounts(): Promise<Account[]> {
+    const _state = await this._statePromise
+
+    const accountId = _state.wallet.getAccountId()
+    const account = _state.wallet.account()
+
+    if (!accountId || !account) {
+      return []
+    }
+
+    const publicKey = await account.connection.signer.getPublicKey(
+      account.accountId,
+      this._config.networkId
+    )
+    return [
+      {
+        accountId,
+        publicKey: publicKey ? publicKey.toString() : '',
+      },
+    ]
+  }
+
+  verifyOwner(): Promise<void | VerifiedOwner> {
+    throw new Error('Method not implemented.')
+  }
+
+  async signAndSendTransaction({
+    receiverId,
+    actions,
+    callbackUrl,
+  }: BrowserWalletSignAndSendTransactionParams): Promise<void | nearAPI.providers.FinalExecutionOutcome> {
+    const _state = await this._statePromise
+
+    // const { contract } = store.getState()
+
+    // if (!_state.wallet.isSignedIn() || !contract) {
+    //   throw new Error('Wallet not signed in')
+    // }
+
+    const account = _state.wallet.account()
+
+    return account['signAndSendTransaction']({
+      receiverId: receiverId, // || contract.contractId,
+      actions: actions.map((action) => createAction(action)),
+      walletCallbackUrl: callbackUrl,
+    })
+  }
+
+  async signAndSendTransactions({ transactions, callbackUrl }) {
+    const _state = await this._statePromise
+
+    if (!_state.wallet.isSignedIn()) {
+      throw new Error('Wallet not signed in')
+    }
+
+    return _state.wallet.requestSignTransactions({
+      transactions: await this._transformTransactions(transactions),
+      callbackUrl,
+    })
+  }
+
+  buildImportAccountsUrl(): string {
+    return `${this._config.walletUrl}/batch-import`
   }
 
   connect(): ethers.Signer {
@@ -63,13 +166,14 @@ export default class implements NearWallet {
   }
 
   async isConnected() {
-    const accountId = await this._nearWallet.getAccountId()
-    return !!accountId && accountId.length > 0
+    const accounts = await this.getAccounts()
+    return accounts.length > 0
   }
 
   @CacheMethod()
   async connectWallet(): Promise<void> {
-    await this._connectBrowserWallet(this._nearWallet)
+    const _state = await this._statePromise
+    await this._connectBrowserWallet(_state.wallet)
   }
 
   async createAccessKey(contractId: string, loginConfirmationId: string): Promise<void> {
@@ -86,22 +190,28 @@ export default class implements NearWallet {
     const keyPrefix = `login-confirmation:${loginConfirmationId}:`
 
     const near = new Near({
-      ...this._config,
+      walletUrl: this._config.walletUrl,
+      networkId: this._config.networkId,
+      nodeUrl: this._config.nodeUrl,
+      helperUrl: this._config.helperUrl,
+      headers: {},
       deps: {
-        keyStore: new nearAPI.keyStores.BrowserLocalStorageKeyStore(
-          browser.storage.local,
-          keyPrefix
-        ),
+        keyStore: new WebExtensionKeyStorage(keyPrefix),
       },
     })
 
-    const nearWallet = new CustomWalletConnection(near, this._config.networkId)
+    const appKeyPrefix = this._config.networkId
+    const authDataKey = appKeyPrefix + LOCAL_STORAGE_KEY_SUFFIX
+    const authData = await browser.storage.local.get(authDataKey)
+
+    const nearWallet = new CustomWalletConnection(near, authData, authDataKey)
 
     await this._connectBrowserWallet(nearWallet, contractId)
   }
 
   async disconnectWallet() {
-    this._nearWallet.signOut()
+    const _state = await this._statePromise
+    _state.wallet.signOut()
   }
 
   async getMeta() {
@@ -114,10 +224,6 @@ export default class implements NearWallet {
 
   async getLastUsage() {
     return (await browser.storage.local.get(this._lastUsageKey))[this._lastUsageKey]
-  }
-
-  getAccount() {
-    return this._nearWallet.account()
   }
 
   async signMessage(): Promise<string> {
@@ -172,7 +278,69 @@ export default class implements NearWallet {
       )
     }
 
-    nearWallet.completeSignIn(accountId, publicKey, allKeys)
+    nearWallet.completeSignIn(accountId, publicKey, allKeys) // ToDo: need to wait promise?
     browser.storage.local.set({ [this._lastUsageKey]: new Date().toISOString() })
+  }
+
+  private async _setupWalletState() {
+    const keyStore = new WebExtensionKeyStorage()
+
+    const near = new Near({
+      keyStore,
+      walletUrl: this._config.walletUrl,
+      networkId: this._config.networkId,
+      nodeUrl: this._config.nodeUrl,
+      helperUrl: this._config.helperUrl,
+      headers: {},
+    })
+
+    const appKeyPrefix = this._config.networkId
+    const authDataKey = appKeyPrefix + LOCAL_STORAGE_KEY_SUFFIX
+    const authData = await browser.storage.local.get(authDataKey)
+
+    // ToDo: replace this._config.networkId with app_key prefix
+    const wallet = new CustomWalletConnection(near, authData, authDataKey)
+
+    return {
+      wallet,
+      keyStore,
+    }
+  }
+
+  private async _transformTransactions(transactions: Array<Optional<Transaction, 'signerId'>>) {
+    const _state = await this._statePromise
+
+    const account = _state.wallet.account()
+    const { networkId, signer, provider } = account.connection
+
+    const localKey = await signer.getPublicKey(account.accountId, networkId)
+
+    return Promise.all(
+      transactions.map(async (transaction, index) => {
+        const actions = transaction.actions.map((action) => createAction(action))
+        const accessKey = await account.accessKeyForTransaction(
+          transaction.receiverId,
+          actions,
+          localKey
+        )
+
+        if (!accessKey) {
+          throw new Error(
+            `Failed to find matching key for transaction sent to ${transaction.receiverId}`
+          )
+        }
+
+        const block = await provider.block({ finality: 'final' })
+
+        return nearAPI.transactions.createTransaction(
+          account.accountId,
+          nearAPI.utils.PublicKey.from(accessKey.public_key),
+          transaction.receiverId,
+          accessKey.access_key.nonce + index + 1,
+          actions,
+          nearAPI.utils.serialize.base_decode(block.header.hash)
+        )
+      })
+    )
   }
 }
