@@ -27,8 +27,11 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
     actions,
     walletMeta,
   }: SignAndSendTransactionOptions): Promise<FinalExecutionOutcome> {
+    console.log('receiverId', receiverId)
+    console.log('actions', actions)
+    console.log('walletMeta', walletMeta)
     //if (!this.accountId) {
-    const { prepareWalletFor } = initBGFunctions()
+    const { prepareWalletFor, near_signAndSendTransaction } = initBGFunctions()
     // ToDo: remove it?
     // await prepareWalletFor(this._app, 'near/' + this._network, null);
 
@@ -56,9 +59,14 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
       throw new Error(`Cannot find matching key for transaction sent to ${receiverId}`)
     }
 
+    console.log('localKey', localKey)
+    console.log('accessKey', accessKey)
     if (localKey && localKey.toString() === accessKey.public_key) {
       try {
-        return await super.signAndSendTransaction({ receiverId, actions })
+        return await near_signAndSendTransaction(this._app, 'near/' + this._network, {
+          receiverId,
+          actions,
+        })
       } catch (e) {
         if (e.type === 'NotEnoughAllowance') {
           accessKey = await this.accessKeyForTransaction(receiverId, actions)

@@ -1,4 +1,4 @@
-import { Account, Optional, Transaction, VerifiedOwner } from '@near-wallet-selector/core'
+import { Account, Action, Optional, Transaction, VerifiedOwner } from '@near-wallet-selector/core'
 import { createAction } from '@near-wallet-selector/wallet-utils'
 import { ethers } from 'ethers'
 import * as nearAPI from 'near-api-js'
@@ -133,9 +133,44 @@ export default class implements NearWallet {
 
     const account = _state.wallet.account()
 
+    console.log('actions', actions)
+
+    const walletSelectorActionProps = Object.entries(actions[0])
+      .filter(([k]) => k !== 'enum')
+      .map<Action>(([key, params]) => {
+        console.log('key', key)
+        const type = key[0].toUpperCase() + key.slice(1)
+        console.log('type', type)
+        if (
+          type === 'CreateAccount' ||
+          type === 'DeployContract' ||
+          type === 'FunctionCall' ||
+          type === 'Transfer' ||
+          type === 'Stake' ||
+          type === 'AddKey' ||
+          type === 'DeleteKey' ||
+          type === 'DeleteAccount'
+        ) {
+          if (!params.gas) params.gas = '30000000000000'
+          console.log('params.args', params.args)
+          const argsAsBufferArray: number[] = Object.values(params.args)
+          console.log('argsAsBufferArray', argsAsBufferArray)
+          const strArgs = Buffer.from(argsAsBufferArray).toString()
+          console.log('strArgs', strArgs)
+          params.args = JSON.parse(strArgs)
+          console.log('params.args', params.args)
+          return { type, params }
+        } else {
+          throw new Error('Wrong transaction type')
+        }
+      })[0]
+    console.log('walletSelectorActionProps', walletSelectorActionProps)
+    const transactionAction = createAction(walletSelectorActionProps)
+    console.log('transactionAction', transactionAction)
+
     return account['signAndSendTransaction']({
       receiverId: receiverId, // || contract.contractId,
-      actions: actions.map((action) => createAction(action)),
+      actions: [transactionAction],
       walletCallbackUrl: callbackUrl,
     })
   }
