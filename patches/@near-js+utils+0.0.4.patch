@@ -1,0 +1,21 @@
+diff --git a/node_modules/@near-js/utils/lib/provider.js b/node_modules/@near-js/utils/lib/provider.js
+index c50b3a9..cfdb883 100644
+--- a/node_modules/@near-js/utils/lib/provider.js
++++ b/node_modules/@near-js/utils/lib/provider.js
+@@ -6,12 +6,13 @@ function getTransactionLastResult(txResult) {
+     if (typeof txResult.status === 'object' && typeof txResult.status.SuccessValue === 'string') {
+         const value = Buffer.from(txResult.status.SuccessValue, 'base64').toString();
+         try {
+-            return JSON.parse(value);
++            const parsedValue = JSON.parse(value);
++            txResult.payload = parsedValue
+         }
+         catch (e) {
+-            return value;
++            txResult.payload = value
+         }
+     }
+-    return null;
++    return txResult;
+ }
+ exports.getTransactionLastResult = getTransactionLastResult;
