@@ -47,12 +47,8 @@ export async function createContractWrapper(
 
   const currentNetworkConfig = await _getCurrentNetworkConfig(cfg.network)
   const near = new BackgroundNear(app, currentNetworkConfig, keyStorePrefix)
-  console.log('near', near)
   const wallet = new BackgroundWalletConnection(near, cfg.network, app)
-  console.log('wallet', wallet)
   const account = wallet.account()
-  console.log('account', account)
   const contract = new NearAPI.Contract(account, address, options)
-  console.log('contract', contract)
   return contract
 }

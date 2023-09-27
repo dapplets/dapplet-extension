@@ -326,9 +326,6 @@ export default class ConnectedAccountService {
 
     const gas = signature ? 300_000_000_000_000 : 30_000_000_000_000
     const amount = stake === null ? undefined : stake
-    console.log('requestBody', requestBody)
-    console.log('gas', gas)
-    console.log('amount', amount)
     const res = await contract['requestVerification'](requestBody, gas, amount)
     EventBus.emit('connected_accounts_changed')
     return res
