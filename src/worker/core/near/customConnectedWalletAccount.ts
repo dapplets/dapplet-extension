@@ -58,7 +58,9 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
 
     if (localKey && localKey.toString() === accessKey.public_key) {
       try {
-        return await super.signAndSendTransaction({ receiverId, actions })
+        // walletCallbackUrl is null to prevent calling of walletCallbackUrl = window.location.href (window is undefined in web workers)
+        // at https://github.com/near/near-api-js/blob/53ba3f21c6da503e971a251b205bf50ea8b36dd0/packages/wallet-account/src/wallet_account.ts#L306
+        return await super.signAndSendTransaction({ receiverId, actions, walletCallbackUrl: null })
       } catch (e) {
         if (e.type === 'NotEnoughAllowance') {
           accessKey = await this.accessKeyForTransaction(receiverId, actions)
