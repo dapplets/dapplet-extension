@@ -202,7 +202,9 @@ export default class implements NearWallet {
 
     const appKeyPrefix = this._config.networkId
     const authDataKey = appKeyPrefix + LOCAL_STORAGE_KEY_SUFFIX
-    const authData = await browser.storage.local.get(authDataKey)
+    const authData = JSON.parse(
+      (await browser.storage.local.get(authDataKey))[authDataKey] ?? 'null'
+    )
 
     const nearWallet = new CustomWalletConnection(near, authData, authDataKey)
 
@@ -286,17 +288,19 @@ export default class implements NearWallet {
     const keyStore = new WebExtensionKeyStorage()
 
     const near = new Near({
-      keyStore,
       walletUrl: this._config.walletUrl,
       networkId: this._config.networkId,
       nodeUrl: this._config.nodeUrl,
       helperUrl: this._config.helperUrl,
       headers: {},
+      deps: { keyStore },
     })
 
     const appKeyPrefix = this._config.networkId
     const authDataKey = appKeyPrefix + LOCAL_STORAGE_KEY_SUFFIX
-    const authData = await browser.storage.local.get(authDataKey)
+    const authData = JSON.parse(
+      (await browser.storage.local.get(authDataKey))[authDataKey] ?? 'null'
+    )
 
     // ToDo: replace this._config.networkId with app_key prefix
     const wallet = new CustomWalletConnection(near, authData, authDataKey)
