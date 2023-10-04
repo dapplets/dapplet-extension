@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { ReactElement, useRef, useState } from 'react'
+import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import browser from 'webextension-polyfill'
 import { StorageRef } from '../../../../../common/types'
 import { addZero } from '../../helpers/addZero'
@@ -21,28 +22,57 @@ export interface NotificationProps {
   isRead?: number
   actions?: NotificationAction[]
   teaser?: string
+  stateNotify?: any
 }
 
 export const Notification = (props: NotificationProps): ReactElement => {
-  const { icon, label, title, date, onClear, _id, description, href, isRead, actions, teaser } =
-    props
+  const {
+    icon,
+    label,
+    title,
+    date,
+    onClear,
+    _id,
+    description,
+    href,
+    isRead,
+    actions,
+    teaser,
+    stateNotify,
+  } = props
   const [isDelete, onDelete] = useState(false)
   const [newDescription, setDescription] = useState(description)
   const refComponent = useRef<HTMLInputElement>()
   const newDateNum = new Date(date)
-
+  const location = useLocation()
   async function handleActionButtonClick(actionId: string) {
     const { resolveNotificationAction, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
     await resolveNotificationAction(_id, actionId, thisTab.id)
   }
+  useEffect(() => {
+    if (stateNotify && stateNotify.targetID === _id) {
+      let timerRemove
+
+      const timerStyles = setTimeout(() => {
+        timerRemove = setTimeout(() => {
+          onClear(stateNotify.targetID)
+        }, 2000)
+      }, 2500)
+
+      return () => {
+        clearTimeout(timerStyles)
+      }
+    }
+  }, [])
 
   return (
     <div
       data-testid={isRead !== 0 ? 'new-notification' : 'old-notification'}
       className={cn(styles.wrapper, {
         [styles.delete]: isDelete,
-        [styles.isRead]: isRead === 0,
+        [styles.isRead]:
+          isRead === 0 || (stateNotify && stateNotify.isLaterRead && stateNotify.targetID === _id),
       })}
     >
       <div className={styles.blockTitle}>

@@ -20,6 +20,10 @@
   border-radius: 6px;
 
   transition: all 0.5s cubic-bezier(0.36, -0.64, 0.34, 1.76);
+  &:hover{
+    box-shadow: 0px 4px 20px 0px rgba(11, 87, 111, 0.15), 0px 4px 5px 0px rgba(45, 52, 60, 0.10);
+  }
+
 }
 
 .isRead {

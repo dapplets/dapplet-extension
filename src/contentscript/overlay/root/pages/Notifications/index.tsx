@@ -1,5 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../common/global-event-bus'
 import {
@@ -19,6 +20,8 @@ export const Notifications = () => {
   const [isOlder, setOlder] = useState(false)
   const [count, setCount] = useState(5)
   const [loadNotify, setLoadNotify] = useState(false)
+  const location = useLocation()
+  const state = location.state as any
 
   const counter = () => {
     setCount((prevState) => prevState + 5)
@@ -142,6 +145,7 @@ export const Notifications = () => {
                               date={x.createdAt}
                               actions={x.actions}
                               teaser={x.teaser}
+                              stateNotify={state ? state : null}
                             />
                           )
                         })}
