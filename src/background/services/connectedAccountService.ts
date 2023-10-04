@@ -302,18 +302,29 @@ export default class ConnectedAccountService {
       statement,
     } = props
     const contract = await this._getContract()
-    const requestBody = {
+    const requestBody: {
+      firstAccountId: string
+      firstOriginId: string
+      secondAccountId: string
+      secondOriginId: string
+      isUnlink: boolean
+      firstProofUrl?: string
+      secondProofUrl?: string
+      signature?: EthSignature
+      statement?: string
+    } = {
       firstAccountId,
       firstOriginId,
       secondAccountId,
       secondOriginId,
       isUnlink,
-      firstProofUrl: firstProofUrl === null ? undefined : firstProofUrl,
-      secondProofUrl: secondProofUrl === null ? undefined : secondProofUrl,
-      signature: signature === undefined ? null : signature,
-      statement: statement === null ? undefined : statement,
     }
-    const gas = signature ? 300_000_000_000_000 : null
+    if (firstProofUrl) requestBody.firstProofUrl = firstProofUrl
+    if (secondProofUrl) requestBody.secondProofUrl = secondProofUrl
+    requestBody.signature = signature === undefined ? null : signature
+    if (statement) requestBody.statement = statement
+
+    const gas = signature ? 300_000_000_000_000 : 30_000_000_000_000
     const amount = stake === null ? undefined : stake
     const res = await contract['requestVerification'](requestBody, gas, amount)
     EventBus.emit('connected_accounts_changed')
