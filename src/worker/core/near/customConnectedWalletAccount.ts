@@ -1,26 +1,36 @@
+import { FinalExecutionOutcome } from '@near-wallet-selector/core'
+import BN from 'bn.js'
 import { baseDecode } from 'borsh'
-import * as nearAPI from 'near-api-js'
-import { ConnectedWalletAccount } from 'near-api-js'
+import { ConnectedWalletAccount, Connection } from 'near-api-js'
+import { SignAndSendTransactionOptions } from 'near-api-js/lib/account'
+import { AccessKeyView } from 'near-api-js/lib/providers/provider'
+import { createTransaction } from 'near-api-js/lib/transaction'
+import { PublicKey } from 'near-api-js/lib/utils'
 import { generateGuid } from '../../../common/generateGuid'
 import { browserStorage_get, getURL, initBGFunctions } from '../../communication'
+import { BackgroundWalletConnection } from './backgroundWalletConnection'
 
 export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
   accountId: string
 
+  /** @hidden */
+  accessKeyByPublicKeyCache: { [key: string]: AccessKeyView } = {}
+
   constructor(
-    walletConnection: nearAPI.WalletConnection,
-    connection: nearAPI.Connection,
+    walletConnection: BackgroundWalletConnection,
+    connection: Connection,
     accountId: string,
     private _app: string,
     private _network: string
   ) {
-    super(walletConnection, connection, accountId)
+    super(walletConnection as any, connection, accountId)
   }
 
-  async signAndSendTransaction(
-    receiverId: string,
-    actions: nearAPI.transactions.Action[]
-  ): Promise<nearAPI.providers.FinalExecutionOutcome> {
+  async signAndSendTransaction({
+    receiverId,
+    actions,
+    walletMeta,
+  }: SignAndSendTransactionOptions): Promise<FinalExecutionOutcome> {
     //if (!this.accountId) {
     const { prepareWalletFor } = initBGFunctions()
     // ToDo: remove it?
@@ -52,23 +62,32 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
 
     if (localKey && localKey.toString() === accessKey.public_key) {
       try {
-        return await super.signAndSendTransaction(receiverId, actions)
+        // walletCallbackUrl is null to prevent calling of walletCallbackUrl = window.location.href (window is undefined in web workers)
+        // at https://github.com/near/near-api-js/blob/53ba3f21c6da503e971a251b205bf50ea8b36dd0/packages/wallet-account/src/wallet_account.ts#L306
+        return await super.signAndSendTransaction({
+          receiverId,
+          actions,
+          walletCallbackUrl: null,
+        })
       } catch (e) {
-        if (e.type === 'NotEnoughBalance') {
+        if (e.type === 'NotEnoughAllowance') {
           accessKey = await this.accessKeyForTransaction(receiverId, actions)
         } else {
           throw e
         }
+      } finally {
+        // clear keys cached in this.findAccessKey method to prevent inconsistent nonce
+        delete this.accessKeyByPublicKeyCache[accessKey.public_key]
       }
     }
 
     const block = await this.connection.provider.block({ finality: 'final' })
     const blockHash = baseDecode(block.header.hash)
 
-    const publicKey = nearAPI.utils.PublicKey.from(accessKey.public_key)
+    const publicKey = PublicKey.from(accessKey.public_key)
     // TODO: Cache & listen for nonce updates for given access key
-    const nonce = accessKey.access_key.nonce + 1
-    const transaction = nearAPI.transactions.createTransaction(
+    const nonce = accessKey.access_key.nonce.add(new BN(1))
+    const transaction = createTransaction(
       this.accountId,
       publicKey,
       receiverId,
@@ -85,7 +104,11 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
 
     let callbackTab = null
     const waitTabPromise = waitTab(callbackUrl).then((x) => (callbackTab = x))
-    const requestPromise = this.walletConnection.requestSignTransactions([transaction], callbackUrl)
+    const requestPromise = this.walletConnection.requestSignTransactions({
+      transactions: [transaction],
+      meta: walletMeta,
+      callbackUrl,
+    })
 
     await Promise.race([waitTabPromise, requestPromise])
 
@@ -96,6 +119,12 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
 
     const callbackTabUrlObject = new URL(callbackTab.url)
     const transactionHashes = callbackTabUrlObject.searchParams.get('transactionHashes')
+    const errorCode = callbackTabUrlObject.searchParams.get('errorCode')
+
+    if (errorCode || !transactionHashes) {
+      throw new Error(`User rejected the transaction.`)
+    }
+
     const txHash = baseDecode(transactionHashes)
     const txStatus = await this.walletConnection._near.connection.provider.txStatus(
       txHash,
