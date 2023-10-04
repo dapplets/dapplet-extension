@@ -187,7 +187,7 @@ export class DynamicAdapter implements IDynamicAdapter {
     if (mutations) this.locator.handleMutations(mutations)
   }
 
-  public createWidgetFactory<T>(Widget: any) {
+  public createWidgetFactory<T extends { insertionPoint?: string }>(Widget: any) {
     const me = this
 
     function uuidv4() {
@@ -214,7 +214,12 @@ export class DynamicAdapter implements IDynamicAdapter {
       const context = builder.contexts.get(contextNode)
       if (!context) return
 
-      const insPointName = Widget.contextInsPoints[builder.contextName]
+      // ToDo: unify insertion points for BOS components and built-in widgets
+      // The line below allows to inject BOS components into any insertion points
+      // defined in a Parser Config. It was added at Encode x NEAR Horizon Hackathon
+      const insPointFromDapplet = config?.DEFAULT?.insertionPoint
+      const insPointFromAdapter = Widget.contextInsPoints[builder.contextName]
+      const insPointName = insPointFromDapplet ?? insPointFromAdapter
 
       const insPoint = builder.insPoints[insPointName]
       if (!insPoint) {

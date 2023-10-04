@@ -275,6 +275,12 @@ export type ParserConfig = {
           }
         }
       }
+      insertionPoints?: {
+        [key: string]: {
+          selector: string
+          insert?: string
+        }
+      }
       contextBuilder: ContextBuilder
       childrenContexts?: string[]
     }

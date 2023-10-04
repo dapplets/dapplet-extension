@@ -71,6 +71,7 @@ export function Component({ src, props }: { src: string; props: any }) {
 
 export class BosComponent extends HTMLElement {
   public src: string
+  public insertionPoint: string
   public styles: string
 
   private _adapterStylesMountPoint = document.createElement('style')

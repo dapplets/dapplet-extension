@@ -126,6 +126,17 @@ class ConfigAdapter {
         }
       }
 
+      // ToDo: refactor it after merging of NEAR BOS
+      // These insertion points are defined in Parser Configs
+      // and were introduced at Encode x NEAR Horizon Hackathon
+      for (const insPointName in ctx.insertionPoints ?? {}) {
+        const insPoint = ctx.insertionPoints[insPointName]
+        insPoints[insPointName] = {
+          selector: insPoint.selector,
+          insert: insPoint.insert,
+        }
+      }
+
       config[contextName] = {
         containerSelector: ctx.containerSelector,
         contextSelector: ctx.contextSelector,
