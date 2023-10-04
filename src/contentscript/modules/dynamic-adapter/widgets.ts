@@ -128,11 +128,10 @@ export class WidgetBuilder {
         const insPointConfig = dappletConfig[this.contextName]
 
         if (Array.isArray(insPointConfig)) {
-          this._insertWidgets(insPointConfig, dappletConfig, this.contextName, context, contextNode)
+          this._insertWidgets(insPointConfig, dappletConfig, context, contextNode)
         } else if (typeof insPointConfig === 'function') {
           const arr = insPointConfig(context.parsed)
-          const insert = (arr) =>
-            this._insertWidgets(arr, dappletConfig, this.contextName, context, contextNode)
+          const insert = (arr) => this._insertWidgets(arr, dappletConfig, context, contextNode)
           arr instanceof Promise ? arr.then(insert) : insert(arr)
         } else {
           dappletConfig[this.contextName] = undefined
@@ -222,7 +221,6 @@ export class WidgetBuilder {
   private _insertWidgets(
     insPointConfig: any,
     dappletConfig: DappletConfig,
-    insPointName: string,
     context: Context,
     contextNode: Element
   ) {
@@ -240,12 +238,7 @@ export class WidgetBuilder {
           // console.error(`Invalid widget configuration in the insertion point "${insPointName}". It must be WidgetConstructor instance.`);
           continue
         }
-        const insertedWidget = widgetConstructor(
-          this,
-          insPointName,
-          dappletConfig.orderIndex,
-          contextNode
-        )
+        const insertedWidget = widgetConstructor(this, dappletConfig.orderIndex, contextNode)
         if (!insertedWidget) continue
 
         const registeredWidgets = this.widgets.get(dappletConfig)

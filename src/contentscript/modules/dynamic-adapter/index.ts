@@ -21,7 +21,7 @@ export interface IDynamicAdapter extends IContentAdapter {
     Widget: any
   ): (config: {
     [state: string]: T
-  }) => (builder: WidgetBuilder, insPointName: string, order: number, contextNode: Element) => any
+  }) => (builder: WidgetBuilder, order: number, contextNode: Element) => any
   resetConfig(
     config: DappletConfig,
     newConfig: DappletConfig,
@@ -201,7 +201,6 @@ export class DynamicAdapter implements IDynamicAdapter {
     function createWidget(
       Widget: any,
       builder: WidgetBuilder,
-      _insPointName: string,
       config: { [state: string]: T },
       order: number,
       contextNode: Element,
@@ -396,8 +395,8 @@ export class DynamicAdapter implements IDynamicAdapter {
 
     return (config: WidgetConfig<T>) => {
       const uuid = uuidv4()
-      return (builder: WidgetBuilder, insPointName: string, order: number, contextNode: Element) =>
-        createWidget(Widget, builder, insPointName, config, order, contextNode, uuid)
+      return (builder: WidgetBuilder, order: number, contextNode: Element) =>
+        createWidget(Widget, builder, config, order, contextNode, uuid)
     }
   }
 
