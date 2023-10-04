@@ -3,6 +3,7 @@ import BN from 'bn.js'
 import { baseDecode } from 'borsh'
 import { ConnectedWalletAccount, Connection } from 'near-api-js'
 import { SignAndSendTransactionOptions } from 'near-api-js/lib/account'
+import { AccessKeyView } from 'near-api-js/lib/providers/provider'
 import { createTransaction } from 'near-api-js/lib/transaction'
 import { PublicKey } from 'near-api-js/lib/utils'
 import { generateGuid } from '../../../common/generateGuid'
@@ -11,6 +12,9 @@ import { BackgroundWalletConnection } from './backgroundWalletConnection'
 
 export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
   accountId: string
+
+  /** @hidden */
+  accessKeyByPublicKeyCache: { [key: string]: AccessKeyView } = {}
 
   constructor(
     walletConnection: BackgroundWalletConnection,
@@ -60,13 +64,20 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
       try {
         // walletCallbackUrl is null to prevent calling of walletCallbackUrl = window.location.href (window is undefined in web workers)
         // at https://github.com/near/near-api-js/blob/53ba3f21c6da503e971a251b205bf50ea8b36dd0/packages/wallet-account/src/wallet_account.ts#L306
-        return await super.signAndSendTransaction({ receiverId, actions, walletCallbackUrl: null })
+        return await super.signAndSendTransaction({
+          receiverId,
+          actions,
+          walletCallbackUrl: null,
+        })
       } catch (e) {
         if (e.type === 'NotEnoughAllowance') {
           accessKey = await this.accessKeyForTransaction(receiverId, actions)
         } else {
           throw e
         }
+      } finally {
+        // clear keys cached in this.findAccessKey method to prevent inconsistent nonce
+        delete this.accessKeyByPublicKeyCache[accessKey.public_key]
       }
     }
 
