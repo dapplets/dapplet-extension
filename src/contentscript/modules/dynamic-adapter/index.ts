@@ -219,7 +219,9 @@ export class DynamicAdapter implements IDynamicAdapter {
       // defined in a Parser Config. It was added at Encode x NEAR Horizon Hackathon
       const insPointFromDapplet = config?.DEFAULT?.insertionPoint
       const insPointFromAdapter = Widget.contextInsPoints[builder.contextName]
-      const insPointName = insPointFromDapplet ?? insPointFromAdapter
+      const insPointName = insPointFromDapplet
+        ? `${insPointFromAdapter}/${insPointFromDapplet}`
+        : insPointFromAdapter
 
       const insPoint = builder.insPoints[insPointName]
       if (!insPoint) {
@@ -292,8 +294,8 @@ export class DynamicAdapter implements IDynamicAdapter {
         const ExtendedWidget = class extends Widget {}
 
         // ToDo: dynamic adapter should not know about LitElement
-        if (Widget.stylesByContext[builder.contextName]) {
-          const cssAsString = Widget.stylesByContext[builder.contextName]
+        if (Widget.stylesByInsPoint[insPointName]) {
+          const cssAsString = Widget.stylesByInsPoint[insPointName]
           ExtendedWidget.styles = unsafeCSS(cssAsString)
         }
 
@@ -308,8 +310,8 @@ export class DynamicAdapter implements IDynamicAdapter {
         webcomponent.state = state.state
 
         // For BOS-components
-        if (Widget.stylesByContext[builder.contextName]) {
-          const cssAsString = Widget.stylesByContext[builder.contextName]
+        if (Widget.stylesByInsPoint[insPointName]) {
+          const cssAsString = Widget.stylesByInsPoint[insPointName]
           webcomponent.styles = cssAsString
         }
 

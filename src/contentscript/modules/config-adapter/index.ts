@@ -7,7 +7,7 @@ import BuiltInWidgets from './widgets'
 type ReversedWidgetConfig = {
   [widgetName: string]: {
     contextInsPoints: { [contextName: string]: string }
-    stylesByContext: { [contextName: string]: string | null }
+    stylesByInsPoint: { [insPointName: string]: string | null }
   }
 }
 
@@ -120,20 +120,22 @@ class ConfigAdapter {
       // ToDo: remove after transition to MV3
       // define insertion points for backward compatibility
       for (const widgetName in ctx.widgets ?? {}) {
-        insPoints[`${contextName}/${widgetName}`] = {
-          selector: ctx.widgets[widgetName].insertionPoint,
-          insert: ctx.widgets[widgetName].insert,
-        }
-      }
+        const widgetConfig = ctx.widgets[widgetName]
 
-      // ToDo: refactor it after merging of NEAR BOS
-      // These insertion points are defined in Parser Configs
-      // and were introduced at Encode x NEAR Horizon Hackathon
-      for (const insPointName in ctx.insertionPoints ?? {}) {
-        const insPoint = ctx.insertionPoints[insPointName]
-        insPoints[insPointName] = {
-          selector: insPoint.selector,
-          insert: insPoint.insert,
+        insPoints[`${contextName}/${widgetName}`] = {
+          selector: widgetConfig.insertionPoint,
+          insert: widgetConfig.insert,
+        }
+
+        // ToDo: refactor it after merging of NEAR BOS
+        // These insertion points are defined in Parser Configs
+        // and were introduced at Encode x NEAR Horizon Hackathon
+        for (const insPointName in widgetConfig.insertionPoints ?? {}) {
+          const insPoint = widgetConfig.insertionPoints[insPointName]
+          insPoints[`${contextName}/${widgetName}/${insPointName}`] = {
+            selector: insPoint.selector,
+            insert: insPoint.insert,
+          }
         }
       }
 
@@ -161,15 +163,25 @@ class ConfigAdapter {
         if (!widgetConfigs[widgetName]) {
           widgetConfigs[widgetName] = {
             contextInsPoints: {},
-            stylesByContext: {},
+            stylesByInsPoint: {},
           }
         }
 
         // ToDo: remove after transition to MV3
         // For backward compatibility with old configs
         // Insertion point name example: 'POST/button'
-        widgetConfigs[widgetName].contextInsPoints[contextName] = `${contextName}/${widgetName}`
-        widgetConfigs[widgetName].stylesByContext[contextName] = widgetConfig.styles
+        const insPointName = `${contextName}/${widgetName}`
+        widgetConfigs[widgetName].contextInsPoints[contextName] = insPointName
+        widgetConfigs[widgetName].stylesByInsPoint[insPointName] = widgetConfig.styles
+
+        // ToDo: unify insertion points for BOS components and built-in widgets
+        // The line below allows to inject BOS components into any insertion points
+        // defined in a Parser Config. It was added at Encode x NEAR Horizon Hackathon
+        for (const insPoint in widgetConfig.insertionPoints) {
+          const fullInsPointName = `${insPointName}/${insPoint}`
+          const insPointConfig = widgetConfig.insertionPoints[insPoint]
+          widgetConfigs[widgetName].stylesByInsPoint[fullInsPointName] = insPointConfig.styles
+        }
       }
     }
 
@@ -192,7 +204,7 @@ class ConfigAdapter {
       const ExtendedWidgetClass = class extends WidgetClass {
         // ToDo: remove after transition to MV3
         static contextInsPoints = Object.assign({}, widgetConfig.contextInsPoints)
-        static stylesByContext = widgetConfig.stylesByContext
+        static stylesByInsPoint = widgetConfig.stylesByInsPoint
       }
 
       exports[widgetName] = this._dynamicAdapter.createWidgetFactory(ExtendedWidgetClass)

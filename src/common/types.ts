@@ -264,6 +264,13 @@ export type ParserConfig = {
           styles?: string
           insertionPoint: string
           insert?: string
+          insertionPoints?: {
+            [key: string]: {
+              selector: string
+              styles?: string
+              insert?: string
+            }
+          }
         }
       }
       events?: {
@@ -273,12 +280,6 @@ export type ParserConfig = {
           data?: {
             [key: string]: string
           }
-        }
-      }
-      insertionPoints?: {
-        [key: string]: {
-          selector: string
-          insert?: string
         }
       }
       contextBuilder: ContextBuilder
