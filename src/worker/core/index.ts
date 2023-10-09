@@ -1,5 +1,6 @@
 import * as ethers from 'ethers'
 import * as NearApi from 'near-api-js'
+import semver from 'semver'
 import ModuleInfo from '../../background/models/moduleInfo'
 import VersionInfo from '../../background/models/versionInfo'
 import { formatModuleId, joinUrls, parseShareLink } from '../../common/helpers'
@@ -551,5 +552,13 @@ export class Core {
     conn.state = state
     conn.state.addConnection(conn)
     return conn
+  }
+
+  public extension = {
+    satisfied: this._isExtensionVersionSatisfied,
+  }
+
+  private _isExtensionVersionSatisfied(statement: string): boolean {
+    return semver.satisfies(EXTENSION_VERSION, statement)
   }
 }

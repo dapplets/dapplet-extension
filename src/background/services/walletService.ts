@@ -12,7 +12,11 @@ import {
 import wallets from '../wallets'
 import { EthereumWallet } from '../wallets/ethereum/interface'
 import { GenericWallet } from '../wallets/interface'
-import { NearWallet } from '../wallets/near/interface'
+import {
+  BrowserWalletSignAndSendTransactionParams,
+  BrowserWalletSignInParams,
+  NearWallet,
+} from '../wallets/near/interface'
 import GlobalConfigService from './globalConfigService'
 import { OverlayService } from './overlayService'
 import { SessionService } from './sessionService'
@@ -342,6 +346,49 @@ export class WalletService {
   ) {
     const wallet = (await this._getInternalSignerFor(app, chain, false)) as NearWallet
     return wallet.getAccount()
+  }
+
+  public async near_signIn(
+    app: string | DefaultSigners,
+    chain: ChainTypes.NEAR_MAINNET | ChainTypes.NEAR_TESTNET,
+    params: BrowserWalletSignInParams
+  ) {
+    const wallet = (await this._getInternalSignerFor(app, chain, false)) as NearWallet
+    return wallet.signIn(params)
+  }
+
+  public async near_signOut(
+    app: string | DefaultSigners,
+    chain: ChainTypes.NEAR_MAINNET | ChainTypes.NEAR_TESTNET
+  ) {
+    const wallet = (await this._getInternalSignerFor(app, chain, false)) as NearWallet
+    return wallet.signOut()
+  }
+
+  public async near_getAccounts(
+    app: string | DefaultSigners,
+    chain: ChainTypes.NEAR_MAINNET | ChainTypes.NEAR_TESTNET
+  ) {
+    const wallet = (await this._getInternalSignerFor(app, chain, false)) as NearWallet
+    return wallet.getAccounts()
+  }
+
+  public async near_signAndSendTransaction(
+    app: string | DefaultSigners,
+    chain: ChainTypes.NEAR_MAINNET | ChainTypes.NEAR_TESTNET,
+    params: BrowserWalletSignAndSendTransactionParams
+  ) {
+    const wallet = (await this._getInternalSignerFor(app, chain, false)) as NearWallet
+    return wallet.signAndSendTransaction(params)
+  }
+
+  public async near_signAndSendTransactions(
+    app: string | DefaultSigners,
+    chain: ChainTypes.NEAR_MAINNET | ChainTypes.NEAR_TESTNET,
+    params: any // ToDo: add types
+  ) {
+    const wallet = (await this._getInternalSignerFor(app, chain, false)) as NearWallet
+    return wallet.signAndSendTransactions(params)
   }
 
   public async getGenericWallet(chain: ChainTypes, wallet: WalletTypes): Promise<GenericWallet> {

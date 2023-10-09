@@ -1,8 +1,9 @@
 import { Provider, TransactionRequest } from '@ethersproject/providers'
 import { ethers } from 'ethers'
 import browser from 'webextension-polyfill'
-import { EthereumWallet } from './interface'
 import * as walletIcons from '../../../common/resources/wallets'
+import { EthereumWallet } from './interface'
+
 export default class extends ethers.Signer implements EthereumWallet {
   public provider: ethers.providers.StaticJsonRpcProvider
   private _wallet: ethers.Wallet = null

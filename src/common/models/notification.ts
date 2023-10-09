@@ -7,8 +7,6 @@ export type NotificationAction = {
   icon?: string
 }
 
-
-
 export type NotificationPayload = {
   title: string
   message?: string
