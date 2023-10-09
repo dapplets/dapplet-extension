@@ -3,7 +3,7 @@ import { initBGFunctions } from '../../communication'
 
 export class BackgroundJsonRpcProvider extends providers.JsonRpcProvider {
   constructor(private _app: string, private _network: string) {
-    super()
+    super({ url: '' }) // ToDo: unfake values
   }
 
   async sendJsonRpc(method: string, params: object): Promise<any> {

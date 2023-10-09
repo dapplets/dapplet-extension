@@ -101,6 +101,12 @@ browser.runtime.onMessage.addListener(
     eth_sendCustomRequest: walletService.eth_sendCustomRequest.bind(walletService),
     eth_sendCustomRequestToWallet: walletService.eth_sendCustomRequestToWallet.bind(walletService),
     eth_waitTransaction: walletService.eth_waitTransaction.bind(walletService),
+
+    near_signIn: walletService.near_signIn.bind(walletService),
+    near_signOut: walletService.near_signOut.bind(walletService),
+    near_getAccounts: walletService.near_getAccounts.bind(walletService),
+    near_signAndSendTransaction: walletService.near_signAndSendTransaction.bind(walletService),
+    near_signAndSendTransactions: walletService.near_signAndSendTransactions.bind(walletService),
     near_sendCustomRequest: walletService.near_sendCustomRequest.bind(walletService),
 
     // SessionService

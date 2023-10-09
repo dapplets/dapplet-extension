@@ -12,7 +12,7 @@ export class BackgroundNear extends Near {
     const signer = new InMemorySigner(keyStore)
     super({ ...cfg, deps: { keyStore }, signer })
     const provider = new BackgroundJsonRpcProvider(app, cfg.networkId)
-    const connection = new Connection(cfg.networkId, provider, signer)
+    const connection = new Connection(cfg.networkId, provider, signer, `jsvm.${cfg.networkId}`)
     Object.defineProperty(this, 'connection', {
       value: connection,
     })
