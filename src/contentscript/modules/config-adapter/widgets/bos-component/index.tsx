@@ -92,7 +92,10 @@ export class BosComponent extends HTMLElement {
 
     // Apply styles from parser config
     if (this.styles) {
-      this._adapterStylesMountPoint.innerHTML = this.styles
+      // It will prevent inheritance without affecting other CSS defined within the ShadowDOM.
+      // https://stackoverflow.com/a/68062098
+      const disableInheritanceRule = ':host { all: initial; } '
+      this._adapterStylesMountPoint.innerHTML = disableInheritanceRule + this.styles
       shadowRoot.appendChild(this._adapterStylesMountPoint)
     }
 
