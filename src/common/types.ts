@@ -269,6 +269,9 @@ export type ParserConfig = {
               selector: string
               styles?: string
               insert?: string
+              wrapper?: {
+                styles?: string
+              }
             }
           }
         }

@@ -42,6 +42,7 @@ export class DynamicAdapter implements IDynamicAdapter {
   private contextBuilders: WidgetBuilder[] = []
   private stateStorage = new Map<string, State<any>>()
   private locator: Locator
+  private wrappers = new Set<HTMLDivElement>()
 
   constructor(private _core: Core) {
     if (!document || !window || !MutationObserver)
@@ -347,7 +348,7 @@ export class DynamicAdapter implements IDynamicAdapter {
       widget.el.classList.add('dapplet-widget', clazz)
       widget.el.setAttribute('data-dapplet-order', order.toString())
 
-      const insertTo: 'begin' | 'end' | 'inside' =
+      const insertTo: 'begin' | 'end' | 'inside' | 'wrapper' =
         insPoint.insert !== undefined
           ? insPoint.insert
           : insPoint.insPoints?.[Widget.contextInsPoints[insPointName]].insert === undefined
@@ -356,23 +357,60 @@ export class DynamicAdapter implements IDynamicAdapter {
 
       const insertedElements = node.parentNode.querySelectorAll(':scope > .dapplet-widget')
 
+      let wrapper: HTMLDivElement
+
+      if (insPoint.wrapper) {
+        wrapper = node.parentNode.querySelector(':scope > .dapplet-wrapper')
+        if (!wrapper) {
+          wrapper = document.createElement('div')
+          wrapper.classList.add('dapplet-wrapper')
+          const shadowRoot = wrapper.attachShadow({ mode: 'open' })
+          const style = document.createElement('style')
+          style.textContent = insPoint.wrapper.styles
+          shadowRoot.appendChild(style)
+          me.wrappers.add(wrapper)
+
+          switch (insertTo) {
+            case 'end':
+              node.parentNode.insertBefore(wrapper, node.nextSibling)
+              break
+            case 'begin':
+              node.parentNode.insertBefore(wrapper, node)
+              break
+            case 'inside':
+              node.appendChild(wrapper)
+              break
+            default:
+              console.error(
+                'Invalid "insert" value in the insertion point config. The valid values are "begin" or "end".'
+              )
+          }
+        }
+      }
+
       if (insertedElements.length === 0) {
-        switch (insertTo) {
-          case 'end':
-            node.parentNode.insertBefore(widget.el, node.nextSibling)
-            break
-          case 'begin':
-            node.parentNode.insertBefore(widget.el, node)
-            break
-          case 'inside':
-            node.appendChild(widget.el)
-            break
-          default:
-            console.error(
-              'Invalid "insert" value in the insertion point config. The valid values are "begin" or "end".'
-            )
+        if (!wrapper) {
+          switch (insertTo) {
+            case 'end':
+              node.parentNode.insertBefore(widget.el, node.nextSibling)
+              break
+            case 'begin':
+              node.parentNode.insertBefore(widget.el, node)
+              break
+            case 'inside':
+              node.appendChild(widget.el)
+              break
+            default:
+              console.error(
+                'Invalid "insert" value in the insertion point config. The valid values are "begin" or "end".'
+              )
+          }
+        } else {
+          wrapper.shadowRoot.appendChild(widget.el)
         }
       } else {
+        // ToDo: handle the case with wrapper
+
         let targetElementIndex = null
 
         // ToDo: find an element with the same order to throw the error
@@ -408,6 +446,7 @@ export class DynamicAdapter implements IDynamicAdapter {
   }
 
   public deactivate() {
+    this.wrappers.forEach((x) => x.remove())
     this.contextBuilders.forEach((x) => x.observer?.disconnect())
     this.observer.disconnect()
   }

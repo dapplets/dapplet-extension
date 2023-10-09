@@ -135,6 +135,7 @@ class ConfigAdapter {
           insPoints[`${contextName}/${widgetName}/${insPointName}`] = {
             selector: insPoint.selector,
             insert: insPoint.insert,
+            wrapper: insPoint.wrapper, // Container that wraps child widgets
           }
         }
       }
