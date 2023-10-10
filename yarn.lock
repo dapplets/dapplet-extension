@@ -7668,6 +7668,11 @@ lodash.capitalize@^4.2.1:
   resolved "https://registry.yarnpkg.com/lodash.capitalize/-/lodash.capitalize-4.2.1.tgz#f826c9b4e2a8511d84e3aca29db05e1a4f3b72a9"
   integrity sha512-kZzYOKspf8XVX5AvmQF94gQW0lejFVgb80G85bU4ZWzoJ6C03PQg3coYAUpSTpQWelrZELd3XWgHzw4Ck5kaIw==
 
+lodash.clonedeep@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz#e23f3f9c4f8fbdde872529c1071857a086e5ccef"
+  integrity sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==
+
 lodash.debounce@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
@@ -8636,8 +8641,8 @@ near-api-js@^2.1.4:
     tweetnacl "^1.0.1"
 
 "near-social-vm@github:dapplets/near-social-vm":
-  version "2.3.2"
-  resolved "https://codeload.github.com/dapplets/near-social-vm/tar.gz/4ccc1ea125b91d96d87000459cb5ddea4ec39c12"
+  version "2.4.2"
+  resolved "https://codeload.github.com/dapplets/near-social-vm/tar.gz/a61c93739ae836e29ac6fa18a1f7d831a40fd3b4"
   dependencies:
     "@braintree/sanitize-url" "6.0.0"
     "@radix-ui/react-accordion" "^1.1.1"
@@ -8680,7 +8685,7 @@ near-api-js@^2.1.4:
     idb "^7.1.1"
     iframe-resizer-react "^1.1.0"
     local-storage "^2.0.0"
-    lodash "^4.17.21"
+    lodash.clonedeep "^4.5.0"
     mdast-util-find-and-replace "^2.0.0"
     nanoid "^4.0.1"
     prettier "^2.7.1"
@@ -8690,7 +8695,7 @@ near-api-js@^2.1.4:
     react-files "^3.0.0-alpha.3"
     react-infinite-scroller "^1.2.6"
     react-markdown "^7.1.0"
-    react-singleton-hook "^3.1.1"
+    react-singleton-hook "^4.0.1"
     react-syntax-highlighter "^15.5.0"
     react-uuid "^1.0.2"
     remark-gfm "^3.0.1"
@@ -9933,10 +9938,10 @@ react-secure-link@^3.1.2:
   resolved "https://registry.yarnpkg.com/react-secure-link/-/react-secure-link-3.1.2.tgz#c73bf821a5d01ac0e6fe717748c4998498e8ccee"
   integrity sha512-ykYOw/YVm6Q1g8RMzmDx1Sdqv0z5de0Sda/yAHs7TN22hj8E2fQrW5uhe0kmS+DkuZCoCCXBNcrC1yQ/OEqtjQ==
 
-react-singleton-hook@^3.1.1:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/react-singleton-hook/-/react-singleton-hook-3.4.0.tgz#23e1fb8ea55c6e4f7fffdc8674bb03e99a948490"
-  integrity sha512-eQEpyacGAaRejmWUizUdNNQFn5AO0iaKRSl1jxgC0FQadVY/I1WFuPrYiutglPzO9s8yEbIh95UXVJQel4d7HQ==
+react-singleton-hook@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/react-singleton-hook/-/react-singleton-hook-4.0.1.tgz#98082b37be06b22845ced85eb11e02bacc3b2580"
+  integrity sha512-fWuk8VxcZPChrkQasDLM8pgd/7kyi+Cr/5FfCiD99FicjEru+JmtEZNnN4lJ8Z7KbqAST5CYPlpz6lmNsZFGNw==
 
 react-style-singleton@^2.2.1:
   version "2.2.1"

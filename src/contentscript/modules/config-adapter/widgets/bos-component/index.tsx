@@ -4,17 +4,13 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { EthersProviderContext, useInitNear, Widget } from 'near-social-vm'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
+import { singletonHook } from 'react-singleton-hook'
 import { StyleSheetManager } from 'styled-components'
 import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../common/global-event-bus'
 
-const networkId = 'mainnet'
-
-export function Component({ src, props }: { src: string; props: any }) {
+export const useSingletonInitNear = singletonHook(null, () => {
   const { initNear } = useInitNear()
-  const [overrides, setOverrides] = React.useState<{ [widgetSrc: string]: string }>({})
-  const [isLoading, setIsLoading] = React.useState(true)
-
   React.useEffect(() => {
     initNear &&
       initNear({
@@ -25,6 +21,11 @@ export function Component({ src, props }: { src: string; props: any }) {
         }),
       })
   }, [initNear])
+})
+
+export const useSingletonOverrides = singletonHook({ overrides: {}, isLoading: true }, () => {
+  const [overrides, setOverrides] = React.useState<{ [widgetSrc: string]: string }>({})
+  const [isLoading, setIsLoading] = React.useState(true)
 
   const loadOverrides = React.useCallback(() => {
     ;(async () => {
@@ -49,6 +50,19 @@ export function Component({ src, props }: { src: string; props: any }) {
     EventBus.on('bos_mutation_preview', setOverrides)
     return () => EventBus.off('bos_mutation_preview', setOverrides)
   }, [])
+
+  return { overrides, isLoading }
+})
+
+const networkId = 'mainnet'
+
+const Component: React.FC<{
+  src: string
+  props: any
+}> = ({ src, props }) => {
+  useSingletonInitNear()
+
+  const { overrides, isLoading } = useSingletonOverrides()
 
   if (!EthersProviderContext.Provider || isLoading) {
     return null
@@ -116,6 +130,10 @@ export class BosComponent extends HTMLElement {
     })
 
     this._render()
+  }
+
+  disconnectedCallback() {
+    this._root.unmount()
   }
 
   _getCustomProps(): { src: string; props: any } {
