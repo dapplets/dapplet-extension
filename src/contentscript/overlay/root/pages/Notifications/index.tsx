@@ -18,14 +18,14 @@ export const Notifications = () => {
 
   const [load, setLoad] = useState(true)
   const [isOlder, setOlder] = useState(false)
-  const [count, setCount] = useState(5)
+  const [count, setCount] = useState(8)
   const [loadNotify, setLoadNotify] = useState(false)
   const location = useLocation()
   const state = location.state as any
   console.log(state)
 
   const counter = () => {
-    setCount((prevState) => prevState + 5)
+    setCount((prevState) => prevState + 10)
   }
 
   useEffect(() => {
@@ -139,7 +139,14 @@ export const Notifications = () => {
                   <>
                     {event.length > 0 &&
                       event
-                        .filter((x) => x.status === NotificationStatus.Highlighted)
+                        .sort((x, i) =>
+                          x.status === NotificationStatus.Highlighted
+                            ? -1
+                            : i.status === NotificationStatus.Highlighted
+                            ? 0
+                            : 1
+                        )
+                        // .filter((x) => x.status === NotificationStatus.Highlighted)
                         .map((x, i) => {
                           if (i < count) {
                             return (
@@ -165,7 +172,7 @@ export const Notifications = () => {
                 )}
 
                 <>
-                  {event.length > 0 &&
+                  {/* {event.length > 0 &&
                     event
                       .filter((x) => x.status === NotificationStatus.Default)
                       .map((x, i) => {
@@ -190,7 +197,7 @@ export const Notifications = () => {
                             <span className={styles.notOlder}>Nothing here</span>
                           )
                         }
-                      })}
+                      })} */}
 
                   <button
                     disabled={
