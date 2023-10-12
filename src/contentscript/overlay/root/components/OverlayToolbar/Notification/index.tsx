@@ -87,7 +87,15 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
     >
       <div className={styles.titleNotificationWrapperTeaser}>
         <div className={styles.notificationBlockTop}>
-          <div className={styles.iconNotificationBlock} onClick={handleActionButtonClick}>
+          <div
+            className={styles.iconNotificationBlock}
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              handleOpenOverlayNotification(payload.id)
+              onRemove(payload)
+            }}
+          >
             {payload.icon ? (
               <DappletImage storageRef={payload.icon} className={styles.iconNotification} />
             ) : (

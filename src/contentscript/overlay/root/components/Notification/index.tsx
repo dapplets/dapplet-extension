@@ -5,7 +5,6 @@ import { useLocation } from 'react-router-dom'
 import browser from 'webextension-polyfill'
 import { StorageRef } from '../../../../../common/types'
 import { addZero } from '../../helpers/addZero'
-import { CloseIcon } from '../CloseIcon'
 import { DappletImage } from '../DappletImage'
 import { LinkifyText } from '../LinkifyText'
 import styles from './Notification.module.scss'
@@ -57,17 +56,18 @@ export const Notification = (props: NotificationProps): ReactElement => {
       const timerStyles = setTimeout(() => {
         timerRemove = setTimeout(() => {
           onClear(stateNotify.targetID)
-        }, 2000)
+        }, 3000)
       }, 2500)
 
       return () => {
         clearTimeout(timerStyles)
       }
     }
-  }, [])
+  }, [stateNotify])
 
   return (
     <div
+      onClick={() => onClear && onClear(_id)}
       data-testid={isRead !== 0 ? 'new-notification' : 'old-notification'}
       className={cn(styles.wrapper, {
         [styles.delete]: isDelete,
@@ -94,14 +94,14 @@ export const Notification = (props: NotificationProps): ReactElement => {
           &nbsp;&nbsp;
           <span>{addZero(newDateNum.getHours()) + ':' + addZero(newDateNum.getMinutes())}</span>
         </span>
-        {isRead !== 0 ? (
+        {/* {isRead !== 0 ? (
           <CloseIcon
             appearance="small"
             color="red"
             isNotification
             onClick={() => onClear && onClear(_id)}
           />
-        ) : null}
+        ) : null} */}
       </div>
       <div className={styles.blockDesccription}>
         <div className={styles.blockInfo}>
