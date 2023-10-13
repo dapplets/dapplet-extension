@@ -263,7 +263,7 @@ export default class GlobalConfigService {
         isEnabled: false,
       },
     ]
-    config.devMode = true
+    config.devMode = false
     config.trustedUsers = [
       { account: 'listing.dapplet-base.eth' },
       { account: 'buidl.testnet' },
@@ -513,6 +513,7 @@ export default class GlobalConfigService {
     const config = await this.get()
     callback(config)
     await this.set(config)
+    EventBus.emit('dev_mod_changed')
   }
 
   async updateTargetStorages(storages: StorageTypes[]) {

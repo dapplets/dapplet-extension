@@ -58,7 +58,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const [walletIcon, setWalletIcon] = useState(null)
   const [walletTypeWalletConnect, setWalletTypeWalletConnect] = useState(null)
   const liRef = useRef<HTMLDivElement>()
-
+  const [devMode, setMode] = useState(false)
   // const isEveryWalletConnected = descriptors.filter((x) => !x.connected).length === 0
 
   useEffect(() => {
@@ -77,6 +77,21 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       EventBus.off('wallet_changed', refresh)
     }
   }, [])
+
+  useEffect(() => {
+    // EventBus.emit('dev_mod_changed')
+    EventBus.on('dev_mod_changed', refresh)
+
+    return () => {
+      EventBus.off('dev_mod_changed', refresh)
+    }
+  }, [])
+  const loadDevMode = async () => {
+    const { getDevMode } = await initBGFunctions(browser)
+    const devMode = await getDevMode()
+
+    setMode(devMode)
+  }
 
   const refresh = async () => {
     const { getWalletDescriptors, getDefaultWalletFor } = await initBGFunctions(browser)
@@ -129,6 +144,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         setWalletTypeWalletConnect(null)
       }
     }
+    await loadDevMode()
   }
 
   const disconnectButtonClick = async (chain: ChainTypes, wallet: WalletTypes) => {
@@ -276,6 +292,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         onClose={setOpen}
         connectWallet={connectWallet} // isEveryWalletConnected ? null : connectWallet
         refresh={refresh}
+        devMode={devMode}
       />
       <ModalWallet
         visible={isModalWallet}
