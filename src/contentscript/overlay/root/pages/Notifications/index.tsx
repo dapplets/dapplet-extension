@@ -11,7 +11,6 @@ import {
 } from '../../../../../common/models/notification'
 import IconDefault from '../../assets/icons/notificationIcons/defaultIcon.svg'
 import { Notification } from '../../components/Notification'
-import { TabLoader } from '../../components/TabLoader'
 import styles from './Notifications.module.scss'
 export const Notifications = () => {
   const [event, setEvent] = useState<Notify[]>([])
@@ -22,7 +21,7 @@ export const Notifications = () => {
   const [loadNotify, setLoadNotify] = useState(false)
   const location = useLocation()
   const state = location.state as any
-  console.log(state)
+  // console.log(state)
 
   const counter = () => {
     setCount((prevState) => prevState + 10)
@@ -70,6 +69,13 @@ export const Notifications = () => {
     await deleteNotification(f.id, contextIds)
 
     const d = event.filter((x) => x.id !== f.id)
+    // .sort((x, i) =>
+    //   x.status === NotificationStatus.Highlighted
+    //     ? -1
+    //     : i.status === NotificationStatus.Highlighted
+    //     ? 0
+    //     : 1
+    // )
     setEvent(d)
   }
 
@@ -95,21 +101,40 @@ export const Notifications = () => {
     const notification = await getNotifications()
     setEvent(notification)
   }
+  const sortedStatuses = [
+    NotificationStatus.Highlighted,
+    NotificationStatus.Default,
+    NotificationStatus.Resolved,
+  ]
+
+  const sortedData = (data) => {
+    return data
+      .reduce((acc, item) => {
+        acc.push({
+          key1: sortedStatuses.indexOf(item.status),
+          key2: new Date(item.createdAt),
+          item,
+        })
+        return acc
+      }, [])
+      .sort((a, b) => a.key1 - b.key1 || b.key2 - a.key2)
+  }
+  // console.log(sortedData(event))
 
   return (
     <div className={styles.wrapper} data-testid="notification">
       <>
-        {load ? (
+        {/* {load ? (
           <TabLoader />
-        ) : (
-          <div className={styles.block}>
-            {/* <div className={styles.warning}>
+        ) : ( */}
+        <div className={styles.block}>
+          {/* <div className={styles.warning}>
               <span>Some of the network functions are not available.</span>
               <span>We are already working on a solution.</span>
             </div> */}
 
-            <div className={styles.notification}>
-              {/* <>
+          <div className={styles.notification}>
+            {/* <>
                 <div className={styles.titleWrapper}>
                   <span className={styles.titleBlock}>Announcements</span>
                   <div className={styles.delimeter}></div>
@@ -117,62 +142,51 @@ export const Notifications = () => {
                 <span className={styles.notOlder}>Nothing here</span>
               </> */}
 
-              <>
-                <div className={styles.titleWrapper}>
-                  <span className={styles.titleBlock}>Notifications</span>
-                  <button
-                    className={cn(styles.btnNotification, styles.isRead)}
-                    onClick={() => onRemoveEventsAll(event)}
-                    disabled={
-                      event &&
-                      event.filter((x) => x.status === NotificationStatus.Highlighted).length === 0
-                    }
-                  >
-                    Mark all as read
-                  </button>
-                </div>
-                {loadNotify ? (
-                  // todo: unificate loaders
-                  // todo: unificate bg in pages
-                  <div className={styles.loaderNotify}></div>
-                ) : (
-                  <>
-                    {event.length > 0 &&
-                      event
-                        .sort((x, i) =>
-                          x.status === NotificationStatus.Highlighted
-                            ? -1
-                            : i.status === NotificationStatus.Highlighted
-                            ? 0
-                            : 1
-                        )
-                        // .filter((x) => x.status === NotificationStatus.Highlighted)
-                        .map((x, i) => {
-                          if (i < count) {
-                            return (
-                              <Notification
-                                onClear={getReadNotifications}
-                                icon={x.icon ? x.icon : IconDefault}
-                                //
-                                key={x.id}
-                                label={'System'}
-                                title={x.title}
-                                description={x.message}
-                                _id={x.id}
-                                date={x.createdAt}
-                                actions={x.actions}
-                                teaser={x.teaser}
-                                stateNotify={state ? state : null}
-                                isRead={x.status}
-                              />
-                            )
-                          }
-                        })}
-                  </>
-                )}
+            <>
+              <div className={styles.titleWrapper}>
+                <span className={styles.titleBlock}>Notifications</span>
+                <button
+                  className={cn(styles.btnNotification, styles.isRead)}
+                  onClick={() => onRemoveEventsAll(event)}
+                  disabled={
+                    event &&
+                    event.filter((x) => x.status === NotificationStatus.Highlighted).length === 0
+                  }
+                >
+                  Mark all as read
+                </button>
+              </div>
 
-                <>
-                  {/* {event.length > 0 &&
+              <>
+                {event.length > 0 &&
+                  sortedData(event) &&
+                  sortedData(event).length &&
+                  sortedData(event).map((x, i) => {
+                    if (i < count) {
+                      return (
+                        <Notification
+                          onClear={getReadNotifications}
+                          icon={x.item.icon ? x.item.icon : IconDefault}
+                          //
+                          key={x.item.id}
+                          label={'System'}
+                          title={x.item.title}
+                          description={x.item.message}
+                          _id={x.item.id}
+                          date={x.item.createdAt}
+                          actions={x.item.actions}
+                          teaser={x.item.teaser}
+                          stateNotify={state ? state : null}
+                          isRead={x.item.status}
+                        />
+                      )
+                    }
+                  })}
+              </>
+              {/* )} */}
+
+              <>
+                {/* {event.length > 0 &&
                     event
                       .filter((x) => x.status === NotificationStatus.Default)
                       .map((x, i) => {
@@ -199,21 +213,21 @@ export const Notifications = () => {
                         }
                       })} */}
 
-                  <button
-                    disabled={
-                      count >=
-                      // .filter((x) => x.status === NotificationStatus.Default)
-                      event.length
-                    }
-                    className={styles.btnNotification}
-                    onClick={() => counter()}
-                  >
-                    Load more
-                  </button>
-                </>
+                <button
+                  disabled={
+                    count >=
+                    // .filter((x) => x.status === NotificationStatus.Default)
+                    event.length
+                  }
+                  className={styles.btnNotification}
+                  onClick={() => counter()}
+                >
+                  Load more
+                </button>
               </>
+            </>
 
-              {/* {isOlder ? (
+            {/* {isOlder ? (
                 <>
                  
                   {event.length > 0 &&
@@ -254,10 +268,11 @@ export const Notifications = () => {
                   </button>
                 </>
               ) : null} */}
-            </div>
           </div>
-        )}
+        </div>
+        {/* )} */}
       </>
+      {!event.length && <div className={styles.noNot}>No notifications yet</div>}
     </div>
   )
 }
