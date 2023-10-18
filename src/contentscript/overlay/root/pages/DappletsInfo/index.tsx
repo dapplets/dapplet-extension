@@ -73,19 +73,21 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }, [])
 
   const _updateData = async () => {
-    const { getRegistries, getContextIds, getTargetStorages } = await initBGFunctions(browser)
+    const { getRegistries, getContextIds, getTargetStorages, getAdmins } = await initBGFunctions(
+      browser
+    )
     const storagesToUpload = await getTargetStorages()
     setTargetStorages(storagesToUpload) // ToDo: when Swarm will be added uplopad dapplets with overlays only to Swarm but not to Ipfs
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
     const contextId = await getContextIds(prodRegistries[0]?.url, mi.name)
+    const authors = await getAdmins(prodRegistries[0]?.url, mi.name)
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
+    setAdmins(authors)
     setVisibleContextId(contextId)
     await _updateCurrentAccount()
-
-    await getAdmins()
   }
   const _updateCurrentAccount = async () => {
     if (targetChain) {
