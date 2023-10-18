@@ -499,11 +499,13 @@ export class Core {
 
     const { createSession, getThisTab } = initBGFunctions()
     const thisTab = await getThisTab()
+    //ToDo DiP: pick existing sessions here (if any). create a new one if there is no any
     const session = await createSession(moduleName, _request, thisTab.id)
 
     const ls = {} // ToDo: specify LoginInfo
     onLogin?.call({}, ls)
 
+    //ToDo DiP: why Login Session and LoginSession?
     const loginSession = new LoginSession(session)
     loginSession.logoutHandler = onLogout
     this._loginSesssionsMap.set(session.id, loginSession)
