@@ -36,6 +36,7 @@ export const ConnectWallet: FC<Props> = (p: Props) => {
               (x) =>
                 x.label !== 'WalletConnect' &&
                 (!devMode ? x.label !== 'Built-in Test Only Wallet' : x.label !== 'WalletConnect')
+              // ToDo: ^^^ Attention! Hardcoded values! Move this logic from the UI-layer
             )
             .map(({ id, label, icon }) => (
               <li

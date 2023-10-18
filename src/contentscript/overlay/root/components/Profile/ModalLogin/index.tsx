@@ -118,6 +118,7 @@ export const ModalLogin = ({
         <div className={styles.walletBlock}>
           {wallets &&
             wallets.map((x, i) => (
+              // ToDo: Attention! Hardcoded values! Move all mentions x.type.includes('near') from the UI-layer
               <div
                 key={i}
                 className={cn(styles.newProfileBlock, {
