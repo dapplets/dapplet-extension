@@ -75,7 +75,7 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
   if (!payload) {
     return null
   }
-  const getReadNotifications = async (id) => {
+  const setReadNotifications = async (id) => {
     const { markNotificationAsViewed } = await initBGFunctions(browser)
 
     await markNotificationAsViewed(id)
@@ -113,7 +113,7 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
                 color="red"
                 isNotification
                 onClick={() => {
-                  getReadNotifications(payload.id)
+                  setReadNotifications(payload.id)
                   setIsRemoving(true)
 
                   setTimeout(() => {

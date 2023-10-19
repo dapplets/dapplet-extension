@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
 import browser from 'webextension-polyfill'
 import { NotificationStatus } from '../../../../../common/models/notification'
 import { StorageRef } from '../../../../../common/types'
@@ -21,31 +20,16 @@ export interface NotificationProps {
   description: any
   status?: NotificationStatus
   actions?: NotificationAction[]
-  teaser?: string
   stateNotify?: any
 }
 
 export const Notification = (props: NotificationProps): ReactElement => {
-  const {
-    icon,
-    label,
-    title,
-    date,
-    onClear,
-    _id,
-    description,
-    href,
-    status,
-    actions,
-    teaser,
-    stateNotify,
-  } = props
+  const { icon, title, date, onClear, _id, description, href, status, actions, stateNotify } = props
 
   const [isDelete, onDelete] = useState(false)
   const [newDescription, setDescription] = useState(description)
   const refComponent = useRef<HTMLInputElement>()
   const newDateNum = new Date(date)
-  const location = useLocation()
 
   async function handleActionButtonClick(
     actionId: string,

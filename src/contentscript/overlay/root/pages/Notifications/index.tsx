@@ -16,12 +16,11 @@ export const Notifications = () => {
   const [event, setEvent] = useState<Notify[]>([])
 
   const [load, setLoad] = useState(true)
-  const [isOlder, setOlder] = useState(false)
+  // const [isOlder, setOlder] = useState(false)
   const [count, setCount] = useState(8)
-  const [loadNotify, setLoadNotify] = useState(false)
+  // const [loadNotify, setLoadNotify] = useState(false)
   const location = useLocation()
   const state = location.state as any
-  // console.log(state)
 
   const counter = () => {
     setCount((prevState) => prevState + 10)
@@ -79,10 +78,10 @@ export const Notifications = () => {
   }
 
   const onRemoveEventsAll = async (f) => {
-    setLoadNotify(true)
+    // setLoadNotify(true)
     const { markAllNotificationsAsViewed, deleteAllNotifications } = await initBGFunctions(browser)
     await markAllNotificationsAsViewed(f)
-    setTimeout(() => setLoadNotify(false), 1000)
+    // setTimeout(() => setLoadNotify(false), 1000)
     const notification = await getNotifications()
     setEvent(notification)
   }
@@ -92,7 +91,7 @@ export const Notifications = () => {
     const isUpdateAvailable = await getNewExtensionVersion()
   }
 
-  const getReadNotifications = async (id) => {
+  const setReadNotifications = async (id) => {
     const { markNotificationAsViewed } = await initBGFunctions(browser)
 
     await markNotificationAsViewed(id)
@@ -118,7 +117,6 @@ export const Notifications = () => {
       }, [])
       .sort((a, b) => a.key1 - b.key1 || b.key2 - a.key2)
   }
-  // console.log(sortedData(event))
 
   return (
     <div className={styles.wrapper} data-testid="notification">
@@ -164,7 +162,7 @@ export const Notifications = () => {
                     if (i < count) {
                       return (
                         <Notification
-                          onClear={getReadNotifications}
+                          onClear={setReadNotifications}
                           icon={x.item.icon ? x.item.icon : IconDefault}
                           //
                           key={x.item.id}
@@ -174,7 +172,6 @@ export const Notifications = () => {
                           _id={x.item.id}
                           date={x.item.createdAt}
                           actions={x.item.actions}
-                          teaser={x.item.teaser}
                           stateNotify={state ? state : null}
                           status={x.item.status}
                         />
