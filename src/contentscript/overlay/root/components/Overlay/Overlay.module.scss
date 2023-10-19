@@ -85,23 +85,23 @@
   & > *:last-child {
     margin-right: 0;
 
-    &:hover {
-      svg {
-        path {
-          fill: none;
-          stroke: $primary-hover;
-        }
-      }
-    }
+    // &:hover {
+    //   svg {
+    //     path {
+    //       fill: none;
+    //       stroke: $primary-hover;
+    //     }
+    //   }
+    // }
 
-    &:active {
-      svg {
-        path {
-          fill: none;
-          stroke: $primary-pressed;
-        }
-      }
-    }
+    // &:active {
+    //   svg {
+    //     path {
+    //       fill: none;
+    //       stroke: $primary-pressed;
+    //     }
+    //   }
+    // }
   }
 }
 

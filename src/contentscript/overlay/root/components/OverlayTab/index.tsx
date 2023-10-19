@@ -333,7 +333,14 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     {
                       [styles.selected]: p.activeTabMenuId === menu.id,
                     },
-                    p.classNameItem
+
+                    {
+                      [styles.dappletsList]:
+                        menu.title === 'Dapplets' && p.classNameItem !== 'mainIconDapplet',
+                    },
+                    { [styles.mainIconDapplet]: p.classNameItem === 'mainIconDapplet' },
+                    { [styles.iconNotification]: menu.title === 'Notifications' },
+                    { [styles.iconSettings]: menu.title === 'Settings' }
                   )}
                 >
                   {menu.id === 'connectedAccounts' ? (
