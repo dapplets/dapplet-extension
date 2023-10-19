@@ -30,7 +30,6 @@ export const Notifications = () => {
   useEffect(() => {
     const init = async () => {
       const notifications = await getNotifications()
-
       setEvent(notifications)
       setLoad(false)
       // checkUpdates()
@@ -177,7 +176,7 @@ export const Notifications = () => {
                           actions={x.item.actions}
                           teaser={x.item.teaser}
                           stateNotify={state ? state : null}
-                          isRead={x.item.status}
+                          status={x.item.status}
                         />
                       )
                     }

@@ -3,6 +3,7 @@ import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import browser from 'webextension-polyfill'
+import { NotificationStatus } from '../../../../../common/models/notification'
 import { StorageRef } from '../../../../../common/types'
 import { addZero } from '../../helpers/addZero'
 import { DappletImage } from '../DappletImage'
@@ -18,7 +19,7 @@ export interface NotificationProps {
   href?: string
   _id: any
   description: any
-  isRead?: number
+  status?: NotificationStatus
   actions?: NotificationAction[]
   teaser?: string
   stateNotify?: any
@@ -34,21 +35,31 @@ export const Notification = (props: NotificationProps): ReactElement => {
     _id,
     description,
     href,
-    isRead,
+    status,
     actions,
     teaser,
     stateNotify,
   } = props
+
   const [isDelete, onDelete] = useState(false)
   const [newDescription, setDescription] = useState(description)
   const refComponent = useRef<HTMLInputElement>()
   const newDateNum = new Date(date)
   const location = useLocation()
-  async function handleActionButtonClick(actionId: string) {
+
+  async function handleActionButtonClick(
+    actionId: string,
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) {
+    // prevent concurrent execution of resolveNotificationAction and markNotificationAsViewed functions
+    event.stopPropagation()
+    event.preventDefault()
+
     const { resolveNotificationAction, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
     await resolveNotificationAction(_id, actionId, thisTab.id)
   }
+
   useEffect(() => {
     if (stateNotify && stateNotify.targetID === _id) {
       let timerRemove
@@ -65,14 +76,18 @@ export const Notification = (props: NotificationProps): ReactElement => {
     }
   }, [stateNotify])
 
+  const isOldNotification =
+    status === NotificationStatus.Default ||
+    status === NotificationStatus.Resolved ||
+    (stateNotify && stateNotify.isLaterRead && stateNotify.targetID === _id)
+
   return (
     <div
       onClick={() => onClear && onClear(_id)}
-      data-testid={isRead !== 0 ? 'new-notification' : 'old-notification'}
+      data-testid={isOldNotification ? 'old-notification' : 'new-notification'}
       className={cn(styles.wrapper, {
         [styles.delete]: isDelete,
-        [styles.isRead]:
-          isRead === 0 || (stateNotify && stateNotify.isLaterRead && stateNotify.targetID === _id),
+        [styles.isRead]: isOldNotification,
       })}
     >
       <div className={styles.blockTitle}>
@@ -117,14 +132,13 @@ export const Notification = (props: NotificationProps): ReactElement => {
         )}
       </div>
 
-      {/* ToDo: design it */}
-      {actions?.length > 0 ? (
+      {status !== NotificationStatus.Resolved && actions?.length > 0 ? (
         <div className={styles.buttonNotificationBlock}>
           {actions.map(({ action, title }) => (
             <button
               className={styles.buttonNotification}
               key={action}
-              onClick={() => handleActionButtonClick(action)}
+              onClick={(event) => handleActionButtonClick(action, event)}
             >
               {title}
             </button>
