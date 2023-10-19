@@ -1,11 +1,12 @@
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useEffect, useState } from 'react'
+import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../../common/global-event-bus'
 import { ReactComponent as Noties } from '../../../assets/icons/notificationIcons/defaultIcon.svg'
 import { CloseIcon } from '../../CloseIcon'
 import { DappletImage } from '../../DappletImage'
 import styles from '../OverlayToolbar.module.scss'
-
 export interface NotificationOverlayProps {
   payload: any
   onRemove: any
@@ -74,7 +75,11 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
   if (!payload) {
     return null
   }
+  const getReadNotifications = async (id) => {
+    const { markNotificationAsViewed } = await initBGFunctions(browser)
 
+    await markNotificationAsViewed(id)
+  }
   return (
     <div
       data-testid="notification-label"
@@ -82,7 +87,15 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
     >
       <div className={styles.titleNotificationWrapperTeaser}>
         <div className={styles.notificationBlockTop}>
-          <div className={styles.iconNotificationBlock} onClick={handleActionButtonClick}>
+          <div
+            className={styles.iconNotificationBlock}
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              handleOpenOverlayNotification(payload.id)
+              onRemove(payload)
+            }}
+          >
             {payload.icon ? (
               <DappletImage storageRef={payload.icon} className={styles.iconNotification} />
             ) : (
@@ -100,7 +113,9 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
                 color="red"
                 isNotification
                 onClick={() => {
+                  getReadNotifications(payload.id)
                   setIsRemoving(true)
+
                   setTimeout(() => {
                     onRemove(payload)
                   }, 500)
@@ -114,7 +129,7 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
-          handleOpenOverlayNotification()
+          handleOpenOverlayNotification(payload.id)
           onRemove(payload)
         }}
         className={styles.messageNotification}
