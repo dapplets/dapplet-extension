@@ -1,6 +1,6 @@
 {
   "name": "@dapplets/dapplet-extension",
-  "version": "0.62.0",
+  "version": "0.63.1-alpha.1",
   "description": "The Bridge to the Augmented Web.",
   "main": "./lib/index.min.js",
   "types": "./lib/index.d.ts",
@@ -32,6 +32,7 @@
     "@fontsource/montserrat": "^4.5.14",
     "@fontsource/roboto": "^4.5.8",
     "@metamask/providers": "^11.0.0",
+    "@near-wallet-selector/wallet-utils": "^8.5.2",
     "@playwright/test": "^1.37.0",
     "@rjsf/core": "^5.10.0",
     "@rjsf/utils": "^5.10.0",
@@ -121,9 +122,10 @@
     "yup": "^1.0.2"
   },
   "dependencies": {
+    "@near-wallet-selector/core": "^8.5.2",
     "@types/classnames": "^2.3.1",
     "ethers": "^5.7.2",
-    "near-api-js": "^0.39.0",
+    "near-api-js": "^2.1.4",
     "patch-package": "^7.0.0"
   },
   "directories": {
