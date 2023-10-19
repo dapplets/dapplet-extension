@@ -1,5 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import cn from 'classnames'
 import React, { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../common/global-event-bus'
 import {
@@ -9,25 +11,24 @@ import {
 } from '../../../../../common/models/notification'
 import IconDefault from '../../assets/icons/notificationIcons/defaultIcon.svg'
 import { Notification } from '../../components/Notification'
-import { TabLoader } from '../../components/TabLoader'
 import styles from './Notifications.module.scss'
-
 export const Notifications = () => {
   const [event, setEvent] = useState<Notify[]>([])
 
   const [load, setLoad] = useState(true)
-  const [isOlder, setOlder] = useState(false)
-  const [count, setCount] = useState(5)
-  const [loadNotify, setLoadNotify] = useState(false)
+  // const [isOlder, setOlder] = useState(false)
+  const [count, setCount] = useState(8)
+  // const [loadNotify, setLoadNotify] = useState(false)
+  const location = useLocation()
+  const state = location.state as any
 
   const counter = () => {
-    setCount((prevState) => prevState + 5)
+    setCount((prevState) => prevState + 10)
   }
 
   useEffect(() => {
     const init = async () => {
       const notifications = await getNotifications()
-
       setEvent(notifications)
       setLoad(false)
       // checkUpdates()
@@ -66,14 +67,21 @@ export const Notifications = () => {
     await deleteNotification(f.id, contextIds)
 
     const d = event.filter((x) => x.id !== f.id)
+    // .sort((x, i) =>
+    //   x.status === NotificationStatus.Highlighted
+    //     ? -1
+    //     : i.status === NotificationStatus.Highlighted
+    //     ? 0
+    //     : 1
+    // )
     setEvent(d)
   }
 
   const onRemoveEventsAll = async (f) => {
-    setLoadNotify(true)
+    // setLoadNotify(true)
     const { markAllNotificationsAsViewed, deleteAllNotifications } = await initBGFunctions(browser)
     await markAllNotificationsAsViewed(f)
-    setTimeout(() => setLoadNotify(false), 1000)
+    // setTimeout(() => setLoadNotify(false), 1000)
     const notification = await getNotifications()
     setEvent(notification)
   }
@@ -83,7 +91,7 @@ export const Notifications = () => {
     const isUpdateAvailable = await getNewExtensionVersion()
   }
 
-  const getReadNotifications = async (id) => {
+  const setReadNotifications = async (id) => {
     const { markNotificationAsViewed } = await initBGFunctions(browser)
 
     await markNotificationAsViewed(id)
@@ -91,46 +99,99 @@ export const Notifications = () => {
     const notification = await getNotifications()
     setEvent(notification)
   }
+  const sortedStatuses = [
+    NotificationStatus.Highlighted,
+    NotificationStatus.Default,
+    NotificationStatus.Resolved,
+  ]
+
+  const sortedData = (data) => {
+    return data
+      .reduce((acc, item) => {
+        acc.push({
+          key1: sortedStatuses.indexOf(item.status),
+          key2: new Date(item.createdAt),
+          item,
+        })
+        return acc
+      }, [])
+      .sort((a, b) => a.key1 - b.key1 || b.key2 - a.key2)
+  }
 
   return (
     <div className={styles.wrapper} data-testid="notification">
       <>
-        {load ? (
+        {/* {load ? (
           <TabLoader />
-        ) : (
-          <div className={styles.block}>
-            <div className={styles.warning}>
+        ) : ( */}
+        <div className={styles.block}>
+          {/* <div className={styles.warning}>
               <span>Some of the network functions are not available.</span>
               <span>We are already working on a solution.</span>
-            </div>
+            </div> */}
 
-            <div className={styles.notification}>
-              <>
+          <div className={styles.notification}>
+            {/* <>
                 <div className={styles.titleWrapper}>
                   <span className={styles.titleBlock}>Announcements</span>
                   <div className={styles.delimeter}></div>
                 </div>
                 <span className={styles.notOlder}>Nothing here</span>
-              </>
+              </> */}
+
+            <>
+              <div className={styles.titleWrapper}>
+                <span className={styles.titleBlock}>Notifications</span>
+                <button
+                  className={cn(styles.btnNotification, styles.isRead)}
+                  onClick={() => onRemoveEventsAll(event)}
+                  disabled={
+                    event &&
+                    event.filter((x) => x.status === NotificationStatus.Highlighted).length === 0
+                  }
+                >
+                  Mark all as read
+                </button>
+              </div>
 
               <>
-                <div className={styles.titleWrapper}>
-                  <span className={styles.titleBlock}>From dapplets</span>
-                  <div className={styles.delimeter}></div>
-                </div>
-                {loadNotify ? (
-                  // todo: unificate loaders
-                  // todo: unificate bg in pages
-                  <div className={styles.loaderNotify}></div>
-                ) : (
-                  <>
-                    {event.length > 0 &&
-                      event
-                        .filter((x) => x.status === NotificationStatus.Highlighted)
-                        .map((x, i) => {
-                          return (
+                {event.length > 0 &&
+                  sortedData(event) &&
+                  sortedData(event).length &&
+                  sortedData(event).map((x, i) => {
+                    if (i < count) {
+                      return (
+                        <Notification
+                          onClear={setReadNotifications}
+                          icon={x.item.icon ? x.item.icon : IconDefault}
+                          //
+                          key={x.item.id}
+                          label={'System'}
+                          title={x.item.title}
+                          description={x.item.message}
+                          _id={x.item.id}
+                          date={x.item.createdAt}
+                          actions={x.item.actions}
+                          stateNotify={state ? state : null}
+                          status={x.item.status}
+                        />
+                      )
+                    }
+                  })}
+              </>
+              {/* )} */}
+
+              <>
+                {/* {event.length > 0 &&
+                    event
+                      .filter((x) => x.status === NotificationStatus.Default)
+                      .map((x, i) => {
+                        if (i < count) {
+                          return x ? (
                             <Notification
-                              onClear={getReadNotifications}
+                              onClear={() => {
+                                onRemoveEvent(x)
+                              }}
                               // todo: mocked
                               icon={x.icon ? x.icon : IconDefault}
                               //
@@ -140,41 +201,31 @@ export const Notifications = () => {
                               description={x.message}
                               _id={x.id}
                               date={x.createdAt}
-                              actions={x.actions}
-                              teaser={x.teaser}
+                              isRead={x.status}
                             />
+                          ) : (
+                            <span className={styles.notOlder}>Nothing here</span>
                           )
-                        })}
-                  </>
-                )}
+                        }
+                      })} */}
 
-                <div className={styles.btnGroup}>
-                  <button
-                    data-testid="notification-show-old"
-                    className={styles.btnNotification}
-                    onClick={() => setOlder(!isOlder)}
-                  >
-                    Show old
-                  </button>
-                  <button
-                    className={styles.btnNotification}
-                    onClick={() => onRemoveEventsAll(event)}
-                    disabled={
-                      event &&
-                      event.filter((x) => x.status === NotificationStatus.Highlighted).length === 0
-                    }
-                  >
-                    Dismiss all
-                  </button>
-                </div>
+                <button
+                  disabled={
+                    count >=
+                    // .filter((x) => x.status === NotificationStatus.Default)
+                    event.length
+                  }
+                  className={styles.btnNotification}
+                  onClick={() => counter()}
+                >
+                  Load more
+                </button>
               </>
+            </>
 
-              {isOlder ? (
+            {/* {isOlder ? (
                 <>
-                  <div className={styles.titleWrapper}>
-                    <span className={styles.titleBlock}>Older notifications</span>
-                    <div className={styles.delimeter}></div>
-                  </div>
+                 
                   {event.length > 0 &&
                     event
                       .filter((x) => x.status === NotificationStatus.Default)
@@ -212,11 +263,12 @@ export const Notifications = () => {
                     Load more
                   </button>
                 </>
-              ) : null}
-            </div>
+              ) : null} */}
           </div>
-        )}
+        </div>
+        {/* )} */}
       </>
+      {!event.length && <div className={styles.noNot}> No notifications yet</div>}
     </div>
   )
 }
