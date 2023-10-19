@@ -105,6 +105,7 @@ export type LoginRequest = {
   help?: string
   target?: string | any
   secureLogin?: 'required' | 'optional' | 'disabled'
+  reusePolicy?: 'auto' | 'manual' | 'disabled'
   from?: 'me' | 'any'
   contractId?: string // ToDo: rethink this parameter, needed for NEAR only
 }

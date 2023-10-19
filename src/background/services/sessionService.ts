@@ -92,10 +92,20 @@ export class SessionService {
   ): Promise<LoginSession> {
     request.timeout = request.timeout ?? DEFAULT_REQUEST_TIMEOUT
     request.secureLogin = request.secureLogin ?? 'disabled'
+    request.reusePolicy = request.reusePolicy ?? 'manual'
     request.from = request.from ?? 'any'
 
-    if (!request.authMethods || request.authMethods.length === 0)
+    if (!request.authMethods || request.authMethods.length === 0) {
       throw new Error(`"authMethods" is required.`)
+    }
+
+    if (!['disabled', 'optional', 'required'].includes(request.secureLogin)) {
+      throw new Error('Invalid "secureLogin" value.')
+    }
+
+    if (!['disabled', 'auto', 'manual'].includes(request.reusePolicy)) {
+      throw new Error('Invalid "reusePolicy" value.')
+    }
 
     if (request.secureLogin === 'required') {
       for (const authMethod of request.authMethods) {
@@ -114,30 +124,53 @@ export class SessionService {
       }
     }
 
-    if (!['disabled', 'optional', 'required'].includes(request.secureLogin))
-      throw new Error('Invalid "secureLogin" value.')
-
-    const { wallet, chain, confirmationId } = await this._overlayService.openLoginSessionOverlay(
+    const overlayResult = await this._overlayService.openLoginSessionOverlay(
       moduleName,
       request,
       tabId
     )
 
-    if (request.secureLogin === 'required' && !confirmationId)
+    const { wallet, chain } = overlayResult
+    let { confirmationId } = overlayResult
+
+    if (request.secureLogin === 'required' && request.reusePolicy === 'manual' && !confirmationId) {
       throw new Error('LoginConfirmation must be selected in secure login mode.')
-    if (!request.authMethods.includes(chain)) throw new Error('Invalid auth method selected.')
+    }
+
+    if (!request.authMethods.includes(chain)) {
+      throw new Error('Invalid auth method selected.')
+    }
 
     const descriptors = await this._walletService.getWalletDescriptors()
+
     if (
       descriptors.findIndex((x) => x.connected && x.type === wallet && x.chain === chain) === -1
     ) {
       throw new Error('Selected wallet is disconnected.')
     }
 
-    if (confirmationId) {
+    if (request.secureLogin === 'required') {
       const loginConfirmations = await this.getSuitableLoginConfirmations(moduleName, request)
-      if (loginConfirmations.findIndex((x) => x.loginConfirmationId === confirmationId) === -1) {
-        throw new Error('Login confirmation is expired.')
+
+      // Which reuse policy is defined by dapplet developer?
+      if (request.reusePolicy === 'manual') {
+        // manual - a user must select login confirmation manually and it must exist
+        if (loginConfirmations.findIndex((x) => x.loginConfirmationId === confirmationId) === -1) {
+          throw new Error('Login confirmation is expired.')
+        }
+      } else if (request.reusePolicy === 'auto' && loginConfirmations.length > 0) {
+        // auto - the extension selects any available login confirmation automatically if exists
+        //        if it doesn't exist, then create a new one below
+        confirmationId = loginConfirmations[0].loginConfirmationId
+      } else {
+        // disabled - the extension creates a new login confirmation every time, reusing is disabled
+        const loginConfirmation = await this.createLoginConfirmation(
+          moduleName,
+          request,
+          chain,
+          wallet
+        )
+        confirmationId = loginConfirmation.loginConfirmationId
       }
     }
 
