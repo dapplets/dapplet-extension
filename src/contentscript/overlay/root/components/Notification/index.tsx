@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import browser from 'webextension-polyfill'
 import { NotificationStatus } from '../../../../../common/models/notification'
 import { StorageRef } from '../../../../../common/types'
@@ -23,11 +23,11 @@ export interface NotificationProps {
   stateNotify?: any
 }
 
-export const Notification = (props: NotificationProps): ReactElement => {
+export const Notification: React.FC<NotificationProps> = (props) => {
   const { icon, title, date, onClear, _id, description, href, status, actions, stateNotify } = props
 
-  const [isDelete, onDelete] = useState(false)
-  const [newDescription, setDescription] = useState(description)
+  const [isDelete] = useState(false)
+  const [newDescription] = useState(description)
   const refComponent = useRef<HTMLInputElement>()
   const newDateNum = new Date(date)
 
