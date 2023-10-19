@@ -123,7 +123,10 @@
   "dependencies": {
     "@types/classnames": "^2.3.1",
     "ethers": "^5.7.2",
+    "express-ws": "^5.0.2",
+    "i": "^0.3.7",
     "near-api-js": "^0.39.0",
+    "npm": "^10.2.1",
     "patch-package": "^7.0.0"
   },
   "directories": {
