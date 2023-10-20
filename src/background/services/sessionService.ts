@@ -92,7 +92,7 @@ export class SessionService {
   ): Promise<LoginSession> {
     request.timeout = request.timeout ?? DEFAULT_REQUEST_TIMEOUT
     request.secureLogin = request.secureLogin ?? 'disabled'
-    request.reusePolicy = request.reusePolicy ?? 'manual'
+    request.reusePolicy = request.reusePolicy ?? 'disabled'
     request.from = request.from ?? 'any'
 
     if (!request.authMethods || request.authMethods.length === 0) {
