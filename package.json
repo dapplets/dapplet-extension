@@ -1,6 +1,6 @@
 {
   "name": "@dapplets/dapplet-extension",
-  "version": "0.63.0",
+  "version": "0.64.0",
   "description": "The Bridge to the Augmented Web.",
   "main": "./lib/index.min.js",
   "types": "./lib/index.d.ts",
@@ -18,7 +18,7 @@
     "stylelint": "stylelint ./src/**/*.{css,scss,module.scss} --fix",
     "modules": "cd tests/modules && webpack serve --config webpack.config.js",
     "modules:server-interaction": "cd tests/modules/servers/server-interaction && npm run start",
-    "postinstall": "patch-package",
+    "postinstall": "patch-package && npm run install:modules:server-interaction",
     "install:modules:server-interaction": "cd tests/modules/servers/server-interaction && npm i"
   },
   "devDependencies": {

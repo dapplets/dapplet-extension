@@ -519,6 +519,8 @@ globalThis.dapplets = {
   enableRegistry: globalConfigService.enableRegistry.bind(globalConfigService),
   disableRegistry: globalConfigService.disableRegistry.bind(globalConfigService),
   setIsFirstInstallation: globalConfigService.setIsFirstInstallation.bind(globalConfigService),
+  enableDevMode: () => globalConfigService.setDevMode(true),
+  disableDevMode: () => globalConfigService.setDevMode(false),
 }
 
 // ToDo: remove or restore this code, it was commented to remove downloads permission before publishing

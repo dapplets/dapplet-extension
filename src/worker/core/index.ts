@@ -559,6 +559,6 @@ export class Core {
   }
 
   private _isExtensionVersionSatisfied(statement: string): boolean {
-    return semver.satisfies(EXTENSION_VERSION, statement)
+    return semver.satisfies(EXTENSION_VERSION, statement, { includePrerelease: true })
   }
 }
