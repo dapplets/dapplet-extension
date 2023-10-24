@@ -611,7 +611,9 @@ class _App extends React.Component<P, S> {
                   {pathname === '/system/dapplets' && (
                     <SquaredButton
                       title="Search dapplets"
-                      className={s.classNameSearchButton}
+                      className={cn(s.classNameSearchButton, {
+                        [styles.classNameSearchButtonActive]: s.isOpenSearch,
+                      })}
                       onClick={() =>
                         s.isOpenSearch ? this.handleCloseSearch() : this.handleOpenSearchClick()
                       }

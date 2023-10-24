@@ -223,61 +223,59 @@
   &:hover {
     svg {
       path {
-        fill: $primary;
-        stroke: $primary;
+        fill: $primary-hover;
+        stroke: $primary-hover;
       }
     }
     svg path:first-child {
-      fill: $primary !important;
+      fill: $primary-hover !important;
       stroke: $pure-white !important;
     }
     svg path:last-child {
       fill: $pure-white !important;
-      stroke: $primary !important;
+      stroke: $primary-hover !important;
     }
-    svg rect{
-      fill: $primary !important;
+    svg rect {
+      fill: $primary-hover !important;
       stroke: $pure-white !important;
     }
     svg rect:first-child {
-      fill: #E3E3E3 !important;
+      fill: #e3e3e3 !important;
       stroke: $pure-white !important;
     }
   }
 
   &:active {
-    
-      svg {
-        path {
-          fill: $primary-pressed;
-          stroke: $primary-pressed;
-        }
+    svg {
+      path {
+        fill: $primary-pressed;
+        stroke: $primary-pressed;
       }
-      svg path:first-child {
-        fill: $primary-pressed !important;
-        stroke: $pure-white !important;
-      }
-      svg path:last-child {
-        fill: $pure-white !important;
-        stroke: $primary-pressed !important;
-      }
-      svg rect{
-        fill: $primary-pressed !important;
-        stroke: $pure-white !important;
-      }
-      svg rect:first-child {
-        fill: #E3E3E3 !important;
-        stroke: $pure-white !important;
-      }
-    
+    }
+    svg path:first-child {
+      fill: $primary-pressed !important;
+      stroke: $pure-white !important;
+    }
+    svg path:last-child {
+      fill: $pure-white !important;
+      stroke: $primary-pressed !important;
+    }
+    svg rect {
+      fill: $primary-pressed !important;
+      stroke: $pure-white !important;
+    }
+    svg rect:first-child {
+      fill: #e3e3e3 !important;
+      stroke: $pure-white !important;
+    }
   }
 }
 .iconNotification {
   &:hover {
     svg {
       path {
-        fill: $primary !important;
-        stroke: $primary !important;
+        fill: $primary-hover !important;
+        stroke: $primary-hover !important;
       }
     }
   }
@@ -293,7 +291,7 @@
 .iconSettings {
   &:hover {
     svg path:first-child {
-      fill: $primary !important;
+      fill: $primary-hover !important;
     }
     svg path:last-child {
       fill: $pure-white !important;
@@ -310,12 +308,53 @@
     }
   }
 }
+.iconSettingsActive {
+  svg path:first-child {
+    fill: $primary !important;
+  }
+  svg path:last-child {
+    fill: $pure-white !important;
+    stroke: $pure-white !important;
+  }
+}
+.dappletsListActive {
+  svg {
+    path {
+      fill: $primary;
+      stroke: $primary;
+    }
+  }
+  svg path:first-child {
+    fill: $primary !important;
+    stroke: $pure-white !important;
+  }
+  svg path:last-child {
+    fill: $pure-white !important;
+    stroke: $primary !important;
+  }
+  svg rect {
+    fill: $primary !important;
+    stroke: $pure-white !important;
+  }
+  svg rect:first-child {
+    fill: #e3e3e3 !important;
+    stroke: $pure-white !important;
+  }
+}
+.iconNotificationActive {
+  svg {
+    path {
+      fill: $primary !important;
+      stroke: $primary !important;
+    }
+  }
+}
 .mainIconDapplet {
   &:hover {
     svg {
       path {
-        fill: $primary !important;
-        stroke: $primary !important;
+        fill: $primary-hover !important;
+        stroke: $primary-hover !important;
       }
     }
   }

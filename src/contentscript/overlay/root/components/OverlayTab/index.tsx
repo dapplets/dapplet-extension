@@ -340,7 +340,21 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     },
                     { [styles.mainIconDapplet]: p.classNameItem === 'mainIconDapplet' },
                     { [styles.iconNotification]: menu.title === 'Notifications' },
-                    { [styles.iconSettings]: menu.title === 'Settings' }
+                    { [styles.iconSettings]: menu.title === 'Settings' },
+                    {
+                      [styles.iconSettingsActive]:
+                        menu.title === 'Settings' && p.activeTabMenuId === menu.id,
+                    },
+                    {
+                      [styles.dappletsListActive]:
+                        menu.title === 'Dapplets' &&
+                        p.classNameItem !== 'mainIconDapplet' &&
+                        p.activeTabMenuId === menu.id,
+                    },
+                    {
+                      [styles.iconNotificationActive]:
+                        menu.title === 'Notifications' && p.activeTabMenuId === menu.id,
+                    }
                   )}
                 >
                   {menu.id === 'connectedAccounts' ? (

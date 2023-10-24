@@ -219,3 +219,12 @@
   box-shadow: inset 0 1px 2px rgb(225 225 225 / 20%), inset 0 -1px 2px rgb(225 225 225 / 20%),
     inset 0 -1px 2px rgb(255 255 255 / 90%), inset 0 1px 3px rgb(225 225 225 / 90%);
 }
+.classNameSearchButtonActive{
+  svg {
+    path {
+      
+      stroke: $primary;
+    }
+  }
+
+}
