@@ -8,7 +8,7 @@ type TestableDappletParams = {
 export const test = ({ devServerUrl, dappletName }: TestableDappletParams) =>
   base.extend({
     testableDapplet: async (
-      { page, skipOnboarding, enableDevServer, activateDapplet, deactivateDapplet },
+      { page, skipOnboarding, enableDevMode, enableDevServer, activateDapplet, deactivateDapplet },
       use
     ) => {
       // open context webpage
@@ -18,6 +18,7 @@ export const test = ({ devServerUrl, dappletName }: TestableDappletParams) =>
       await expect(page.locator('.dapplet-widget')).not.toBeVisible()
 
       await skipOnboarding()
+      await enableDevMode()
       await enableDevServer(devServerUrl)
       await activateDapplet(dappletName, devServerUrl)
 

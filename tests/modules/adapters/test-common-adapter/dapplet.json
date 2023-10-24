@@ -12,7 +12,8 @@
     "google.com",
     "youtube.com",
     "facebook.com",
-    "example.com"
+    "example.com",
+    "dapplets-e2e.netlify.app"
   ],
   "dependencies": {}
 }

@@ -21,6 +21,7 @@ interface ModalLoginProps {
   connectWallet?: () => void
   refresh?: () => void
   descriptors: WalletDescriptor[]
+  devMode: boolean
 }
 
 export const ModalLogin = ({
@@ -32,6 +33,7 @@ export const ModalLogin = ({
   connectWallet,
   refresh,
   descriptors,
+  devMode,
 }: ModalLoginProps) => {
   const [isNotVisible, setNotVisible] = useState(false)
   const [value, setValue] = useState('')
@@ -116,12 +118,24 @@ export const ModalLogin = ({
         <div className={styles.walletBlock}>
           {wallets &&
             wallets.map((x, i) => (
-              <div key={i} className={styles.newProfileBlock}>
+              // ToDo: Attention! Hardcoded values! Move all mentions x.type.includes('near') from the UI-layer
+              <div
+                key={i}
+                className={cn(styles.newProfileBlock, {
+                  [styles.noHover]: !devMode || x.type.includes('near'),
+                })}
+              >
                 <div
                   onClick={() => {
-                    handleWalletClick(x)
+                    devMode && !x.type.includes('near')
+                      ? handleWalletClick(x)
+                      : devMode && x.type.includes('near')
+                      ? null
+                      : null
                   }}
-                  className={styles.newProfileBlockInfo}
+                  className={cn(styles.newProfileBlockInfo, {
+                    [styles.noHover]: !devMode || x.type.includes('near'),
+                  })}
                 >
                   {x.account ? (
                     <img
