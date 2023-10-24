@@ -104,7 +104,12 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
           </div>
           <div className={styles.blockNotificationInfo}>
             <div className={styles.titleNotificationWrapperTeaser}>
-              <div onClick={handleActionButtonClick} className={styles.titleNotificationTeaser}>
+              <div onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              handleOpenOverlayNotification(payload.id)
+              onRemove(payload)
+            }} className={styles.titleNotificationTeaser}>
                 {payload.title}
               </div>
               <CloseIcon
