@@ -83,6 +83,12 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
   return (
     <div
       data-testid="notification-label"
+      // onClick={(e) => {
+      //   e.preventDefault()
+      //   e.stopPropagation()
+      //   handleOpenOverlayNotification(payload.id)
+      //   onRemove(payload)
+      // }}
       className={cn(styles.widgetButtonNotificationTeaser, { remove_notification: isRemoving })}
     >
       <div className={styles.titleNotificationWrapperTeaser}>
@@ -104,12 +110,15 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
           </div>
           <div className={styles.blockNotificationInfo}>
             <div className={styles.titleNotificationWrapperTeaser}>
-              <div onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              handleOpenOverlayNotification(payload.id)
-              onRemove(payload)
-            }} className={styles.titleNotificationTeaser}>
+              <div
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleOpenOverlayNotification(payload.id)
+                  onRemove(payload)
+                }}
+                className={styles.titleNotificationTeaser}
+              >
                 {payload.title}
               </div>
               <CloseIcon
