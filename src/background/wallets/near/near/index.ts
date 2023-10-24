@@ -121,35 +121,32 @@ export default class implements NearWallet {
   async signAndSendTransaction({
     receiverId,
     actions,
-    callbackUrl,
   }: BrowserWalletSignAndSendTransactionParams): Promise<void | nearAPI.providers.FinalExecutionOutcome> {
     const _state = await this._statePromise
 
-    // const { contract } = store.getState()
-
-    // if (!_state.wallet.isSignedIn() || !contract) {
-    //   throw new Error('Wallet not signed in')
-    // }
-
     const account = _state.wallet.account()
 
-    return account['signAndSendTransaction']({
-      receiverId: receiverId, // || contract.contractId,
+    return account.signAndSendTransaction({
+      receiverId: receiverId,
       actions: actions.map((action) => createAction(action)),
-      walletCallbackUrl: callbackUrl,
     })
   }
 
-  async signAndSendTransactions({ transactions, callbackUrl }) {
-    const _state = await this._statePromise
-
-    if (!_state.wallet.isSignedIn()) {
-      throw new Error('Wallet not signed in')
+  async signAndSendTransactions({ transactions }) {
+    // ToDo: implement batch transactions
+    if (transactions.length > 1) {
+      throw new Error('Batch transactions are not implemented')
     }
 
-    return _state.wallet.requestSignTransactions({
-      transactions: await this._transformTransactions(transactions),
-      callbackUrl,
+    const [transaction] = transactions
+
+    const _state = await this._statePromise
+
+    const account = _state.wallet.account()
+
+    await account.signAndSendTransaction({
+      receiverId: transaction.receiverId,
+      actions: transaction.actions.map((action) => createAction(action)),
     })
   }
 

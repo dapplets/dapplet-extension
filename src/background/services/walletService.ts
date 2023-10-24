@@ -378,7 +378,8 @@ export class WalletService {
     chain: ChainTypes.NEAR_MAINNET | ChainTypes.NEAR_TESTNET,
     params: BrowserWalletSignAndSendTransactionParams
   ) {
-    const wallet = (await this._getInternalSignerFor(app, chain, false)) as NearWallet
+    const wallet = ((await this._getInternalSignerFor(app, chain)) ??
+      (await this._pairSignerFor(app, chain))) as NearWallet
     return wallet.signAndSendTransaction(params)
   }
 
@@ -387,7 +388,8 @@ export class WalletService {
     chain: ChainTypes.NEAR_MAINNET | ChainTypes.NEAR_TESTNET,
     params: any // ToDo: add types
   ) {
-    const wallet = (await this._getInternalSignerFor(app, chain, false)) as NearWallet
+    const wallet = ((await this._getInternalSignerFor(app, chain)) ??
+      (await this._pairSignerFor(app, chain))) as NearWallet
     return wallet.signAndSendTransactions(params)
   }
 

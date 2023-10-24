@@ -1,0 +1,13 @@
+{
+  "name": "bos-write-transaction",
+  "version": "0.1.0",
+  "description": "bos-write-transaction",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "bos-write-transaction",
+  "contextIds": ["test-e2e-adapter"],
+  "dependencies": {
+    "test-e2e-adapter": "0.1.0"
+  }
+}

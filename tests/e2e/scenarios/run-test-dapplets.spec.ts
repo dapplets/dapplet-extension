@@ -16,6 +16,7 @@ const dapplets = [
   'test-common-dapplet',
   'inject-bos-component',
   'inject-nested-bos-component',
+  'bos-write-transaction',
   // 'test-dynamic-dapplet', // ToDo: uncomment when dynamic context will be fixed
   // 'update-parsed-context', // ToDo: uncomment when testing website will be implemented
 ]
@@ -76,6 +77,11 @@ for (const dappletName of dapplets) {
         await expect(page.getByText('dapplets.near/widget/LevelOne').first()).toBeVisible()
         await expect(page.getByText('dapplets.near/widget/LevelTwo').first()).toBeVisible()
         await expect(page.getByText('dapplets.near/widget/LevelThree').first()).toBeVisible()
+        break
+
+      case 'bos-write-transaction':
+        await page.locator('[data-bos-src="dapplets.near/widget/WriteButton"]').first().click()
+        await expect(page.getByTestId('wallet-to-connect-near_mainnet')).toBeVisible()
         break
 
       default:

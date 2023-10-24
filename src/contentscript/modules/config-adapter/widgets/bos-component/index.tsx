@@ -1,4 +1,3 @@
-// near-social-vm
 import { setupWalletSelector } from '@near-wallet-selector/core'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { EthersProviderContext, useInitNear, Widget } from 'near-social-vm'
@@ -8,16 +7,39 @@ import { singletonHook } from 'react-singleton-hook'
 import { StyleSheetManager } from 'styled-components'
 import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../common/global-event-bus'
+import { ChainTypes, DefaultSigners } from '../../../../../common/types'
+import { FakeStorage } from './fake-storage'
+import { setupWallet } from './setup-wallet'
 
+// ToDo: allow to switch network in BOS
+const networkId = 'mainnet'
+
+// The singleton prevents the creation of new VM instances.
 export const useSingletonInitNear = singletonHook(null, () => {
   const { initNear } = useInitNear()
   React.useEffect(() => {
     initNear &&
       initNear({
         networkId,
+        // The wallet selector looks like an unnecessary abstraction layer over the background wallet
+        // but we have to use it because near-social-vm uses not only a wallet object, but also a selector state
+        // object and its Observable for event subscription
         selector: setupWalletSelector({
           network: networkId,
-          modules: [],
+          // The storage is faked because it's not necessary. The selected wallet ID is hardcoded below
+          storage: new FakeStorage(),
+          modules: [
+            // ToDo: use real app and chain, now it's difficult to implement because of the singleton
+            setupWallet({
+              app: DefaultSigners.EXTENSION,
+              chain: ChainTypes.NEAR_MAINNET,
+            }),
+          ],
+        }).then((selector) => {
+          // Use background wallet by default
+          const wallet = selector.wallet
+          selector.wallet = () => wallet('background')
+          return selector
         }),
       })
   }, [initNear])
@@ -53,8 +75,6 @@ export const useSingletonOverrides = singletonHook({ overrides: {}, isLoading: t
 
   return { overrides, isLoading }
 })
-
-const networkId = 'mainnet'
 
 const Component: React.FC<{
   src: string
