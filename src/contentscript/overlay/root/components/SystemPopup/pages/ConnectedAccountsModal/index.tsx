@@ -307,7 +307,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     )
   }
 
-  if (condition.result) {
+  if (condition?.result) {
     const walletAccount = selectedFirstUser.walletType ? selectedFirstUser : selectedSecondUser
     return (
       <Modal
