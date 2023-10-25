@@ -1,7 +1,9 @@
 import cn from 'classnames'
 import React, { ReactElement, useEffect } from 'react'
-import { CAUserButton } from '../../../CAUserButton'
 import Loader from '../../assests/loader.svg'
+import emptyLinesToParagraphEl from './helpers/emptyLinesToParagraphEl'
+import infoLinesToInfoBlocks from './helpers/infoLinesToInfoBlocks'
+import lineWithUnderlinePartsToParagraphEl from './helpers/lineWithUnderlinePartsToParagraphEl'
 import styles from './Modal.module.scss'
 
 interface IModalProps {
@@ -51,41 +53,11 @@ export const Modal = ({
         {accounts && <div className={styles.modalAccounts}>{accounts}</div>}
         {content && (
           <div className={styles.modalBody}>
-            {content.split('\n').map((t, i) => {
-              const strChunks = t.split(/<[/u]*?>/g)
-              return (
-                <p key={i}>
-                  {strChunks.map((s, j) =>
-                    j % 2 === 0 ? (
-                      s.includes('<info') ? (
-                        <CAUserButton
-                          key={(i + 31) * j * 100}
-                          user={{
-                            img: '',
-                            name: s
-                              .split(/<\/?info/g)[1]
-                              .trim()
-                              .split('>')[1],
-                            origin: s
-                              .split(/<\/?info/g)[1]
-                              .trim()
-                              .split('>')[0],
-                            accountActive: false,
-                          }}
-                          info={true}
-                        />
-                      ) : (
-                        s
-                      )
-                    ) : (
-                      <span key={i * j * 1000} className={styles.underline}>
-                        {s}
-                      </span>
-                    )
-                  )}
-                </p>
-              )
-            })}
+            {content
+              .split('\n')
+              .map(emptyLinesToParagraphEl)
+              .map(lineWithUnderlinePartsToParagraphEl)
+              .map(infoLinesToInfoBlocks)}
           </div>
         )}
         <div className={styles.modalFooter}>
