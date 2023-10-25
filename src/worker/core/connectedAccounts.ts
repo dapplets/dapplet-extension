@@ -150,7 +150,10 @@ class ConnectedAccounts {
             accountActive: secondAccountStatus,
           },
         ],
-        condition: !canConnect,
+        condition: {
+          result: !canConnect,
+          original: condition,
+        },
       },
       thisTab.id
     )

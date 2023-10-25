@@ -23,7 +23,13 @@ interface IConnectedAccountsModalProps {
     bunchOfAccountsToConnect?: [IConnectedAccountUser, IConnectedAccountUser][]
     accountsToDisconnect?: [IConnectedAccountUser, IConnectedAccountUser]
     accountToChangeStatus?: IConnectedAccountUser
-    condition?: boolean
+    condition?: {
+      result: boolean
+      original: {
+        type: string
+        [name: string]: string
+      }
+    }
     frameId: string
   }
   onCloseClick: () => void
@@ -42,9 +48,13 @@ type TRequestBody = {
   statement?: string
 }
 
-const ModalCAUserButton = ({ user }: { user: IConnectedAccountUser }) => (
-  <CAUserButton user={user} maxLength={24} color="#eaf0f0" />
-)
+const ModalCAUserButton = ({
+  user,
+  copyButton = false,
+}: {
+  user: IConnectedAccountUser
+  copyButton?: boolean
+}) => <CAUserButton user={user} maxLength={24} color="#eaf0f0" copyButton={copyButton} />
 
 const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   const { data, onCloseClick, bus } = props
@@ -297,16 +307,20 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     )
   }
 
-  if (condition) {
-    // ToDo: site-specific things must be removed or moved to another layer
-    //       origin === 'github'
+  if (condition.result) {
+    const walletAccount = selectedFirstUser.walletType ? selectedFirstUser : selectedSecondUser
     return (
       <Modal
         isWaiting={isWaiting}
         title={'Add your NEAR account ID'}
-        content={`Add your NEAR account ID to your ${socialNetworkToConnect} username ${
-          selectedFirstUser.origin === 'github' ? ' and refresh browser page' : null
-        }. This is done so the Oracle can confirm your ownership of the ${socialNetworkToConnect} account`}
+        accounts={<ModalCAUserButton user={walletAccount} copyButton={true} />}
+        content={`to your ${socialNetworkToConnect} username <u>${
+          condition.original['user']
+        }</u>. For example:\n \n<info ${socialNetworkToConnect.toLowerCase()}>${
+          condition.original['user']
+        } (${
+          walletAccount.name
+        })</info>\n \nThis is done so the Oracle can confirm your ownership of the ${socialNetworkToConnect} account.`}
         onClose={onCloseClick}
         onConfirm={async () => {
           bus.publish('ready')
@@ -317,6 +331,8 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     )
   }
 
+  // ToDo: site-specific things must be removed or moved to another layer
+  //       origin === 'github'
   if (firstSelectorUsers?.length && secondSelectorUsers?.length) {
     if (!isUnlink) {
       return (

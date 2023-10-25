@@ -89,7 +89,7 @@
   display: block;
 
   width: 300px;
-  padding: 20px 0 5px;
+  padding: 20px 0 10px;
 
   font-family: Roboto, sans-serif;
   font-size: 24px;
@@ -101,7 +101,7 @@
 .modalAccounts {
   display: flex;
   flex-direction: column;
-  width: 236px;
+  width: 250px;
   margin-top: 4px;
 }
 
@@ -110,12 +110,24 @@
 }
 
 .modalBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
   width: 80%;
   margin-top: 12px;
 
-  font-size: 16px;
+  font-size: 14px;
   line-height: 150%;
-  color: #797979;
+  color: #636363;
+
+  p {
+    padding-bottom: .3rem;
+  }
+}
+
+.underline {
+  text-decoration: underline;
 }
 
 .modalFooter {

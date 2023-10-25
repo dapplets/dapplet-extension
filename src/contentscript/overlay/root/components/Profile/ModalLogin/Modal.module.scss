@@ -143,18 +143,21 @@
     background: $stroke-color;
   }
 }
+
 .noHover{
   cursor: default;
+
   &:hover {
-    background: $pure-white;
     cursor: default;
+    background: $pure-white;
   }
 
   &:active {
-    background: $pure-white;
     cursor: default;
+    background: $pure-white;
   }
 }
+
 .newProfileBlockInfo {
   display: flex;
   align-items: center;
