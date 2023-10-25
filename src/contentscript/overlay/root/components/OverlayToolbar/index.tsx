@@ -272,6 +272,8 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       newTab.menus = filterNotifications
       const activeTabId = p.pathname.split('/')[1]
       const activeTabMenuId = p.pathname.split('/')[2]
+      console.log()
+
       return (
         <div key={NewTabs.id}>
           <OverlayTab
@@ -288,6 +290,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             selectedWallet={p.selectedWallet}
             connectedDescriptors={p.connectedDescriptors}
             setOpenWallet={p.setOpenWallet}
+            classNameItem={'mainIconDapplet'}
             onMenuClick={(menu) => {
               if (
                 document
@@ -381,48 +384,50 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             className={cn(styles.TabList, { [styles.isOpenWallet]: p.isOpenWallet })}
           >
             {getNewButtonTab('Dapplets')}
-
-            <span
-              data-testid="notification-button"
-              className={cn(styles.notificationCounter)}
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                if (
-                  document
-                    .querySelector('#dapplets-overlay-manager')
-                    ?.classList.contains('dapplets-overlay-collapsed')
-                ) {
-                  p.navigate('/system/notifications')
-
-                  p.onToggleClick()
-                } else if (
-                  !document
-                    .querySelector('#dapplets-overlay-manager')
-                    ?.classList.contains('dapplets-overlay-collapsed')
-                ) {
-                  p.navigate('/system/notifications')
-                }
-              }}
-            >
-              {event &&
-              event.filter((x) => x.status === NotificationStatus.Highlighted).length > 0 ? (
-                <span className={styles.counter} data-testid="notification-counter">
-                  +{event.filter((x) => x.status === NotificationStatus.Highlighted).length}
-                </span>
-              ) : null}
-              {event &&
-              event.filter((x) => x.status === NotificationStatus.Highlighted).length > 0 ? (
-                <NotificationWithCircle />
-              ) : (
-                <Notification />
-              )}
+            {event && event.length > 0 ? (
               <span
-                className={cn({
-                  [styles.notificationCounterAnimate]: isPinnedNotification,
-                })}
-              ></span>
-            </span>
+                data-testid="notification-button"
+                className={cn(styles.notificationCounter)}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  if (
+                    document
+                      .querySelector('#dapplets-overlay-manager')
+                      ?.classList.contains('dapplets-overlay-collapsed')
+                  ) {
+                    p.navigate('/system/notifications')
+
+                    p.onToggleClick()
+                  } else if (
+                    !document
+                      .querySelector('#dapplets-overlay-manager')
+                      ?.classList.contains('dapplets-overlay-collapsed')
+                  ) {
+                    p.navigate('/system/notifications')
+                  }
+                }}
+              >
+                {event &&
+                event.filter((x) => x.status === NotificationStatus.Highlighted).length > 0 ? (
+                  <span className={styles.counter} data-testid="notification-counter">
+                    +{event.filter((x) => x.status === NotificationStatus.Highlighted).length}
+                  </span>
+                ) : null}
+                {event &&
+                event.filter((x) => x.status === NotificationStatus.Highlighted).length > 0 ? (
+                  <NotificationWithCircle />
+                ) : (
+                  <Notification />
+                )}
+                <span
+                  className={cn({
+                    [styles.notificationCounterAnimate]: isPinnedNotification,
+                  })}
+                ></span>
+              </span>
+            ) : null}
+
             <div className={styles.notificationsWrapper}>
               {!!newNotifications.length &&
                 newNotifications.map((payload) => (

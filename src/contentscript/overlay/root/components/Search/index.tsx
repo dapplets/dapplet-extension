@@ -24,10 +24,19 @@ export const Search = (props: SearchProps): ReactElement => {
     handleSearchChange,
     ...otherProps
   } = props
+  console.log(isOpenSearch)
 
   return (
     <div className={cn(styles.wrapper, className)}>
-      <div className={styles.searchIcon} onClick={() => handleSearchChange()}>
+      <div
+        className={cn(
+          styles.searchIcon
+          //   , {
+          //   [styles.searchIconActive]: isOpenSearch,
+          // }
+        )}
+        onClick={() => handleSearchChange()}
+      >
         <SearchIcon />
       </div>
       <label className={styles.labelSearchModule}>
