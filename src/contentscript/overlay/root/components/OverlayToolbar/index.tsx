@@ -420,11 +420,14 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 ) : (
                   <Notification />
                 )}
-                <span
-                  className={cn({
-                    [styles.notificationCounterAnimate]: isPinnedNotification,
-                  })}
-                ></span>
+                {event &&
+                event.filter((x) => x.status === NotificationStatus.Highlighted).length === 1 ? (
+                  <span
+                    className={cn({
+                      [styles.notificationCounterAnimate]: isPinnedNotification,
+                    })}
+                  ></span>
+                ) : null}
               </span>
             ) : null}
 

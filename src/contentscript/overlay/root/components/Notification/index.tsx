@@ -26,7 +26,8 @@ export interface NotificationProps {
 export const Notification: React.FC<NotificationProps> = (props) => {
   const { icon, title, date, onClear, _id, description, href, status, actions, stateNotify } = props
 
-  const [isDelete] = useState(false)
+  // const [isDelete] = useState(false)
+  const [isAnimateRead, setAnimateRead] = useState(false)
   const [newDescription] = useState(description)
   const refComponent = useRef<HTMLInputElement>()
   const newDateNum = new Date(date)
@@ -45,20 +46,28 @@ export const Notification: React.FC<NotificationProps> = (props) => {
   }
 
   useEffect(() => {
-    if (stateNotify && stateNotify.targetID === _id) {
+    if (
+      stateNotify &&
+      stateNotify.targetID === _id &&
+      !document
+        .querySelector('#dapplets-overlay-manager')
+        ?.classList.contains('dapplets-overlay-collapsed')
+    ) {
       let timerRemove
 
       const timerStyles = setTimeout(() => {
+        setAnimateRead(true)
         timerRemove = setTimeout(() => {
           onClear(stateNotify.targetID)
-        }, 3000)
-      }, 2500)
+          setAnimateRead(false)
+        }, 0)
+      }, 500)
 
       return () => {
         clearTimeout(timerStyles)
       }
     }
-  }, [stateNotify])
+  }, [stateNotify, isAnimateRead])
 
   const isOldNotification =
     status === NotificationStatus.Default ||
@@ -70,8 +79,9 @@ export const Notification: React.FC<NotificationProps> = (props) => {
       onClick={() => onClear && onClear(_id)}
       data-testid={isOldNotification ? 'old-notification' : 'new-notification'}
       className={cn(styles.wrapper, {
-        [styles.delete]: isDelete,
+        // [styles.delete]: isDelete,
         [styles.isRead]: isOldNotification,
+        [styles.isAnimateRead]: isAnimateRead,
       })}
     >
       <div className={styles.blockTitle}>
