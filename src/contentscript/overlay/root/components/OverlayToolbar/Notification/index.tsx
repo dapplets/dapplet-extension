@@ -7,10 +7,11 @@ import { ReactComponent as Noties } from '../../../assets/icons/notificationIcon
 import { CloseIcon } from '../../CloseIcon'
 import { DappletImage } from '../../DappletImage'
 import styles from '../OverlayToolbar.module.scss'
+
 export interface NotificationOverlayProps {
-  payload: any
-  onRemove: any
-  handleOpenOverlayNotification?: any
+  payload
+  onRemove
+  handleOpenOverlayNotification?
 }
 
 export const NotificationOverlay = (props: NotificationOverlayProps): ReactElement => {
@@ -56,13 +57,13 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
     }
   }, [])
 
-  const handleActionButtonClick = () => {
-    setIsRemoving(true)
-    handleOpenOverlayNotification()
-    setTimeout(() => {
-      onRemove(payload)
-    }, 500)
-  }
+  // const handleActionButtonClick = () => {
+  //   setIsRemoving(true)
+  //   handleOpenOverlayNotification()
+  //   setTimeout(() => {
+  //     onRemove(payload)
+  //   }, 500)
+  // }
 
   function trimText(text, length) {
     if (text.length > length) {
@@ -83,25 +84,17 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
   return (
     <div
       data-testid="notification-label"
-      // onClick={(e) => {
-      //   e.preventDefault()
-      //   e.stopPropagation()
-      //   handleOpenOverlayNotification(payload.id)
-      //   onRemove(payload)
-      // }}
+      onClick={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        handleOpenOverlayNotification(payload.id)
+        onRemove(payload)
+      }}
       className={cn(styles.widgetButtonNotificationTeaser, { remove_notification: isRemoving })}
     >
       <div className={styles.titleNotificationWrapperTeaser}>
         <div className={styles.notificationBlockTop}>
-          <div
-            className={styles.iconNotificationBlock}
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              handleOpenOverlayNotification(payload.id)
-              onRemove(payload)
-            }}
-          >
+          <div className={styles.iconNotificationBlock}>
             {payload.icon ? (
               <DappletImage storageRef={payload.icon} className={styles.iconNotification} />
             ) : (
@@ -110,26 +103,17 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
           </div>
           <div className={styles.blockNotificationInfo}>
             <div className={styles.titleNotificationWrapperTeaser}>
-              <div
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  handleOpenOverlayNotification(payload.id)
-                  onRemove(payload)
-                }}
-                className={styles.titleNotificationTeaser}
-              >
-                {payload.title}
-              </div>
+              <div className={styles.titleNotificationTeaser}>{payload.title}</div>
               <CloseIcon
                 className={styles.closeNotification}
                 appearance="small"
                 color="red"
                 isNotification
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
                   setReadNotifications(payload.id)
                   setIsRemoving(true)
-
                   setTimeout(() => {
                     onRemove(payload)
                   }, 500)
@@ -139,16 +123,7 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
           </div>
         </div>
       </div>
-      <div
-        onClick={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-          handleOpenOverlayNotification(payload.id)
-          onRemove(payload)
-        }}
-        className={styles.messageNotification}
-        style={{ cursor: 'pointer' }}
-      >
+      <div className={styles.messageNotification} style={{ cursor: 'pointer' }}>
         {payload.teaser
           ? trimText(payload.teaser, 50)
           : payload.message
