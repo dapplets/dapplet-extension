@@ -1,4 +1,5 @@
 import {} from '../../../../../lib'
+import Black_Icon2 from '../../demo-e2e-dapplet/src/images/Black_Icon2.svg'
 
 @Injectable
 export default class DemoDapplet {
@@ -17,11 +18,12 @@ export default class DemoDapplet {
       BODY: () => [
         button({
           DEFAULT: {
-            label: 'TEST',
+            tooltip: 'TEST',
+            img: Black_Icon2,
             exec: async () => {
               await Core.notify({
                 title: 'Test Title',
-                message: 'Test Message',
+                message: 'Very very very very very very very very very long Test Message',
                 payload: {
                   key: 'value',
                 },
