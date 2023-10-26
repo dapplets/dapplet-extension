@@ -1,6 +1,6 @@
 {
   "name": "@dapplets/dapplet-extension",
-  "version": "0.63.0",
+  "version": "0.64.0",
   "description": "The Bridge to the Augmented Web.",
   "main": "./lib/index.min.js",
   "types": "./lib/index.d.ts",
@@ -25,7 +25,7 @@
     "test:wa": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/wallets\" --headed --browser chrome",
     "test:notify": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/notifications\" --headed --browser chrome",
     "test:demo": "concurrently -c \"yellow,magenta\" -n \"test-dapplets,cypress\" \"npm run test-dapplets\" \"npm test\" --kill-others",
-    "postinstall": "patch-package",
+    "postinstall": "patch-package && npm run install:modules:server-interaction",
     "install:modules:server-interaction": "cd tests/modules/servers/server-interaction && npm i"
   },
   "devDependencies": {

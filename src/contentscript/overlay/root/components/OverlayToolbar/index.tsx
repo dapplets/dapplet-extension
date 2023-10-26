@@ -343,13 +343,13 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     return notifications
   }
 
-  const handleOpenOverlayNotification = () => {
+  const handleOpenOverlayNotification = (id) => {
     if (
       document
         .querySelector('#dapplets-overlay-manager')
         ?.classList.contains('dapplets-overlay-collapsed')
     ) {
-      p.navigate('/system/notifications')
+      p.navigate('/system/notifications', { state: { targetID: id, isLaterRead: true } })
 
       p.onToggleClick()
     } else if (
@@ -357,7 +357,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
         .querySelector('#dapplets-overlay-manager')
         ?.classList.contains('dapplets-overlay-collapsed')
     ) {
-      p.navigate('/system/notifications')
+      p.navigate('/system/notifications', { state: { targetID: id, isLaterRead: true } })
     }
   }
 

@@ -43,13 +43,12 @@ for (const dappletName of dapplets) {
         await page.getByRole('button', { name: 'Ok' }).click()
         await expect(page.getByText('PASS').first()).toBeVisible()
         await expect(page.getByTestId('notification-counter')).toHaveText('+1')
-        await page.getByText('Dismiss all').click()
+        await page.getByText('Mark all as read').click()
         await expect(page.getByTestId('notification-counter')).not.toBeVisible()
         await expect(page.getByTestId('new-notification')).not.toBeVisible()
-        await expect(page.getByText('Dismiss all')).toBeDisabled()
-        await expect(page.getByTestId('old-notification')).not.toBeVisible()
-        await page.getByTestId('notification-show-old').click()
-        await expect(page.getByTestId('old-notification')).toBeVisible()
+        await expect(page.getByText('Mark all as read')).toBeDisabled()
+        await expect(page.getByTestId('old-notification')).toHaveCount(2)
+        await expect(page.getByRole('button', { name: 'Ok' })).not.toBeVisible() // Action buttons must be hidden, if notification is resolved
         break
 
       case 'core-confirm-cancel':
