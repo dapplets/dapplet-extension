@@ -603,7 +603,7 @@ class _App extends React.Component<P, S> {
                     setOpenWalletMini={this.setOpenWalletMini}
                     // isOpenSearch={s.isOpenSearch}
                   />
-                  {/* {this.getNewButtonTab('Connected Accounts')} */}
+                  {this.getNewButtonTab('Connected Accounts')}
                 </div>
 
                 <div className={styles.right}>

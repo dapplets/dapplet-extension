@@ -308,6 +308,26 @@
     }
   }
 }
+.iconAccounts{
+  &:hover {
+    &:hover {
+      svg {
+        path {
+          fill: $primary-hover !important;
+          stroke: $pure-white !important;
+        }
+      }
+    }
+    &:active {
+      svg {
+        path {
+          fill: $primary-pressed !important;
+          stroke: $pure-white !important;
+        }
+      }
+    }
+  }
+}
 .iconSettingsActive {
   svg path:first-child {
     fill: $primary !important;
@@ -346,6 +366,14 @@
     path {
       fill: $primary !important;
       stroke: $primary !important;
+    }
+  }
+}
+.iconAccountsActive {
+  svg {
+    path {
+      fill: $primary !important;
+      stroke: $pure-white !important;
     }
   }
 }
