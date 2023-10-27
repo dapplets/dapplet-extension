@@ -19,11 +19,6 @@
           "styles": "styles/body/button.css",
           "insertionPoint": "body",
           "insert": "end"
-        },
-        "popup": {
-          "styles": "styles/body/popup.css",
-          "insertionPoint": "body",
-          "insert": "end"
         }
       },
       "contextBuilder": {
