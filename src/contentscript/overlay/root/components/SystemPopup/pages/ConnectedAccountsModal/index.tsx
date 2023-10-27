@@ -8,6 +8,7 @@ import {
   IConnectedAccountUser,
   NearNetworks,
 } from '../../../../../../../common/types'
+import smartTitleSlice from '../../../../helpers/smartTitleSlice'
 import { CAUserButton } from '../../../CAUserButton'
 import { DropdownCAModal } from '../../../DropdownCAModal'
 import areConnectedAccountsUsersWallets from './helpers/areConnectedAccountsUsersWallets'
@@ -309,24 +310,39 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
 
   if (condition?.result) {
     const walletAccount = selectedFirstUser.walletType ? selectedFirstUser : selectedSecondUser
+    const isLongAddressToX =
+      (socialNetworkToConnect.toLowerCase() === 'twitter' ||
+        socialNetworkToConnect.toLowerCase() === 'x') &&
+      walletAccount.name.length > 50
+    const isLongAddressPlusTitleToX =
+      (socialNetworkToConnect.toLowerCase() === 'twitter' ||
+        socialNetworkToConnect.toLowerCase() === 'x') &&
+      `${condition.original['user']} (${walletAccount.name})`.length > 50
     return (
       <Modal
         isWaiting={isWaiting}
         title={'Add your NEAR account ID'}
-        accounts={<ModalCAUserButton user={walletAccount} copyButton={true} />}
-        content={`to your ${socialNetworkToConnect} username <u>${
-          condition.original['user']
-        }</u>. For example:\n \n<info ${socialNetworkToConnect.toLowerCase()}>${
-          condition.original['user']
-        } (${
-          walletAccount.name
-        })</info>\n \nThis is done so the Oracle can confirm your ownership of the ${socialNetworkToConnect} account.`}
+        accounts={<ModalCAUserButton user={walletAccount} copyButton={!isLongAddressToX} />}
+        content={
+          isLongAddressToX
+            ? 'Unfortunately, the connected wallet address is too long to insert the X username. Choose another!'
+            : `to your ${socialNetworkToConnect} username <u>${
+                condition.original['user']
+              }</u>. For example:\n \n<info ${socialNetworkToConnect.toLowerCase()}>${
+                isLongAddressPlusTitleToX
+                  ? smartTitleSlice(condition.original['user'], walletAccount.name)
+                  : `${condition.original['user']} (${walletAccount.name})`
+              }</info>\n \nThis is done so the Oracle can confirm your ownership of the ${socialNetworkToConnect} account.`
+        }
         onClose={onCloseClick}
-        onConfirm={async () => {
-          bus.publish('ready')
-          onCloseClick()
-        }}
-        onConfirmLabel="Already done"
+        onConfirm={
+          !isLongAddressToX &&
+          (async () => {
+            bus.publish('ready')
+            onCloseClick()
+          })
+        }
+        onConfirmLabel={!isLongAddressToX && 'Already done'}
       />
     )
   }

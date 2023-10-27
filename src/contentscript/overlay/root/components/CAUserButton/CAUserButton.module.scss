@@ -14,7 +14,7 @@
   padding: 0 10px;
 
   border: 1px solid #E3E3E3;
-  border-radius: 99em;
+  border-radius: 22px;
 }
 
 .pointer {
@@ -42,6 +42,12 @@
   }
 }
 
+.info .imgUser svg {
+  width: 22px;
+  height: 22px;
+  fill: #636363;
+}
+
 .nameUser {
   flex-grow: 1;
 
@@ -57,13 +63,9 @@
 }
 
 .info .nameUser {
+  width: calc(100% - 22px);
   color: #636363;
-}
-
-.info .imgUser svg {
-  width: 22px;
-  height: 22px;
-  fill: #636363;
+  word-wrap: break-word;
 }
 
 .nameUserActive {
