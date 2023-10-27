@@ -23,7 +23,7 @@ export default class DemoDapplet {
             exec: async () => {
               await Core.notify({
                 title: 'Test Title',
-                message: 'Very very very very very very very very very long Test Message',
+                message: 'Test Message very very very very very very very very very long',
                 payload: {
                   key: 'value',
                 },
