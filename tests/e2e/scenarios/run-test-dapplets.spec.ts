@@ -37,7 +37,6 @@ for (const dappletName of dapplets) {
         await page.locator('.dapplet-widget').locator(':scope > *').first().click()
         const floatingNotification = await page.getByTestId('notification-label')
         await expect(floatingNotification).toContainText('Test Title')
-        await  page.pause()
         await expect(floatingNotification).toContainText('Test Message')
         await floatingNotification.getByText('show more').click() // opens notifications overlay
         await expect(floatingNotification).not.toBeVisible()
