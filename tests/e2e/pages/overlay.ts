@@ -16,7 +16,7 @@ export class Overlay {
   }
 
   async clickToggle() {
-    await this.root.getByTestId('system-tab-dapplets').click()
+    await this.root.getByTestId('system-tab-dapplets').first().click()
   }
 
   async clickSettings() {
