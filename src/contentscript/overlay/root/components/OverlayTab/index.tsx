@@ -154,21 +154,6 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
               })}
             ></div>
             <div className={styles.blockStandartFunction}>
-              {/* <SquaredButton
-            menuVisible &&
-            p.isOverlayCollapsed && (
-              <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
-                {p.getWigetsConstructor(p.menuWidgets, true)}
-                <div className={styles.delimeterMenuWidgets}></div>
-                <div className={styles.blockStandartFunction}>
-                  <SquaredButton
-                    style={{ cursor: 'auto' }}
-                    className={styles.squaredButtonMenuWidget}
-                    data-visible
-                    disabled={true}
-                    appearance={'big'}
-                    icon={Help}
-                  /> */}
               <SquaredButton
                 className={styles.squaredButtonMenuWidget}
                 data-visible
@@ -206,19 +191,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                   onOpenStore(p.id)
                 }}
               />
-              {/* <SquaredButton
-                    style={{ cursor: 'auto' }}
-                    className={styles.squaredButtonMenuWidget}
-                    data-visible
-                    disabled={true}
-                    appearance={'big'}
-                    icon={Pause}
-                  /> */}
             </div>
           </div>
         ) : null}
         <div className={styles.top}>
-          {p.icon && typeof p.icon === 'function' ? null : p.icon && // /> //   })} //     [styles.cursor]: !p.isActiveTab, //   className={cn(styles.image, { //   }} //     !p.isActiveTab && p.onTabClick() //   onClick={() => { // <p.icon
+          {p.icon && typeof p.icon === 'function' ? null : p.icon &&
             typeof p.icon === 'object' &&
             'moduleName' in p.icon ? (
             <ModuleIcon
@@ -338,78 +315,6 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                 </li>
               )
             })}
-            {/* {p.pinned &&
-                  menuVisible &&
-                  p.isOverlayCollapsed && (
-                    <ul data-testid="main-menu-actions" className={styles.mainMenu}>
-                      <li onClick={connectWallet} className={styles.mainMenuItem}>
-                        <span className={styles.mainMenuItemTitle}>Log in to extension</span>
-                        <span className={styles.mainMenuItemIcon}>
-                          <Login />
-                        </span>
-                      </li>
-                      <li
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          p.navigate(`/system/connectedAccounts`)
-                          p.onToggleClick()
-                          setMenuVisible(false)
-                        }}
-                        className={styles.mainMenuItem}
-                      >
-                        <span className={styles.mainMenuItemTitle}>Connected Accounts</span>
-                        <span className={styles.mainMenuItemIcon}>
-                          <Account />
-                        </span>
-                      </li>
-                      <li
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          p.onToggleClick()
-                          p.navigate(`/system/notifications`)
-
-                          setMenuVisible(false)
-                        }}
-                        className={styles.mainMenuItem}
-                      >
-                        <span className={styles.mainMenuItemTitle}>Notifications</span>
-                        <span className={styles.mainMenuItemIcon}>
-                          <NotificationIcon />
-                        </span>
-                      </li>
-                     
-                      <li className={styles.mainMenuItem}>
-                    <span className={styles.mainMenuItemTitle}>Disable dapplets on this page</span>
-                    <span className={styles.mainMenuItemIcon}>
-                      <Power />
-                    </span>
-                  </li> 
-                      <li
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          p.onToggleClick()
-                          p.navigate(`/system/dapplets`)
-
-                          setMenuVisible(false)
-                        }}
-                        className={styles.mainMenuItem}
-                      >
-                        <span className={styles.mainMenuItemTitle}>Maximize extension</span>
-                        <span className={styles.mainMenuItemIcon}>
-                          <Max />
-                        </span>
-                      </li>
-                      <li className={styles.mainMenuItem}>
-                    <span className={styles.mainMenuItemTitle}>Edit lists</span>
-                    <span className={styles.mainMenuItemIcon}>
-                      <Edit />
-                    </span>
-                  </li> 
-                    </ul>
-                  )} */}
           </ul>
         )}
       </div>

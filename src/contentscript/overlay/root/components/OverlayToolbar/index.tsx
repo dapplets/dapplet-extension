@@ -71,11 +71,8 @@ export interface OverlayToolbarProps {
 export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const { dappletActions, pinDappletAction, unpinDappletAction } = useDappletActions()
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
-  // const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
   const noSystemTabs = p.tabs.filter((f) => f.title !== 'Dapplets')
   const [isShowTabs, onShowTabs] = useToggle(true)
-  // const [isClick, onClick] = useToggle(false)
-  // const [widgets, setwidgets] = useState(widgets)
   const [isVisibleAnimation, setVisibleAnimation] = useState(false)
   const [iconAnimateWidget, setIconAnimateWidget] = useState('')
   const [isPinnedAnimateWidget, setPinnedAnimateWidget] = useState(false)
@@ -83,7 +80,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [event, setEvent] = useState<Notify[]>([])
   const [payload, setPayload] = useState(null)
   const btnRef = useRef<HTMLDivElement>()
-  // const notificationRef = useRef<HTMLDivElement>()
   const [newNotifications, setNewNotifications] = useState([])
 
   const handleUpdateNotifications = async () => {
