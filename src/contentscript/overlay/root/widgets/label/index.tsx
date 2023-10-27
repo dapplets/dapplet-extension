@@ -11,6 +11,7 @@ export interface LabelProps {
 
 export const LabelButton: FC<LabelProps> = (props: LabelProps) => {
   const { title, icon, hidden = false, ...otherProps } = props
+
   return (
     <span
       className={cn(styles.widgetLabel, {
