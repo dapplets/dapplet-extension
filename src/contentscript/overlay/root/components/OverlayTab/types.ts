@@ -31,4 +31,5 @@ export interface OverlayTabProps {
   selectedWallet?: any
   isToolbar?: boolean
   hasActionHandler?: boolean
+  isOverlayCollapsed: boolean
 }

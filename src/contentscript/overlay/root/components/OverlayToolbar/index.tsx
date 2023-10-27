@@ -65,6 +65,7 @@ export interface OverlayToolbarProps {
   widgets?: any
   connectedDescriptors?: any
   selectedWallet?: any
+  isOverlayCollapsed: boolean
 }
 
 export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
@@ -194,6 +195,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
         <div key={NewTabs.id}>
           <OverlayTab
             {...newTab}
+            isOverlayCollapsed={p.isOverlayCollapsed}
             isToolbar={true}
             isActiveTab={activeTabId === NewTabs.id}
             activeTabMenuId={activeTabMenuId}
@@ -207,19 +209,11 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             connectedDescriptors={p.connectedDescriptors}
             setOpenWallet={p.setOpenWallet}
             onMenuClick={(menu) => {
-              if (
-                document
-                  .querySelector('#dapplets-overlay-manager')
-                  ?.classList.contains('dapplets-overlay-collapsed')
-              ) {
+              if (p.isOverlayCollapsed) {
                 p.onMenuClick(NewTabs, menu)
 
                 p.onToggleClick()
-              } else if (
-                !document
-                  .querySelector('#dapplets-overlay-manager')
-                  ?.classList.contains('dapplets-overlay-collapsed')
-              ) {
+              } else if (!p.isOverlayCollapsed) {
                 if (p.pathname === '/system/connectedAccounts') {
                   p.onToggleClick()
                 } else {
@@ -262,19 +256,10 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   }
 
   const handleOpenOverlayNotification = (id) => {
-    if (
-      document
-        .querySelector('#dapplets-overlay-manager')
-        ?.classList.contains('dapplets-overlay-collapsed')
-    ) {
+    if (p.isOverlayCollapsed) {
       p.navigate('/system/notifications', { state: { targetID: id, isLaterRead: true } })
-
       p.onToggleClick()
-    } else if (
-      !document
-        .querySelector('#dapplets-overlay-manager')
-        ?.classList.contains('dapplets-overlay-collapsed')
-    ) {
+    } else {
       p.navigate('/system/notifications', { state: { targetID: id, isLaterRead: true } })
     }
   }
@@ -306,19 +291,10 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
-                if (
-                  document
-                    .querySelector('#dapplets-overlay-manager')
-                    ?.classList.contains('dapplets-overlay-collapsed')
-                ) {
+                if (p.isOverlayCollapsed) {
                   p.navigate('/system/notifications')
-
                   p.onToggleClick()
-                } else if (
-                  !document
-                    .querySelector('#dapplets-overlay-manager')
-                    ?.classList.contains('dapplets-overlay-collapsed')
-                ) {
+                } else {
                   p.navigate('/system/notifications')
                 }
               }}
@@ -360,12 +336,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             {isVisibleAnimation && getAnimateButtonWidget(iconAnimateWidget)}
 
             {/* Pinned Dapplet Actions */}
-            {!isShowTabs &&
-            document
-              .querySelector('#dapplets-overlay-manager')
-              ?.classList.contains('dapplets-overlay-collapsed')
-              ? getWigetsConstructor(dappletActions)
-              : null}
+            {!isShowTabs && p.isOverlayCollapsed ? getWigetsConstructor(dappletActions) : null}
 
             {p.modules?.filter((x) => x.isActive).length !== 0 && (
               <>
@@ -386,6 +357,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
                       return (
                         <OverlayTab
+                          isOverlayCollapsed={p.isOverlayCollapsed}
                           setOpenWallet={p.setOpenWallet}
                           isOpenWallet={p.isOpenWallet}
                           key={tab.id}

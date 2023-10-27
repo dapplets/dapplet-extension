@@ -27,9 +27,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const [event, setEvent] = useState<Notification[]>([])
 
   useEffect(() => {
-    !document
-      .querySelector('#dapplets-overlay-manager')
-      ?.classList.contains('dapplets-overlay-collapsed') && setMenuVisible(false)
+    !p.isOverlayCollapsed && setMenuVisible(false)
   }, [menuVisible, p])
 
   useEffect(() => {
@@ -81,11 +79,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           const tab = await getCurrentTab()
           if (!tab) return
           await openDappletAction(f, tab.id)
-          if (
-            document
-              .querySelector('#dapplets-overlay-manager')
-              ?.classList.contains('dapplets-overlay-collapsed')
-          ) {
+          if (p.isOverlayCollapsed) {
             p.onToggleClick()
           }
         } catch (err) {
@@ -93,21 +87,13 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
         }
       } else {
         p.overlays.filter((x) => x.source === f).map((x) => p.navigate!(`/${f}/${x.id}`))
-        if (
-          document
-            .querySelector('#dapplets-overlay-manager')
-            ?.classList.contains('dapplets-overlay-collapsed')
-        ) {
+        if (p.isOverlayCollapsed) {
           p.onToggleClick()
         }
       }
     } else {
       p.onTabClick()
-      if (
-        document
-          .querySelector('#dapplets-overlay-manager')
-          ?.classList.contains('dapplets-overlay-collapsed')
-      ) {
+      if (p.isOverlayCollapsed) {
         p.onToggleClick()
       }
     }
@@ -132,11 +118,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
         onBlur={(e) => {
           e.preventDefault()
           e.stopPropagation()
-          if (
-            document
-              .querySelector('#dapplets-overlay-manager')
-              ?.classList.contains('dapplets-overlay-collapsed')
-          ) {
+          if (p.isOverlayCollapsed) {
             e.relatedTarget?.hasAttribute('data-visible') && menuVisible
               ? null
               : setMenuVisible(false)
@@ -148,11 +130,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           e.preventDefault()
           e.stopPropagation()
 
-          if (
-            document
-              .querySelector('#dapplets-overlay-manager')
-              ?.classList.contains('dapplets-overlay-collapsed')
-          ) {
+          if (p.isOverlayCollapsed) {
             setMenuVisible(!menuVisible)
           } else {
             onOpenDappletAction(p.id) && setMenuVisible(false)
@@ -167,9 +145,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
         {!p.pinned &&
         menuVisible &&
         // p.menuWidgets.length &&
-        document
-          .querySelector('#dapplets-overlay-manager')
-          .classList.contains('dapplets-overlay-collapsed') ? (
+        p.isOverlayCollapsed ? (
           <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
             {p.getWigetsConstructor(p.menuWidgets, true)}
             <div
@@ -180,9 +156,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             <div className={styles.blockStandartFunction}>
               {/* <SquaredButton
             menuVisible &&
-            document
-              .querySelector('#dapplets-overlay-manager')
-              ?.classList.contains('dapplets-overlay-collapsed') && (
+            p.isOverlayCollapsed && (
               <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
                 {p.getWigetsConstructor(p.menuWidgets, true)}
                 <div className={styles.delimeterMenuWidgets}></div>
@@ -292,11 +266,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     e.preventDefault
                     e.stopPropagation()
 
-                    if (
-                      document
-                        .querySelector('#dapplets-overlay-manager')
-                        ?.classList.contains('dapplets-overlay-collapsed')
-                    ) {
+                    if (p.isOverlayCollapsed) {
                       // todo: uncomment when main menu will be works
                       // menu.id === 'dapplets' && setMenuVisible(!menuVisible)
 
@@ -370,9 +340,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             })}
             {/* {p.pinned &&
                   menuVisible &&
-                  document
-                    .querySelector('#dapplets-overlay-manager')
-                    ?.classList.contains('dapplets-overlay-collapsed') && (
+                  p.isOverlayCollapsed && (
                     <ul data-testid="main-menu-actions" className={styles.mainMenu}>
                       <li onClick={connectWallet} className={styles.mainMenuItem}>
                         <span className={styles.mainMenuItemTitle}>Log in to extension</span>
