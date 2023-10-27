@@ -67,7 +67,7 @@ export const Notification: React.FC<NotificationProps> = (props) => {
         clearTimeout(timerStyles)
       }
     }
-  }, [stateNotify, isAnimateRead])
+  }, [stateNotify])
 
   const isOldNotification =
     status === NotificationStatus.Default ||
