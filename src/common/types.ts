@@ -104,10 +104,27 @@ export type LoginRequest = {
   role?: string
   help?: string
   target?: string | any
-  secureLogin?: 'required' | 'optional' | 'disabled'
-  reusePolicy?: 'auto' | 'manual' | 'disabled'
-  from?: 'me' | 'any'
+  secureLogin?: SecureLoginOptions
+  reusePolicy?: ReusePolicyOptions
+  from?: LoginRequestFromOptions
   contractId?: string // ToDo: rethink this parameter, needed for NEAR only
+}
+
+export enum SecureLoginOptions {
+  Required = 'required',
+  Optional = 'optional',
+  Disabled = 'disabled',
+}
+
+export enum ReusePolicyOptions {
+  Auto = 'auto',
+  Manual = 'manual',
+  Disabled = 'disabled',
+}
+
+export enum LoginRequestFromOptions {
+  Me = 'me',
+  Any = 'any',
 }
 
 export type SystemOverlayData = {
