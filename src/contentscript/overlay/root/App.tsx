@@ -20,14 +20,13 @@ import { Bus } from '../../../common/bus'
 import { DAPPLETS_STORE_URL, ModuleTypes } from '../../../common/constants'
 import * as EventBus from '../../../common/global-event-bus'
 import { groupBy } from '../../../common/helpers'
-import { ReactComponent as Notification } from './assets/newIcon/bell.svg'
+import { ReactComponent as Notification } from './assets/newIcon/bellNoCircle.svg'
+import { ReactComponent as Hide } from './assets/newIcon/collapsed.svg'
 import { ReactComponent as Account } from './assets/newIcon/connected.svg'
-import { ReactComponent as Hide } from './assets/newIcon/hide.svg'
+import { ReactComponent as Home } from './assets/newIcon/home_top.svg'
 import { ReactComponent as Settings } from './assets/newIcon/mainset.svg'
 import { ReactComponent as DappletsLogo } from './assets/newIcon/mustache.svg'
 import { ReactComponent as SearchIcon } from './assets/newIcon/search.svg'
-import { ReactComponent as Home } from './assets/newIcon/squares.svg'
-import { ReactComponent as StoreIcon } from './assets/newIcon/store.svg'
 import { Onboarding } from './components/BaseOnboarding'
 import { ContentItem } from './components/ContentItem'
 import styles from './components/Overlay/Overlay.module.scss'
@@ -608,10 +607,13 @@ class _App extends React.Component<P, S> {
                 </div>
 
                 <div className={styles.right}>
+                  {this.getNewButtonTab('Dapplets')}
                   {pathname === '/system/dapplets' && (
                     <SquaredButton
                       title="Search dapplets"
-                      className={s.classNameSearchButton}
+                      className={cn(s.classNameSearchButton, {
+                        [styles.classNameSearchButtonActive]: s.isOpenSearch,
+                      })}
                       onClick={() =>
                         s.isOpenSearch ? this.handleCloseSearch() : this.handleOpenSearchClick()
                       }
@@ -622,12 +624,12 @@ class _App extends React.Component<P, S> {
 
                   {this.getNewButtonTab('Notifications')}
 
-                  <SquaredButton
+                  {/* <SquaredButton
                     appearance="big"
                     title="Dapplets Store"
                     icon={StoreIcon}
                     onClick={this.handleStoreButtonClick}
-                  />
+                  /> */}
                   {/* <ShareButton /> */}
                   {this.getNewButtonTab('Settings')}
                 </div>
@@ -637,10 +639,8 @@ class _App extends React.Component<P, S> {
                   <Search
                     className={s.classNameSearch}
                     value={s.search}
-                    isOpenSearch={s.isOpenSearch}
                     onChange={this.handleSearchChange}
                     onClearValue={this.handleSearchClear}
-                    onCloseSearch={this.handleCloseSearch}
                   />
                 </div>
               )}
