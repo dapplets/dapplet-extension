@@ -639,10 +639,8 @@ class _App extends React.Component<P, S> {
                   <Search
                     className={s.classNameSearch}
                     value={s.search}
-                    isOpenSearch={s.isOpenSearch}
                     onChange={this.handleSearchChange}
                     onClearValue={this.handleSearchClear}
-                    onCloseSearch={this.handleCloseSearch}
                   />
                 </div>
               )}
