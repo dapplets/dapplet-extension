@@ -2,6 +2,7 @@ import { hexlify } from '@ethersproject/bytes'
 import { toUtf8Bytes } from '@ethersproject/strings'
 import { SECURE_AUTH_METHODS } from '../../common/constants'
 import { generateGuid } from '../../common/generateGuid'
+import { isValidEnumValue } from '../../common/helpers'
 import {
   ChainTypes,
   LoginRequest,
@@ -106,11 +107,11 @@ export class SessionService {
       throw new Error(`"authMethods" is required.`)
     }
 
-    if (!Object.values(SecureLoginOptions).includes(request.secureLogin)) {
+    if (!isValidEnumValue(SecureLoginOptions, request.secureLogin)) {
       throw new Error('Invalid "secureLogin" value.')
     }
 
-    if (!Object.values(ReusePolicyOptions).includes(request.reusePolicy)) {
+    if (!isValidEnumValue(ReusePolicyOptions, request.reusePolicy)) {
       throw new Error('Invalid "reusePolicy" value.')
     }
 

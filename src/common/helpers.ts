@@ -630,3 +630,7 @@ export const makeCancelable = (promise: Promise<void>) => {
     cancel: onCancel,
   }
 }
+
+export const isValidEnumValue = <T>(enumType: T, value: any): boolean => {
+  return Object.values(enumType).includes(value as T)
+}

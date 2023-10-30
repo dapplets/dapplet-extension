@@ -1,7 +1,11 @@
 import { Runtime } from 'webextension-polyfill'
 import ManifestDTO from '../background/dto/manifestDTO'
 import VersionInfo from '../background/models/versionInfo'
+
+export type ValueOf<T> = T[keyof T]
+
 export type Falsy = false | 0 | '' | null | undefined
+
 export type DefaultConfig = {
   [Environments.Dev]?: {
     [key: string]: any
@@ -104,9 +108,9 @@ export type LoginRequest = {
   role?: string
   help?: string
   target?: string | any
-  secureLogin?: SecureLoginOptions
-  reusePolicy?: ReusePolicyOptions
-  from?: LoginRequestFromOptions
+  secureLogin?: SecureLoginOptions | ValueOf<SecureLoginOptions>
+  reusePolicy?: ReusePolicyOptions | ValueOf<ReusePolicyOptions>
+  from?: LoginRequestFromOptions | ValueOf<LoginRequestFromOptions>
   contractId?: string // ToDo: rethink this parameter, needed for NEAR only
 }
 
