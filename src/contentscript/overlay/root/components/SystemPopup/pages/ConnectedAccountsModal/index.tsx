@@ -381,33 +381,52 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
               : 'Do you want to connect these accounts?'
           }
           content={
-            !selectedFirstUser || !selectedSecondUser
-              ? 'Select the two wallets you want to link in the Connected Accounts service.'
-              : areConnectedAccountsUsersWallets(selectedFirstUser, selectedSecondUser)
-              ? isWaiting
-                ? requestBody
-                  ? 'Please approve NEAR transaction'
-                  : `Please sign the message in ${
-                      EthWalletNames[selectedFirstUser.walletType] ||
-                      EthWalletNames[selectedSecondUser.walletType] ||
-                      ''
-                    }`
-                : `You need to sign a message in ${
+            !selectedFirstUser || !selectedSecondUser ? (
+              'Select the two wallets you want to link in the Connected Accounts service.'
+            ) : areConnectedAccountsUsersWallets(selectedFirstUser, selectedSecondUser) ? (
+              isWaiting ? (
+                requestBody ? (
+                  'Please approve NEAR transaction'
+                ) : (
+                  `Please sign the message in ${
                     EthWalletNames[selectedFirstUser.walletType] ||
                     EthWalletNames[selectedSecondUser.walletType] ||
                     ''
-                  } and approve the transaction to the Connected Accounts NEAR contract in order to link your Ethereum and NEAR accounts.`
-              : isWaiting
-              ? 'Please approve NEAR transaction'
-              : selectedFirstUser.origin === 'twitter' || selectedSecondUser.origin === 'twitter'
-              ? `You need to have your NEAR account name listed in your Twitter profile name to link your accounts.\nExample: Sam Green (sam.${
-                  contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'
-                })`
-              : selectedFirstUser.origin === 'github' || selectedSecondUser.origin === 'github'
-              ? `You need to have your NEAR account name listed in your GitHub profile name to link your accounts.\nExample: Sam Green (sam.${
-                  contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'
-                })`
-              : undefined
+                  }`
+                )
+              ) : (
+                `You need to sign a message in ${
+                  EthWalletNames[selectedFirstUser.walletType] ||
+                  EthWalletNames[selectedSecondUser.walletType] ||
+                  ''
+                } and approve the transaction to the Connected Accounts NEAR contract in order to link your Ethereum and NEAR accounts.`
+              )
+            ) : isWaiting ? (
+              'Please approve NEAR transaction'
+            ) : selectedFirstUser.origin === 'twitter' ||
+              selectedSecondUser.origin === 'twitter' ? (
+              <>
+                <p>
+                  You need to have your NEAR account name listed in your X profile name to link your
+                  accounts.
+                </p>
+                <p>
+                  Example: Sam Green (sam.
+                  {contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'})
+                </p>
+              </>
+            ) : selectedFirstUser.origin === 'github' || selectedSecondUser.origin === 'github' ? (
+              <>
+                <p>
+                  You need to have your NEAR account name listed in your GitHub profile name to link
+                  your accounts.
+                </p>
+                <p>
+                  Example: Sam Green (sam.
+                  {contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'})
+                </p>
+              </>
+            ) : undefined
           }
           accounts={
             <>
@@ -440,33 +459,52 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
               : 'Do you want to disconnect these accounts?'
           }
           content={
-            !selectedFirstUser || !selectedSecondUser
-              ? 'Select the two wallets you want to unlink in the Connected Accounts service.'
-              : areConnectedAccountsUsersWallets(selectedFirstUser, selectedSecondUser)
-              ? isWaiting
-                ? requestBody
-                  ? 'Please approve NEAR transaction'
-                  : `Please sign the message in ${
-                      EthWalletNames[selectedFirstUser.walletType] ||
-                      EthWalletNames[selectedSecondUser.walletType] ||
-                      ''
-                    }`
-                : `You need to sign a message in ${
+            !selectedFirstUser || !selectedSecondUser ? (
+              'Select the two wallets you want to unlink in the Connected Accounts service.'
+            ) : areConnectedAccountsUsersWallets(selectedFirstUser, selectedSecondUser) ? (
+              isWaiting ? (
+                requestBody ? (
+                  'Please approve NEAR transaction'
+                ) : (
+                  `Please sign the message in ${
                     EthWalletNames[selectedFirstUser.walletType] ||
                     EthWalletNames[selectedSecondUser.walletType] ||
                     ''
-                  } and approve the transaction to the Connected Accounts NEAR contract in order to unlink your Ethereum and NEAR accounts.`
-              : isWaiting
-              ? 'Please approve NEAR transaction'
-              : selectedFirstUser.origin === 'twitter' || selectedSecondUser.origin === 'twitter'
-              ? `You need to have your NEAR account name listed in your Twitter profile name to unlink your accounts.\nExample: Sam Green (sam.${
-                  contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'
-                })`
-              : selectedFirstUser.origin === 'github' || selectedSecondUser.origin === 'github'
-              ? `You need to have your NEAR account name listed in your GitHub profile name to unlink your accounts.\nExample: Sam Green (sam.${
-                  contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'
-                })`
-              : undefined
+                  }`
+                )
+              ) : (
+                `You need to sign a message in ${
+                  EthWalletNames[selectedFirstUser.walletType] ||
+                  EthWalletNames[selectedSecondUser.walletType] ||
+                  ''
+                } and approve the transaction to the Connected Accounts NEAR contract in order to unlink your Ethereum and NEAR accounts.`
+              )
+            ) : isWaiting ? (
+              'Please approve NEAR transaction'
+            ) : selectedFirstUser.origin === 'twitter' ||
+              selectedSecondUser.origin === 'twitter' ? (
+              <>
+                <p>
+                  You need to have your NEAR account name listed in your X profile name to unlink
+                  your accounts.
+                </p>
+                <p>
+                  Example: Sam Green (sam.
+                  {contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'})
+                </p>
+              </>
+            ) : selectedFirstUser.origin === 'github' || selectedSecondUser.origin === 'github' ? (
+              <>
+                <p>
+                  You need to have your NEAR account name listed in your GitHub profile name to
+                  unlink your accounts.
+                </p>
+                <p>
+                  Example: Sam Green (sam.
+                  {contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'})
+                </p>
+              </>
+            ) : undefined
           }
           accounts={
             <>
