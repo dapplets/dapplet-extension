@@ -1,14 +1,11 @@
 import cn from 'classnames'
 import React, { ReactElement, useEffect } from 'react'
 import Loader from '../../assests/loader.svg'
-import emptyLinesToParagraphEl from './helpers/emptyLinesToParagraphEl'
-import infoLinesToInfoBlocks from './helpers/infoLinesToInfoBlocks'
-import lineWithUnderlinePartsToParagraphEl from './helpers/lineWithUnderlinePartsToParagraphEl'
 import styles from './Modal.module.scss'
 
 interface IModalProps {
   title?: string
-  content?: string
+  content?: string | React.JSX.Element
   accounts?: ReactElement
   onClose: () => void
   onConfirm?: () => Promise<void>
@@ -51,15 +48,7 @@ export const Modal = ({
           {onClose ? <span className={styles.modalClose} onClick={onClose} /> : null}
         </div>
         {accounts && <div className={styles.modalAccounts}>{accounts}</div>}
-        {content && (
-          <div className={styles.modalBody}>
-            {content
-              .split('\n')
-              .map(emptyLinesToParagraphEl)
-              .map(lineWithUnderlinePartsToParagraphEl)
-              .map(infoLinesToInfoBlocks)}
-          </div>
-        )}
+        {content && <div className={styles.modalBody}>{content}</div>}
         <div className={styles.modalFooter}>
           {onConfirm && onConfirmLabel && !isWaiting && (
             <button

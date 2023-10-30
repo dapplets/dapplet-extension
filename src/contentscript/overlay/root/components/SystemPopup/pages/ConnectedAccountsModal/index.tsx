@@ -324,15 +324,34 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         title={'Add your NEAR account ID'}
         accounts={<ModalCAUserButton user={walletAccount} copyButton={!isLongAddressToX} />}
         content={
-          isLongAddressToX
-            ? 'Unfortunately, the connected wallet address is too long to insert the X username. Choose another!'
-            : `to your ${socialNetworkToConnect} username <u>${
-                condition.original['user']
-              }</u>. For example:\n \n<info ${socialNetworkToConnect.toLowerCase()}>${
-                isLongAddressPlusTitleToX
-                  ? smartTitleSlice(condition.original['user'], walletAccount.name)
-                  : `${condition.original['user']} (${walletAccount.name})`
-              }</info>\n \nThis is done so the Oracle can confirm your ownership of the ${socialNetworkToConnect} account.`
+          isLongAddressToX ? (
+            'Unfortunately, the connected wallet address is too long to insert the X username. Choose another!'
+          ) : (
+            <>
+              <p>
+                to your {socialNetworkToConnect} username{' '}
+                <span style={{ textDecoration: 'underline' }}>{condition.original['user']}</span>.
+                For example:
+              </p>
+              <p></p>
+              <CAUserButton
+                user={{
+                  img: '',
+                  name: isLongAddressPlusTitleToX
+                    ? smartTitleSlice(condition.original['user'], walletAccount.name)
+                    : `${condition.original['user']} (${walletAccount.name})`,
+                  origin: socialNetworkToConnect.toLowerCase(),
+                  accountActive: false,
+                }}
+                info={true}
+              />
+              <p></p>
+              <p>
+                This is done so the Oracle can confirm your ownership of the{' '}
+                {socialNetworkToConnect} account.
+              </p>
+            </>
+          )
         }
         onClose={onCloseClick}
         onConfirm={
