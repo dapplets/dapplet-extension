@@ -1,5 +1,6 @@
 import GITHUB_ICON from './resources/social/github.svg'
-import TWITTER_ICON from './resources/social/twitter-icon.svg'
+// import TWITTER_ICON from './resources/social/twitter-icon.svg'
+import X_ICON from './resources/social/x.svg'
 import ETH_ICON from './resources/wallets/eth.svg'
 import NEAR_ICON from './resources/wallets/near-black.svg'
 
@@ -14,10 +15,10 @@ export interface Resources {
 
 export const resources: Resources = {
   twitter: {
-    title: 'Twitter',
+    title: 'X',
     type: 'social',
-    icon: TWITTER_ICON,
-    proofUrl: (name) => 'https://twitter.com/' + name,
+    icon: X_ICON,
+    proofUrl: (name) => 'https://x.com/' + name,
   },
   github: {
     title: 'GitHub',
