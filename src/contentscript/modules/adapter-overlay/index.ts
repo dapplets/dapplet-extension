@@ -12,7 +12,7 @@ function createWidgetFactory<T>() {
 }
 
 class OverlayAdapter {
-  private states: { state: State<any>; moduleName: string }[] = []
+  _states: { state: State<any>; moduleName: string }[] = []
 
   public exports = (): Exports => ({
     button: createWidgetFactory(),
@@ -28,7 +28,7 @@ class OverlayAdapter {
 
       stateObjects.forEach((state) => (state.changedHandler = this._refreshReactState))
 
-      this.states.push(...stateObjects.map((state) => ({ state, moduleName })))
+      this._states.push(...stateObjects.map((state) => ({ state, moduleName })))
 
       this._refreshReactState()
     })
@@ -36,17 +36,17 @@ class OverlayAdapter {
 
   public detachConfig(_, moduleName) {
     // Unsubscribe
-    this.states
+    this._states
       .filter((state) => state.moduleName === moduleName)
       .forEach((state) => (state.state.changedHandler = null))
 
-    this.states = this.states.filter((state) => state.moduleName !== moduleName)
+    this._states = this._states.filter((state) => state.moduleName !== moduleName)
     this._refreshReactState()
   }
 
-  private _refreshReactState = () => {
+  _refreshReactState = () => {
     setDappletActions(
-      this.states.map((state) => ({
+      this._states.map((state) => ({
         ...state.state.getStateValues(),
         moduleName: state.moduleName,
       }))
