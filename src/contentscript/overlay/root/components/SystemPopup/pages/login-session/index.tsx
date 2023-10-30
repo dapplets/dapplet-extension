@@ -37,9 +37,9 @@ export class LoginSession extends React.Component<Props, State> {
   }
 
   async routePages() {
-    const loginRequest = this.props.request.loginRequest
+    const { loginRequest } = this.props.request
     const chains = loginRequest.authMethods
-    const secureLogin = loginRequest.secureLogin
+    const { secureLogin, reusePolicy } = loginRequest
 
     const { getWalletDescriptors, getSuitableLoginConfirmations } = await initBGFunctions(browser)
 
@@ -54,7 +54,9 @@ export class LoginSession extends React.Component<Props, State> {
       return
     }
 
-    if (secureLogin === 'required') {
+    const isItAboutSigning = secureLogin === 'required' && reusePolicy === 'manual'
+
+    if (isItAboutSigning) {
       // ToDo: handle optional mode
       const confirmations = await getSuitableLoginConfirmations(
         this.props.request.app,

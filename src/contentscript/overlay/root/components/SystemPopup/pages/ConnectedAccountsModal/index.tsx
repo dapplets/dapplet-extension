@@ -8,6 +8,7 @@ import {
   IConnectedAccountUser,
   NearNetworks,
 } from '../../../../../../../common/types'
+import smartTitleSlice from '../../../../helpers/smartTitleSlice'
 import { CAUserButton } from '../../../CAUserButton'
 import { DropdownCAModal } from '../../../DropdownCAModal'
 import areConnectedAccountsUsersWallets from './helpers/areConnectedAccountsUsersWallets'
@@ -23,7 +24,13 @@ interface IConnectedAccountsModalProps {
     bunchOfAccountsToConnect?: [IConnectedAccountUser, IConnectedAccountUser][]
     accountsToDisconnect?: [IConnectedAccountUser, IConnectedAccountUser]
     accountToChangeStatus?: IConnectedAccountUser
-    condition?: boolean
+    condition?: {
+      result: boolean
+      original: {
+        type: string
+        [name: string]: string
+      }
+    }
     frameId: string
   }
   onCloseClick: () => void
@@ -42,9 +49,13 @@ type TRequestBody = {
   statement?: string
 }
 
-const ModalCAUserButton = ({ user }: { user: IConnectedAccountUser }) => (
-  <CAUserButton user={user} maxLength={24} color="#eaf0f0" />
-)
+const ModalCAUserButton = ({
+  user,
+  copyButton = false,
+}: {
+  user: IConnectedAccountUser
+  copyButton?: boolean
+}) => <CAUserButton user={user} maxLength={24} color="#eaf0f0" copyButton={copyButton} />
 
 const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   const { data, onCloseClick, bus } = props
@@ -297,26 +308,66 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     )
   }
 
-  if (condition) {
-    // ToDo: site-specific things must be removed or moved to another layer
-    //       origin === 'github'
+  if (condition?.result) {
+    const walletAccount = selectedFirstUser.walletType ? selectedFirstUser : selectedSecondUser
+    const isLongAddressToX =
+      (socialNetworkToConnect.toLowerCase() === 'twitter' ||
+        socialNetworkToConnect.toLowerCase() === 'x') &&
+      walletAccount.name.length > 50
+    const isLongAddressPlusTitleToX =
+      (socialNetworkToConnect.toLowerCase() === 'twitter' ||
+        socialNetworkToConnect.toLowerCase() === 'x') &&
+      `${condition.original['user']} (${walletAccount.name})`.length > 50
     return (
       <Modal
         isWaiting={isWaiting}
         title={'Add your NEAR account ID'}
-        content={`Add your NEAR account ID to your ${socialNetworkToConnect} username ${
-          selectedFirstUser.origin === 'github' ? ' and refresh browser page' : null
-        }. This is done so the Oracle can confirm your ownership of the ${socialNetworkToConnect} account`}
+        accounts={<ModalCAUserButton user={walletAccount} copyButton={!isLongAddressToX} />}
+        content={
+          isLongAddressToX ? (
+            'Unfortunately, the connected wallet address is too long to insert the X username. Choose another!'
+          ) : (
+            <>
+              <p>
+                to your {socialNetworkToConnect} username{' '}
+                <span style={{ textDecoration: 'underline' }}>{condition.original['user']}</span>.
+                For example:
+              </p>
+              <p></p>
+              <CAUserButton
+                user={{
+                  img: '',
+                  name: isLongAddressPlusTitleToX
+                    ? smartTitleSlice(condition.original['user'], walletAccount.name)
+                    : `${condition.original['user']} (${walletAccount.name})`,
+                  origin: socialNetworkToConnect.toLowerCase(),
+                  accountActive: false,
+                }}
+                info={true}
+              />
+              <p></p>
+              <p>
+                This is done so the Oracle can confirm your ownership of the{' '}
+                {socialNetworkToConnect} account.
+              </p>
+            </>
+          )
+        }
         onClose={onCloseClick}
-        onConfirm={async () => {
-          bus.publish('ready')
-          onCloseClick()
-        }}
-        onConfirmLabel="Already done"
+        onConfirm={
+          !isLongAddressToX &&
+          (async () => {
+            bus.publish('ready')
+            onCloseClick()
+          })
+        }
+        onConfirmLabel={!isLongAddressToX && 'Already done'}
       />
     )
   }
 
+  // ToDo: site-specific things must be removed or moved to another layer
+  //       origin === 'github'
   if (firstSelectorUsers?.length && secondSelectorUsers?.length) {
     if (!isUnlink) {
       return (
@@ -330,33 +381,52 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
               : 'Do you want to connect these accounts?'
           }
           content={
-            !selectedFirstUser || !selectedSecondUser
-              ? 'Select the two wallets you want to link in the Connected Accounts service.'
-              : areConnectedAccountsUsersWallets(selectedFirstUser, selectedSecondUser)
-              ? isWaiting
-                ? requestBody
-                  ? 'Please approve NEAR transaction'
-                  : `Please sign the message in ${
-                      EthWalletNames[selectedFirstUser.walletType] ||
-                      EthWalletNames[selectedSecondUser.walletType] ||
-                      ''
-                    }`
-                : `You need to sign a message in ${
+            !selectedFirstUser || !selectedSecondUser ? (
+              'Select the two wallets you want to link in the Connected Accounts service.'
+            ) : areConnectedAccountsUsersWallets(selectedFirstUser, selectedSecondUser) ? (
+              isWaiting ? (
+                requestBody ? (
+                  'Please approve NEAR transaction'
+                ) : (
+                  `Please sign the message in ${
                     EthWalletNames[selectedFirstUser.walletType] ||
                     EthWalletNames[selectedSecondUser.walletType] ||
                     ''
-                  } and approve the transaction to the Connected Accounts NEAR contract in order to link your Ethereum and NEAR accounts.`
-              : isWaiting
-              ? 'Please approve NEAR transaction'
-              : selectedFirstUser.origin === 'twitter' || selectedSecondUser.origin === 'twitter'
-              ? `You need to have your NEAR account name listed in your Twitter profile name to link your accounts.\nExample: Sam Green (sam.${
-                  contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'
-                })`
-              : selectedFirstUser.origin === 'github' || selectedSecondUser.origin === 'github'
-              ? `You need to have your NEAR account name listed in your GitHub profile name to link your accounts.\nExample: Sam Green (sam.${
-                  contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'
-                })`
-              : undefined
+                  }`
+                )
+              ) : (
+                `You need to sign a message in ${
+                  EthWalletNames[selectedFirstUser.walletType] ||
+                  EthWalletNames[selectedSecondUser.walletType] ||
+                  ''
+                } and approve the transaction to the Connected Accounts NEAR contract in order to link your Ethereum and NEAR accounts.`
+              )
+            ) : isWaiting ? (
+              'Please approve NEAR transaction'
+            ) : selectedFirstUser.origin === 'twitter' ||
+              selectedSecondUser.origin === 'twitter' ? (
+              <>
+                <p>
+                  You need to have your NEAR account name listed in your X profile name to link your
+                  accounts.
+                </p>
+                <p>
+                  Example: Sam Green (sam.
+                  {contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'})
+                </p>
+              </>
+            ) : selectedFirstUser.origin === 'github' || selectedSecondUser.origin === 'github' ? (
+              <>
+                <p>
+                  You need to have your NEAR account name listed in your GitHub profile name to link
+                  your accounts.
+                </p>
+                <p>
+                  Example: Sam Green (sam.
+                  {contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'})
+                </p>
+              </>
+            ) : undefined
           }
           accounts={
             <>
@@ -389,33 +459,52 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
               : 'Do you want to disconnect these accounts?'
           }
           content={
-            !selectedFirstUser || !selectedSecondUser
-              ? 'Select the two wallets you want to unlink in the Connected Accounts service.'
-              : areConnectedAccountsUsersWallets(selectedFirstUser, selectedSecondUser)
-              ? isWaiting
-                ? requestBody
-                  ? 'Please approve NEAR transaction'
-                  : `Please sign the message in ${
-                      EthWalletNames[selectedFirstUser.walletType] ||
-                      EthWalletNames[selectedSecondUser.walletType] ||
-                      ''
-                    }`
-                : `You need to sign a message in ${
+            !selectedFirstUser || !selectedSecondUser ? (
+              'Select the two wallets you want to unlink in the Connected Accounts service.'
+            ) : areConnectedAccountsUsersWallets(selectedFirstUser, selectedSecondUser) ? (
+              isWaiting ? (
+                requestBody ? (
+                  'Please approve NEAR transaction'
+                ) : (
+                  `Please sign the message in ${
                     EthWalletNames[selectedFirstUser.walletType] ||
                     EthWalletNames[selectedSecondUser.walletType] ||
                     ''
-                  } and approve the transaction to the Connected Accounts NEAR contract in order to unlink your Ethereum and NEAR accounts.`
-              : isWaiting
-              ? 'Please approve NEAR transaction'
-              : selectedFirstUser.origin === 'twitter' || selectedSecondUser.origin === 'twitter'
-              ? `You need to have your NEAR account name listed in your Twitter profile name to unlink your accounts.\nExample: Sam Green (sam.${
-                  contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'
-                })`
-              : selectedFirstUser.origin === 'github' || selectedSecondUser.origin === 'github'
-              ? `You need to have your NEAR account name listed in your GitHub profile name to unlink your accounts.\nExample: Sam Green (sam.${
-                  contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'
-                })`
-              : undefined
+                  }`
+                )
+              ) : (
+                `You need to sign a message in ${
+                  EthWalletNames[selectedFirstUser.walletType] ||
+                  EthWalletNames[selectedSecondUser.walletType] ||
+                  ''
+                } and approve the transaction to the Connected Accounts NEAR contract in order to unlink your Ethereum and NEAR accounts.`
+              )
+            ) : isWaiting ? (
+              'Please approve NEAR transaction'
+            ) : selectedFirstUser.origin === 'twitter' ||
+              selectedSecondUser.origin === 'twitter' ? (
+              <>
+                <p>
+                  You need to have your NEAR account name listed in your X profile name to unlink
+                  your accounts.
+                </p>
+                <p>
+                  Example: Sam Green (sam.
+                  {contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'})
+                </p>
+              </>
+            ) : selectedFirstUser.origin === 'github' || selectedSecondUser.origin === 'github' ? (
+              <>
+                <p>
+                  You need to have your NEAR account name listed in your GitHub profile name to
+                  unlink your accounts.
+                </p>
+                <p>
+                  Example: Sam Green (sam.
+                  {contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'})
+                </p>
+              </>
+            ) : undefined
           }
           accounts={
             <>
