@@ -272,7 +272,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       newTab.menus = filterNotifications
       const activeTabId = p.pathname.split('/')[1]
       const activeTabMenuId = p.pathname.split('/')[2]
-      console.log()
 
       return (
         <div key={NewTabs.id}>
