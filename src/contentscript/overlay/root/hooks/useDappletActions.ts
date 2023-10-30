@@ -1,53 +1,91 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { singletonHook } from 'react-singleton-hook'
 import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../common/global-event-bus'
 
-export type DappletAction = {
+export type DappletActionProps = {
   moduleName: string
-  action?: () => void
+  onClick?: () => void
   title?: string
   icon?: string
-  pinnedID?: string
+  pinId?: string
   hidden?: boolean
   disabled?: boolean
   pinned?: boolean
+  onPinned?: () => void
 }
 
 interface IState {
-  dappletActions: DappletAction[]
-  pinDappletAction(moduleName: string, pinId: string): Promise<void>
-  unpinDappletAction(moduleName: string, pinId: string): Promise<void>
+  dappletActions: DappletActionProps[]
 }
 
 const initState: IState = {
   dappletActions: [],
-  pinDappletAction: () => undefined,
-  unpinDappletAction: () => undefined,
 }
 
-let _setDappletActions: (actions: DappletAction[]) => void = () => {
+let _setDappletActions: (actions: DappletActionProps[]) => void = () => {
   throw new Error('You must useDappletActions before setting its state')
 }
 
 export const useDappletActions = singletonHook(initState, () => {
-  const [dappletActions, setDappletActions] = useState(initState.dappletActions)
+  const [dappletActions, setDappletActions] = useState([])
   const [pinnedActions, setPinnedActions] = useState([])
 
+  const pinDappletAction = useCallback(async (name, pinId) => {
+    try {
+      const { addPinnedActions } = await initBGFunctions(browser)
+      await addPinnedActions(name, pinId)
+    } catch (err) {
+      console.error(err)
+    }
+  }, [])
+
+  const unpinDappletAction = useCallback(async (name, pinId) => {
+    try {
+      const { removePinnedActions } = await initBGFunctions(browser)
+      await removePinnedActions(name, pinId)
+    } catch (err) {
+      console.error(err)
+    }
+  }, [])
+
+  const extendActionsWithHandlers = useCallback(
+    (actions: DappletActionProps[]) => {
+      return actions
+        .map((action) => ({
+          ...action,
+          pinned:
+            pinnedActions.some(
+              (pin) => pin.dappletName === action.moduleName && pin.widgetPinId === action.pinId
+            ) ?? false,
+        }))
+        .map((action) => ({
+          ...action,
+          onPinned: async () => {
+            // ToDo: update value in DynamicAdapter/State
+
+            if (action.pinned) {
+              await unpinDappletAction(action.moduleName, action.pinId)
+            } else {
+              await pinDappletAction(action.moduleName, action.pinId)
+            }
+          },
+        }))
+    },
+    [pinnedActions, pinDappletAction, unpinDappletAction]
+  )
+
   _setDappletActions = (actions) => {
-    setDappletActions(
-      actions.map((action) => ({
-        ...action,
-        pinned: pinnedActions.some(
-          (pin) => pin.dappletName === action.moduleName && pin.widgetPinId === action.pinnedID
-        ),
-      }))
-    )
+    setDappletActions(extendActionsWithHandlers(actions))
   }
 
   useEffect(() => {
-    const _refreshData = async () => {
+    setDappletActions((actions) => extendActionsWithHandlers(actions))
+  }, [pinnedActions])
+
+  useEffect(() => {
+    const refreshPinnedActions = async () => {
       try {
         const { getPinnedActions } = await initBGFunctions(browser)
         const pinnedActions = await getPinnedActions()
@@ -57,47 +95,17 @@ export const useDappletActions = singletonHook(initState, () => {
       }
     }
 
-    EventBus.on('myactions_changed', _refreshData)
+    refreshPinnedActions()
+
+    EventBus.on('myactions_changed', refreshPinnedActions)
 
     return () => {
-      EventBus.off('myactions_changed', _refreshData)
+      EventBus.off('myactions_changed', refreshPinnedActions)
     }
   }, [])
 
-  useEffect(() => {
-    // ToDo: code duplication
-    setDappletActions((actions) =>
-      actions.map((action) => ({
-        ...action,
-        pinned: pinnedActions.some(
-          (pin) => pin.dappletName === action.moduleName && pin.widgetPinId === action.pinnedID
-        ),
-      }))
-    )
-  }, [pinnedActions])
-
-  const pinDappletAction = async (name, pinId) => {
-    try {
-      const { addPinnedActions } = await initBGFunctions(browser)
-      await addPinnedActions(name, pinId)
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  const unpinDappletAction = async (name, pinId) => {
-    try {
-      const { removePinnedActions } = await initBGFunctions(browser)
-      await removePinnedActions(name, pinId)
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
   return {
     dappletActions,
-    pinDappletAction,
-    unpinDappletAction,
   }
 })
 

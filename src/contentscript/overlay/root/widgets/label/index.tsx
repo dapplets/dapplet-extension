@@ -1,24 +1,21 @@
 import cn from 'classnames'
 import React, { FC } from 'react'
+import { DappletActionProps } from '../../hooks/useDappletActions'
 import styles from './WidgetLabel.module.scss'
 
 export interface LabelProps {
-  title: string
-  icon?: string
-  hidden?: boolean
-  pinned?: boolean
+  action: DappletActionProps
 }
 
 export const LabelButton: FC<LabelProps> = (props: LabelProps) => {
-  const { title, icon, hidden = false, ...otherProps } = props
+  const { title = null, icon = null, hidden = false } = props.action
 
   return (
     <span
       className={cn(styles.widgetLabel, {
         [styles.widgetHidden]: hidden,
       })}
-      title={title ? title : null}
-      {...otherProps}
+      title={title}
     >
       {icon && icon.length > 0 ? <img className={cn(styles.widgetLabelImg)} src={icon} /> : null}
     </span>

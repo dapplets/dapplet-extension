@@ -15,6 +15,8 @@ import { ReactComponent as Event } from '../../assets/newIcon/notification.svg'
 import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
 import { ReactComponent as SettingsIcon } from '../../assets/svg/newSettings.svg'
 import { StorageRefImage } from '../../components/StorageRefImage'
+import { WidgetButton } from '../../widgets/button'
+import { LabelButton } from '../../widgets/label'
 import { ModuleIcon } from '../ModuleIcon'
 import { SquaredButton } from '../SquaredButton'
 import styles from './styles/OverlayTab.module.scss'
@@ -142,17 +144,22 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           // [styles.isOpenWallet]: p.isOpenWallet,
         })}
       >
-        {!p.pinned &&
-        menuVisible &&
-        // p.menuWidgets.length &&
-        p.isOverlayCollapsed ? (
+        {!p.pinned && menuVisible && p.isOverlayCollapsed ? (
           <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
-            {p.getWigetsConstructor(p.menuWidgets, true)}
+            {p.dappletActions.map((action, i) =>
+              action.onClick ? (
+                <WidgetButton key={i} action={action} isMenu={true} />
+              ) : (
+                <LabelButton key={i} action={action} />
+              )
+            )}
+
             <div
               className={cn(styles.delimeterMenuWidgets, {
-                [styles.invisibleDelimeter]: !p.menuWidgets.length,
+                [styles.invisibleDelimeter]: !p.dappletActions.length,
               })}
             ></div>
+
             <div className={styles.blockStandartFunction}>
               <SquaredButton
                 className={styles.squaredButtonMenuWidget}
@@ -288,7 +295,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     { [styles.mainIconDapplet]: p.classNameItem === 'mainIconDapplet' },
                     { [styles.iconNotification]: menu.title === 'Notifications' },
                     { [styles.iconSettings]: menu.title === 'Settings' },
-                    {[styles.iconAccounts]: menu.title === 'Connected Accounts'},
+                    { [styles.iconAccounts]: menu.title === 'Connected Accounts' },
                     {
                       [styles.iconSettingsActive]:
                         menu.title === 'Settings' && p.activeTabMenuId === menu.id,
@@ -303,7 +310,10 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                       [styles.iconNotificationActive]:
                         menu.title === 'Notifications' && p.activeTabMenuId === menu.id,
                     },
-                    {[styles.iconAccountsActive]: menu.title === 'Connected Accounts'&& p.activeTabMenuId === menu.id},
+                    {
+                      [styles.iconAccountsActive]:
+                        menu.title === 'Connected Accounts' && p.activeTabMenuId === menu.id,
+                    }
                   )}
                 >
                   {menu.id === 'connectedAccounts' ? (

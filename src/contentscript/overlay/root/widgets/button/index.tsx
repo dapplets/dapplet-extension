@@ -1,32 +1,26 @@
 import cn from 'classnames'
 import React, { ButtonHTMLAttributes, DetailedHTMLProps, FC } from 'react'
 import { ReactComponent as Pinned } from '../../assets/icons/iconsWidgetButton/pinned.svg'
+import { DappletActionProps } from '../../hooks/useDappletActions'
 import styles from './WidgetButton.module.scss'
+
 export interface WidgetButtonProps
   extends DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
-  title: string
-  icon?: any
-  disabled?: boolean
-  pinned?: boolean
-  hidden?: boolean
+  action: DappletActionProps
   isMenu?: boolean
-  onClick?: any
-  onPinned?: any
-  pinnedId?: string
 }
 
 export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) => {
+  const { isMenu = false, ...otherProps } = props
   const {
     title,
     icon,
-    disabled,
-    hidden,
-    isMenu = false,
-    pinned,
+    disabled = false,
     onPinned,
+    hidden = false,
+    pinned = false,
     onClick,
-    ...otherProps
-  } = props
+  } = props.action
 
   return (
     <div data-visible>

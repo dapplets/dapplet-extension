@@ -17,10 +17,10 @@ export default class Dapplet {
           DEFAULT: {
             title: this.state.global.counter,
             icon: ICON,
-            action: () => {
+            onClick: () => {
               this.state.global.counter.next(this.state.global.counter.value + 1)
             },
-            pinnedID: 'test-button',
+            pinId: 'test-button',
           },
         }),
         button({
@@ -28,10 +28,10 @@ export default class Dapplet {
           DEFAULT: {
             title: this.state.global.counter,
             icon: ICON,
-            action: () => {
+            onClick: () => {
               this.state.global.counter.next(this.state.global.counter.value + 1)
             },
-            pinnedID: 'test-button-2',
+            pinId: 'test-button-2',
           },
         }),
       ],
