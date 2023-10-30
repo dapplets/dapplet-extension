@@ -6,7 +6,7 @@ export default class Dapplet {
   @Inject('overlay-adapter.dapplet-base.eth')
   public adapter: any
 
-  public state = Core.state({ counter: 0 })
+  public state = Core.state({ hiddenOne: false, hiddenTwo: false })
 
   async activate(): Promise<void> {
     const { button } = this.adapter.exports
@@ -15,23 +15,24 @@ export default class Dapplet {
         button({
           initial: 'DEFAULT',
           DEFAULT: {
-            title: this.state.global.counter,
+            title: 'HIDE 1',
+            hidden: this.state.global.hiddenOne,
             icon: ICON,
             onClick: () => {
-              this.state.global.counter.next(this.state.global.counter.value + 1)
+              this.state.global.hiddenOne.next(true)
             },
-            pinId: 'test-button',
           },
         }),
         button({
           initial: 'DEFAULT',
           DEFAULT: {
-            title: this.state.global.counter,
+            title: 'HIDE 2',
+            hidden: this.state.global.hiddenTwo,
             icon: ICON,
             onClick: () => {
-              this.state.global.counter.next(this.state.global.counter.value + 1)
+              this.state.global.hiddenTwo.next(true)
             },
-            pinId: 'test-button-2',
+            pinId: 'test-2',
           },
         }),
       ],
