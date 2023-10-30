@@ -26,7 +26,6 @@ export interface NotificationProps {
 export const Notification: React.FC<NotificationProps> = (props) => {
   const { icon, title, date, onClear, _id, description, href, status, actions, stateNotify } = props
 
-  // const [isDelete] = useState(false)
   const [isAnimateRead, setAnimateRead] = useState(false)
   const [newDescription] = useState(description)
   const refComponent = useRef<HTMLInputElement>()
