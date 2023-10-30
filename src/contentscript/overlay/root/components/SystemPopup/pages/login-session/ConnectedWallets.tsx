@@ -81,7 +81,7 @@ export class ConnectedWallets extends React.Component<Props, State> {
     const s = this.state
 
     const chains = this.props.data.loginRequest.authMethods
-    const secureLogin = this.props.data.loginRequest.secureLogin
+    const { secureLogin, reusePolicy } = this.props.data.loginRequest
 
     if (s.error) {
       return (
@@ -116,17 +116,20 @@ export class ConnectedWallets extends React.Component<Props, State> {
     const connectedWallets = s.descriptors
       .filter((x) => x.connected)
       .filter((x) => (x.chain ? chains.includes(x.chain) : true))
+
     const disconnectedWallets = s.descriptors
       .filter((x) => !x.connected)
       .filter((x) => (x.chain ? chains.includes(x.chain) : true))
 
+    const isItAboutSigning = secureLogin === 'required' && reusePolicy === 'manual'
+
     return (
       <div className={base.wrapper}>
         <h2 className={base.title}>Connected Wallets</h2>
-        {secureLogin === 'required' && (
+
+        {isItAboutSigning ? (
           <p className={base.subtitle}>Select connected wallet to sign a new login confirmation</p>
-        )}
-        {secureLogin === 'disabled' && (
+        ) : (
           <p className={base.subtitle}>Select connected wallet to log in</p>
         )}
 
@@ -145,14 +148,11 @@ export class ConnectedWallets extends React.Component<Props, State> {
                 }
                 accountIcon={x.account ? makeBlockie(x.account) : null}
                 buttons={
-                  <>
-                    {secureLogin === 'disabled' || secureLogin === 'optional' ? (
-                      <Button onClick={() => this.selectWallet(x.type, x.chain)}>Select</Button>
-                    ) : null}
-                    {secureLogin === 'required' || secureLogin === 'optional' ? (
-                      <Button onClick={() => this.loginWallet(x.type, x.chain)}>Sign</Button>
-                    ) : null}
-                  </>
+                  isItAboutSigning ? (
+                    <Button onClick={() => this.loginWallet(x.type, x.chain)}>Sign</Button>
+                  ) : (
+                    <Button onClick={() => this.selectWallet(x.type, x.chain)}>Select</Button>
+                  )
                 }
               />
             </li>

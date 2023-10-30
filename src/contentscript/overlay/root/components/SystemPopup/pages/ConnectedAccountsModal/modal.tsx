@@ -5,7 +5,7 @@ import styles from './Modal.module.scss'
 
 interface IModalProps {
   title?: string
-  content?: string
+  content?: string | React.JSX.Element
   accounts?: ReactElement
   onClose: () => void
   onConfirm?: () => Promise<void>
@@ -48,13 +48,7 @@ export const Modal = ({
           {onClose ? <span className={styles.modalClose} onClick={onClose} /> : null}
         </div>
         {accounts && <div className={styles.modalAccounts}>{accounts}</div>}
-        {content && (
-          <div className={styles.modalBody}>
-            {content.split('\n').map((t, i) => (
-              <p key={i}>{t}</p>
-            ))}
-          </div>
-        )}
+        {content && <div className={styles.modalBody}>{content}</div>}
         <div className={styles.modalFooter}>
           {onConfirm && onConfirmLabel && !isWaiting && (
             <button

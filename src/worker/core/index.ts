@@ -9,6 +9,7 @@ import {
   LoginRequest,
   NearNetworks,
   SandboxEnvironmentVariables,
+  SecureLoginOptions,
   TAlertAndConfirmPayload,
 } from '../../common/types'
 import { initBGFunctions, sendRequest } from '../communication'
@@ -338,12 +339,12 @@ export class Core {
         )
     }
 
-    const _authMethods = cfg.authMethods ?? [cfg.type + '/' + cfg.network]
+    const authMethods = cfg.authMethods ?? [cfg.type + '/' + cfg.network]
 
     const isConnected = async () => {
       const { getWalletDescriptors } = initBGFunctions()
       const sessions = await this.sessions()
-      const session = sessions.find((x) => _authMethods.includes(x.authMethod))
+      const session = sessions.find((x) => authMethods.includes(x.authMethod))
       if (!session) return false
 
       // ToDo: remove it when subscription on disconnect event will be implemented
@@ -358,7 +359,7 @@ export class Core {
       if (!connected) return null
 
       const sessions = await this.sessions()
-      const session = sessions.find((x) => _authMethods.includes(x.authMethod))
+      const session = sessions.find((x) => authMethods.includes(x.authMethod))
 
       if (!session) {
         return null
@@ -388,7 +389,7 @@ export class Core {
 
       async connect(): Promise<void> {
         if (this._session && this._wallet) return // ???
-        this._session = await me.login({ authMethods: _authMethods, secureLogin: 'disabled' }, {})
+        this._session = await me.login({ authMethods, secureLogin: SecureLoginOptions.Disabled })
         this.authMethod = this._session.authMethod
         this._wallet =
           this.authMethod === 'ethereum/goerli' || this.authMethod === 'ethereum/xdai'
@@ -466,7 +467,7 @@ export class Core {
   ): Promise<LoginSession[]>
   public async login(
     request: (LoginRequest & LoginHooks) | (LoginRequest & LoginHooks)[],
-    settings?: LoginRequestSettings & LoginHooks
+    settings: LoginRequestSettings & LoginHooks = {}
   ): Promise<LoginSession | LoginSession[]> {
     const moduleName = this.manifest.name
 

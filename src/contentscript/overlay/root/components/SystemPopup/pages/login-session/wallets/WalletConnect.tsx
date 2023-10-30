@@ -65,8 +65,9 @@ export default class WalletConnect extends React.Component<Props, State> {
 
       // sign message if required
       let confirmationId = undefined
-      const secureLogin = this.props.data.loginRequest.secureLogin
-      if (secureLogin === 'required') {
+      const { secureLogin, reusePolicy } = this.props.data.loginRequest
+      const isItAboutSigning = secureLogin === 'required' && reusePolicy === 'manual'
+      if (isItAboutSigning) {
         this.setState({ signing: true })
         const app = this.props.data.app
         const loginRequest = this.props.data.loginRequest

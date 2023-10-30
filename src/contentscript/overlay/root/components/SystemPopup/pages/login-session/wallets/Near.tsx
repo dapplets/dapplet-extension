@@ -60,9 +60,9 @@ export default class Near extends React.Component<Props, State> {
 
       // sign message if required
       let confirmationId = undefined
-      const secureLogin = this.props.data.loginRequest.secureLogin
-
-      if (secureLogin === 'required') {
+      const { secureLogin, reusePolicy } = this.props.data.loginRequest
+      const isItAboutSigning = secureLogin === 'required' && reusePolicy === 'manual'
+      if (isItAboutSigning) {
         // ToDo: handle optional mode
         const confirmations = await getSuitableLoginConfirmations(
           this.props.data.app,

@@ -55,8 +55,8 @@
   &:hover {
     svg {
       path {
-        fill: $primary-hover;
-        stroke: $primary-hover;
+        // fill: $primary-hover;
+        stroke: $primary;
       }
     }
   }
@@ -64,7 +64,7 @@
   &:active {
     svg {
       path {
-        fill: $primary-pressed;
+        // fill: $primary-pressed;
         stroke: $primary-pressed;
       }
     }
