@@ -45,8 +45,10 @@
 
 .menuWidgets {
   display: flex;
+  gap: 8px;
   align-items: center;
   justify-content: space-between;
+
   padding: 6px;
 }
 
@@ -127,7 +129,7 @@
 .blockButtonInfo {
   display: flex;
   align-items: center;
-  width: 120px;
+  width: 100%;
   padding-left: 4px;
 
   &:hover {

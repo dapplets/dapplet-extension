@@ -19,6 +19,7 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
     onPinned,
     hidden = false,
     pinned = false,
+    pinId,
     onClick,
   } = props.action
 
@@ -57,21 +58,23 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
             </button>
             <span className={styles.widgetButtonTitle}>{title}</span>
           </div>
-          <button
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              onPinned()
-            }}
-            className={cn(styles.widgetButtonPinned, {
-              [styles.isPinned]: pinned,
-              // 'pinned': pinned
-            })}
-            data-visible
-            data-testid="pinned"
-          >
-            <Pinned />
-          </button>
+          {pinId ? (
+            <button
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                onPinned()
+              }}
+              className={cn(styles.widgetButtonPinned, {
+                [styles.isPinned]: pinned,
+                // 'pinned': pinned
+              })}
+              data-visible
+              data-testid="pinned"
+            >
+              <Pinned />
+            </button>
+          ) : null}
         </div>
       ) : (
         pinned && (
