@@ -20,7 +20,7 @@ import { Bus } from '../../../common/bus'
 import { DAPPLETS_STORE_URL, ModuleTypes } from '../../../common/constants'
 import * as EventBus from '../../../common/global-event-bus'
 import { groupBy } from '../../../common/helpers'
-import { ReactComponent as Notification } from './assets/newIcon/bell.svg'
+import { ReactComponent as Notification } from './assets/newIcon/bellNoCircle.svg'
 import { ReactComponent as Hide } from './assets/newIcon/collapsed.svg'
 import { ReactComponent as Account } from './assets/newIcon/connected.svg'
 import { ReactComponent as Home } from './assets/newIcon/home_top.svg'
@@ -603,7 +603,7 @@ class _App extends React.Component<P, S> {
                     setOpenWalletMini={this.setOpenWalletMini}
                     // isOpenSearch={s.isOpenSearch}
                   />
-                  {/* {this.getNewButtonTab('Connected Accounts')} */}
+                  {this.getNewButtonTab('Connected Accounts')}
                 </div>
 
                 <div className={styles.right}>
@@ -639,10 +639,8 @@ class _App extends React.Component<P, S> {
                   <Search
                     className={s.classNameSearch}
                     value={s.search}
-                    isOpenSearch={s.isOpenSearch}
                     onChange={this.handleSearchChange}
                     onClearValue={this.handleSearchClear}
-                    onCloseSearch={this.handleCloseSearch}
                   />
                 </div>
               )}

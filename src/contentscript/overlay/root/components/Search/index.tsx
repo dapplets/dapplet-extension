@@ -7,36 +7,16 @@ import styles from './Search.module.scss'
 export interface SearchProps
   extends DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   onClearValue?: () => void
-  onCloseSearch?: () => void
-  isOpenSearch: boolean
   className?: string
-  handleSearchChange?: any
+  handleSearchChange?
 }
 
 export const Search = (props: SearchProps): ReactElement => {
-  const {
-    value,
-    onChange,
-    className,
-    onClearValue,
-    onCloseSearch,
-    isOpenSearch,
-    handleSearchChange,
-    ...otherProps
-  } = props
-  console.log(isOpenSearch)
+  const { value, onChange, className, onClearValue, handleSearchChange, ...otherProps } = props
 
   return (
     <div className={cn(styles.wrapper, className)}>
-      <div
-        className={cn(
-          styles.searchIcon
-          //   , {
-          //   [styles.searchIconActive]: isOpenSearch,
-          // }
-        )}
-        onClick={() => handleSearchChange()}
-      >
+      <div className={cn(styles.searchIcon)} onClick={() => handleSearchChange()}>
         <SearchIcon />
       </div>
       <label className={styles.labelSearchModule}>
