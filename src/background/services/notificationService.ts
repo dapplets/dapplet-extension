@@ -1,4 +1,5 @@
 import browser from 'webextension-polyfill'
+import { MutexQueue } from '../../common/decorators/mutex-queue'
 import { generateGuid } from '../../common/generateGuid'
 import * as EventBus from '../../common/global-event-bus'
 import {
@@ -10,6 +11,8 @@ import {
 import NotificationBrowserStorage from '../browserStorages/notificationBrowserStorage'
 
 // ToDo: remove notifications_updated everywhere because it's too generic
+
+const NotificationServiceKey = Symbol()
 
 export class NotificationService {
   public notificationBrowserStorage = new NotificationBrowserStorage()
@@ -28,7 +31,6 @@ export class NotificationService {
     tabId: number
   ): Promise<void> {
     const notificationId = await this.createNotification(notify)
-
     await this.showNotification(notificationId, tabId)
     await this._updateBadge()
   }
@@ -74,6 +76,7 @@ export class NotificationService {
     await this._updateBadge()
   }
 
+  @MutexQueue(NotificationServiceKey)
   async markNotificationAsViewed(id: string | string[]): Promise<void> {
     const ids = Array.isArray(id) ? id : [id]
 
@@ -91,6 +94,7 @@ export class NotificationService {
     await this._updateBadge()
   }
 
+  @MutexQueue(NotificationServiceKey)
   async markAllNotificationsAsViewed(): Promise<void> {
     const notifications = await this.notificationBrowserStorage.getAll(
       (x) => x.status === NotificationStatus.Highlighted
@@ -109,6 +113,7 @@ export class NotificationService {
     await this._updateBadge()
   }
 
+  @MutexQueue(NotificationServiceKey)
   async resolveNotificationAction(
     notificationId: string,
     action: string,
@@ -147,7 +152,7 @@ export class NotificationService {
     return unreadNotifications.length
   }
 
-  async _updateBadge() {
+  private async _updateBadge() {
     const count = await this.getUnreadNotificationsCount()
     browser.action.setBadgeText({
       text: count === 0 ? '' : count.toString(),

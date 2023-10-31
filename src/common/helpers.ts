@@ -463,7 +463,7 @@ export async function checkUrlAvailability(url: string): Promise<UrlAvailability
  * Prevents execution of multiple promises at the same time.
  */
 export function CacheMethod() {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (_, __, descriptor: PropertyDescriptor) {
     const symbol = Symbol()
     const originMethod = descriptor.value
     descriptor.value = function (...args: any[]) {
