@@ -21,7 +21,7 @@ const dapplets = [
 for (const dappletName of dapplets) {
   const test = base({ devServerUrl, dappletName })
 
-  test(`should inject widget in ${dappletName}`, async ({ page, testableDapplet }) => {
+  test(dappletName, async ({ page, testableDapplet }) => {
     switch (dappletName) {
       case 'core-alert':
       case 'core-confirm-ok':

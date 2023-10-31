@@ -80,6 +80,7 @@ export class NotificationService {
     await Promise.all(
       ids.map(async (id) => {
         const notification = await this.notificationBrowserStorage.getById(id)
+        if (notification.status !== NotificationStatus.Highlighted) return
         notification.status = NotificationStatus.Default
         await this.notificationBrowserStorage.update(notification)
       })
@@ -98,11 +99,9 @@ export class NotificationService {
     const viewedNotificationIds = []
 
     for (const notification of notifications) {
-      if (notification.status !== NotificationStatus.Default) {
-        notification.status = NotificationStatus.Default
-        await this.notificationBrowserStorage.update(notification)
-        viewedNotificationIds.push(notification.id)
-      }
+      notification.status = NotificationStatus.Default
+      await this.notificationBrowserStorage.update(notification)
+      viewedNotificationIds.push(notification.id)
     }
 
     EventBus.emit('notifications_viewed', viewedNotificationIds)
@@ -116,8 +115,12 @@ export class NotificationService {
     tabId: number
   ): Promise<void> {
     const notification = await this.notificationBrowserStorage.getById(notificationId)
+
+    if (notification.status === NotificationStatus.Resolved) {
+      throw new Error('Cannot resolve a notification twice')
+    }
+
     notification.status = NotificationStatus.Resolved
-    // ToDo: save resolved actionId?
 
     await this.notificationBrowserStorage.update(notification)
     await this._updateBadge()
