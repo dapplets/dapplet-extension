@@ -31,10 +31,12 @@ export const UserSettings = ({
     const init = async () => {
       setLoad(true)
       setSettingsContext(null)
-      const { getUserSettingsForOverlay } = await initBGFunctions(browser)
+      const { getUserSettingsForOverlay, getRegistries } = await initBGFunctions(browser)
+      const registries = await getRegistries()
+      const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
 
       const { mi, vi, schemaConfig, defaultConfig } = await getUserSettingsForOverlay(
-        registryUrl,
+        prodRegistries[0]?.url,
         dappletName
       )
 
