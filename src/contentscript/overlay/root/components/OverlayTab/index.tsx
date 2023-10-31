@@ -341,10 +341,10 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     { [styles.mainIconDapplet]: p.classNameItem === 'mainIconDapplet' },
                     { [styles.iconNotification]: menu.title === 'Notifications' },
                     { [styles.iconSettings]: menu.title === 'Settings' },
-                    {[styles.iconAccounts]: menu.title === 'Connected Accounts'},
+                    { [styles.iconAccounts]: menu.title === 'Connected Accounts' },
                     {
                       [styles.iconSettingsActive]:
-                        menu.title === 'Settings' && p.activeTabMenuId === menu.id,
+                        menu.title === 'Settings' && p.activeTabMenuId === menu.id && !p.pinned,
                     },
                     {
                       [styles.dappletsListActive]:
@@ -356,7 +356,10 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                       [styles.iconNotificationActive]:
                         menu.title === 'Notifications' && p.activeTabMenuId === menu.id,
                     },
-                    {[styles.iconAccountsActive]: menu.title === 'Connected Accounts'&& p.activeTabMenuId === menu.id},
+                    {
+                      [styles.iconAccountsActive]:
+                        menu.title === 'Connected Accounts' && p.activeTabMenuId === menu.id,
+                    }
                   )}
                 >
                   {menu.id === 'connectedAccounts' ? (

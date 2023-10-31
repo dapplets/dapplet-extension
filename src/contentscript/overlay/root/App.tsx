@@ -180,7 +180,7 @@ class _App extends React.Component<P, S> {
     EventBus.on('context_finished', this.initModules)
     EventBus.on('settings_changed', this.initModules)
     EventBus.on('trustedusers_changed', this.initModules)
-    // 
+    //
   }
 
   componentDidUpdate(prevProps) {
@@ -375,7 +375,7 @@ class _App extends React.Component<P, S> {
         },
         menus: [
           {
-            id: 'settings',
+            id: 'user_settings',
             title: 'User Settings',
             icon: Settings,
             props: {
@@ -406,7 +406,7 @@ class _App extends React.Component<P, S> {
         },
         menus: [
           {
-            id: 'settings',
+            id: 'user_settings',
             title: 'User Settings',
             icon: Settings,
             props: {
