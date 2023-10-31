@@ -483,14 +483,22 @@ const updateAction = async (tabId: number) => {
   const tab = await browser.tabs.get(tabId)
 
   if (tab?.url.startsWith('https://') || tab?.url.startsWith('http://')) {
-    await browser.action.setPopup({ tabId, popup: '' })
-    browser.action.onClicked.addListener(overlayPopupOpen)
-  } else {
-    // if it's a system tab
-    const popupUrl = browser.runtime.getURL('popup.html')
-    await browser.action.setPopup({ tabId, popup: popupUrl })
-    browser.action.onClicked.removeListener(overlayPopupOpen)
+    const isContentScriptInjected = await browser.tabs
+      .sendMessage(tab.id, { type: 'PING' })
+      .then(() => true)
+      .catch(() => false)
+
+    if (isContentScriptInjected) {
+      await browser.action.setPopup({ tabId, popup: '' })
+      browser.action.onClicked.addListener(overlayPopupOpen)
+      return
+    }
   }
+
+  // if it's a system tab or content script is not available
+  const popupUrl = browser.runtime.getURL('popup.html')
+  await browser.action.setPopup({ tabId, popup: popupUrl })
+  browser.action.onClicked.removeListener(overlayPopupOpen)
 }
 
 browser.tabs.onActivated.addListener(({ tabId }) => updateAction(tabId))
