@@ -140,15 +140,9 @@ export class ConnectedWallets extends React.Component<Props, State> {
         )}
 
         {creatingLoginConfirmationFailed && (
-          <p
-            style={{
-              marginTop: '1.5rem',
-              padding: '0 1rem',
-              color: '#d9304f',
-            }}
-          >
+          <p className={base.warningMessage}>
             Connect a wallet that is already connected to the Dapplets extension. If you want to log
-            in with a different wallet, first connect it to the extension in the Wallets module.
+            in with another wallet, first connect it to the extension in the Wallets module.
           </p>
         )}
 
