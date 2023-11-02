@@ -58,8 +58,13 @@ export class ConnectedWallets extends React.Component<Props, State> {
   }
 
   async selectWallet(wallet: string, chain: string) {
-    const frameId = this.props.data.frameId
-    this.props.bus.publish('ready', [frameId, { wallet, chain }])
+    try {
+      const frameId = this.props.data.frameId
+      this.props.bus.publish('ready', [frameId, { wallet, chain }])
+      await this.componentDidMount()
+    } catch (err) {
+      this.setState({ error: err.message })
+    }
   }
 
   async loginWallet(wallet: string, chain: string) {
@@ -81,7 +86,8 @@ export class ConnectedWallets extends React.Component<Props, State> {
     const s = this.state
 
     const chains = this.props.data.loginRequest.authMethods
-    const { secureLogin, reusePolicy } = this.props.data.loginRequest
+    const { secureLogin, reusePolicy, creatingLoginConfirmationFailed } =
+      this.props.data.loginRequest
 
     if (s.error) {
       return (
@@ -131,6 +137,19 @@ export class ConnectedWallets extends React.Component<Props, State> {
           <p className={base.subtitle}>Select connected wallet to sign a new login confirmation</p>
         ) : (
           <p className={base.subtitle}>Select connected wallet to log in</p>
+        )}
+
+        {creatingLoginConfirmationFailed && (
+          <p
+            style={{
+              marginTop: '1.5rem',
+              padding: '0 1rem',
+              color: '#d9304f',
+            }}
+          >
+            Connect a wallet that is already connected to the Dapplets extension. If you want to log
+            in with a different wallet, first connect it to the extension in the Wallets module.
+          </p>
         )}
 
         <ul className={base.list}>

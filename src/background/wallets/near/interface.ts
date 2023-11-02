@@ -36,5 +36,5 @@ export interface NearWallet extends GenericWallet {
   signAndSendTransactions(params: any): Promise<void> // ToDo: add types
   buildImportAccountsUrl(): string
   getAccount(): Promise<CustomConnectedWalletAccount>
-  createAccessKey(contractId: string, loginConfirmationId: string): Promise<void>
+  createAccessKey(contractId: string, loginConfirmationId: string): Promise<boolean>
 }

@@ -96,12 +96,17 @@ export class SessionService {
   async createSession(
     moduleName: string,
     request: LoginRequest,
-    tabId: number
+    tabId: number,
+    wasError?: {
+      creatingLoginConfirmationFailed: boolean
+    }
   ): Promise<LoginSession> {
+    console.log('wasError', wasError)
     request.timeout = request.timeout ?? DEFAULT_REQUEST_TIMEOUT
     request.secureLogin = request.secureLogin ?? SecureLoginOptions.Disabled
     request.reusePolicy = request.reusePolicy ?? ReusePolicyOptions.Disabled
     request.from = request.from ?? LoginRequestFromOptions.Any
+    if (wasError?.creatingLoginConfirmationFailed) request.creatingLoginConfirmationFailed = true
 
     if (!request.authMethods || request.authMethods.length === 0) {
       throw new Error(`"authMethods" is required.`)
@@ -132,11 +137,15 @@ export class SessionService {
       }
     }
 
+    console.log('moduleName', moduleName)
+    console.log('request', request)
+    console.log('tabId', tabId)
     const overlayResult = await this._overlayService.openLoginSessionOverlay(
       moduleName,
       request,
       tabId
     )
+    console.log('overlayResult', overlayResult)
 
     const { wallet, chain } = overlayResult
     let { confirmationId } = overlayResult
@@ -182,6 +191,10 @@ export class SessionService {
           chain,
           wallet
         )
+        if (!loginConfirmation)
+          this.createSession(moduleName, request, tabId, {
+            creatingLoginConfirmationFailed: !loginConfirmation,
+          })
         confirmationId = loginConfirmation.loginConfirmationId
       }
     }
@@ -232,10 +245,12 @@ export class SessionService {
         throw new Error('The parameter `contractId` is required for secure login in NEAR Protocol')
       }
 
-      await (genericWallet as NearWallet).createAccessKey(
+      const isSuccessfulResult = await (genericWallet as NearWallet).createAccessKey(
         request.contractId,
         loginConfirmation.loginConfirmationId
       )
+
+      if (!isSuccessfulResult) return null
 
       loginConfirmation.address = await genericWallet.getAddress()
       loginConfirmation.contractId = request.contractId
