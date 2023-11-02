@@ -375,7 +375,7 @@ class _App extends React.Component<P, S> {
         },
         menus: [
           {
-            id: 'user_settings',
+            id: 'settings',
             title: 'User Settings',
             icon: Settings,
             props: {
@@ -406,7 +406,7 @@ class _App extends React.Component<P, S> {
         },
         menus: [
           {
-            id: 'user_settings',
+            id: 'settings',
             title: 'User Settings',
             icon: Settings,
             props: {
@@ -537,6 +537,7 @@ class _App extends React.Component<P, S> {
           classNameIcon={styles.overlayTabIcon}
           classNameList={styles.overlayTabList}
           classNameItem={styles.overlayTabItem}
+          pathname={pathname}
         />
       )
     })

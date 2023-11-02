@@ -146,12 +146,15 @@
   height: 34px;
   background: #fff;
   border-radius: 50px;
-  &:hover{
+  &:hover {
     svg path:last-child {
       fill: $pure-white !important;
       stroke: $pure-white !important;
     }
-    svg path:nth-child(2){
+    svg path:first-child {
+      stroke: none !important;
+    }
+    svg path:nth-child(2) {
       fill: $pure-white !important;
       stroke: $pure-white !important;
     }
