@@ -41,6 +41,10 @@ export const useSingletonInitNear = singletonHook(null, () => {
           selector.wallet = () => wallet('background')
           return selector
         }),
+        features: {
+          enableComponentSrcDataKey: true,
+          skipTxConfirmationPopup: true,
+        },
       })
   }, [initNear])
 })
@@ -96,8 +100,6 @@ const Component: React.FC<{
         targetProps: props,
         tosName: 'adminalpha.near/widget/TosContent',
       }}
-      autoConfirm
-      enableDataSrcAttribute
       overrides={overrides}
     />
   )

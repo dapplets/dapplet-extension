@@ -9,8 +9,8 @@ export function useVisibleBosComponents() {
     const widgets = Array.from(document.querySelectorAll('.dapplet-widget'))
     const bosComponents = widgets
       .map((el) =>
-        Array.from(el.shadowRoot.querySelectorAll('*[data-bos-src]')).map((bos) =>
-          bos.getAttribute('data-bos-src')
+        Array.from(el.shadowRoot.querySelectorAll('*[data-component]')).map((bos) =>
+          bos.getAttribute('data-component')
         )
       )
       .flat()
