@@ -94,8 +94,9 @@ const SYSTEM_TAB: ToolbarTab = {
   ],
 }
 
-interface P {
+interface AppProps {
   hidden: boolean
+  collapsed: boolean
   onToggle: () => void
   overlayManager: OverlayManager
   navigate?: NavigateFunction
@@ -103,7 +104,7 @@ interface P {
   systemPopupEventBus: Bus
 }
 
-interface S {
+interface AppState {
   isDevMode: boolean
   isOpenSearch: boolean
   search: string
@@ -122,8 +123,8 @@ interface S {
   isNoContentScript: boolean
 }
 
-class _App extends React.Component<P, S> {
-  state: S = {
+class _App extends React.Component<AppProps, AppState> {
+  state: AppState = {
     isDevMode: false,
     isOpenSearch: false,
     search: '',
@@ -315,10 +316,7 @@ class _App extends React.Component<P, S> {
 
   handleTabMenuClick = async (tabs: ToolbarTab, menu?: ToolbarTabMenu) => {
     const menuId = menu?.id ?? tabs.menus[0].id
-    !document
-      .querySelector('#dapplets-overlay-manager')
-      ?.classList.contains('dapplets-overlay-collapsed') &&
-      this.props.navigate!(`/${tabs.id}/${menuId}`)
+    !this.props.collapsed && this.props.navigate!(`/${tabs.id}/${menuId}`)
   }
 
   handleOpenSearchClick = () => {
@@ -521,6 +519,7 @@ class _App extends React.Component<P, S> {
       const activeTabMenuId = pathname.split('/')[2]
       return (
         <OverlayTab
+          isOverlayCollapsed={this.props.collapsed}
           key={NewTabs.id}
           {...newTab}
           isActiveTab={activeTabId === NewTabs.id}
@@ -567,6 +566,7 @@ class _App extends React.Component<P, S> {
         <div className={cn(styles.overlay)}>
           <div className={styles.wrapper}>
             <OverlayToolbar
+              isOverlayCollapsed={this.props.collapsed}
               className={styles.toolbar}
               tabs={this.getTabs()}
               onTabClick={this.handleTabMenuClick}
@@ -734,7 +734,7 @@ const __App = withRouter(_App)
 
 const queryClient = new QueryClient()
 
-export const App = (props: any) => (
+export const App = (props: AppProps) => (
   <MemoryRouter>
     <QueryClientProvider client={queryClient}>
       <ModalProvider>
