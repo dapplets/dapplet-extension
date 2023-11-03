@@ -101,7 +101,6 @@ export class SessionService {
       creatingLoginConfirmationFailed: boolean
     }
   ): Promise<LoginSession> {
-    console.log('wasError', wasError)
     request.timeout = request.timeout ?? DEFAULT_REQUEST_TIMEOUT
     request.secureLogin = request.secureLogin ?? SecureLoginOptions.Disabled
     request.reusePolicy = request.reusePolicy ?? ReusePolicyOptions.Disabled
@@ -137,15 +136,11 @@ export class SessionService {
       }
     }
 
-    console.log('moduleName', moduleName)
-    console.log('request', request)
-    console.log('tabId', tabId)
     const overlayResult = await this._overlayService.openLoginSessionOverlay(
       moduleName,
       request,
       tabId
     )
-    console.log('overlayResult', overlayResult)
 
     const { wallet, chain } = overlayResult
     let { confirmationId } = overlayResult
@@ -192,7 +187,7 @@ export class SessionService {
           wallet
         )
         if (!loginConfirmation)
-          this.createSession(moduleName, request, tabId, {
+          return this.createSession(moduleName, request, tabId, {
             creatingLoginConfirmationFailed: !loginConfirmation,
           })
         confirmationId = loginConfirmation.loginConfirmationId
