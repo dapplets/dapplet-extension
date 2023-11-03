@@ -36,7 +36,7 @@ export const UserSettings = ({
       const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
 
       const { mi, vi, schemaConfig, defaultConfig } = await getUserSettingsForOverlay(
-        prodRegistries[0]?.url,
+        registryUrl ? registryUrl : prodRegistries[0]?.url,
         dappletName
       )
 

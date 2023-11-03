@@ -382,7 +382,6 @@ class _App extends React.Component<P, S> {
       })
       this.setState({ internalTabs })
     }
-
     this.props.navigate!(`/${mi.name}/settings`)
   }
 
