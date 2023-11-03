@@ -294,15 +294,13 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             {/* {isVisibleAnimation && getAnimateButtonWidget(iconAnimateWidget)} */}
 
             {/* Pinned Dapplet Actions */}
-            {!isShowTabs && p.isOverlayCollapsed
-              ? dappletActions.map((action, i) =>
-                  action.onClick ? (
-                    <WidgetButton key={i} action={action} isMenu={false} />
-                  ) : (
-                    <LabelButton key={i} action={action} />
-                  )
-                )
-              : null}
+            {dappletActions.map((action, i) =>
+              action.onClick ? (
+                <WidgetButton key={i} action={action} isMenu={false} />
+              ) : (
+                <LabelButton key={i} action={action} />
+              )
+            )}
 
             {p.modules?.filter((x) => x.isActive).length !== 0 && (
               <>
