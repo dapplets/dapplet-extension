@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import React, { useEffect, useRef, useState } from 'react'
 import { ManifestAndDetails } from '../../../../../common/types'
-import { ReactComponent as SettingsIcon } from '../../assets/newIcon/dapset.svg'
+import { ReactComponent as Settings } from '../../assets/newIcon/mainset.svg'
 import { PopupItem } from '../../components/PopupItem'
 import { TabLoader } from '../../components/TabLoader'
 import { Overlay } from '../../overlay'
@@ -214,7 +214,7 @@ export const ContentItem = (props: IContentItemProps) => {
             <div className={styles.blockButtons}>
               <SquaredButton
                 appearance="smail"
-                icon={SettingsIcon}
+                icon={Settings}
                 className={styles.squareButton}
                 title="Settings"
                 onClick={() => props.onSettingsModule(activeModuleInfo)}

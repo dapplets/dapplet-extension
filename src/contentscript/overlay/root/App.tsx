@@ -179,6 +179,9 @@ class _App extends React.Component<AppProps, AppState> {
     this.initModules()
     EventBus.on('context_started', this.initModules)
     EventBus.on('context_finished', this.initModules)
+    EventBus.on('settings_changed', this.initModules)
+    EventBus.on('trustedusers_changed', this.initModules)
+    //
   }
 
   componentDidUpdate(prevProps) {
@@ -198,6 +201,8 @@ class _App extends React.Component<AppProps, AppState> {
     EventBus.off('dapplet_deactivated', this.handleDappletDeactivated)
     EventBus.off('context_started', this.initModules)
     EventBus.off('context_finished', this.initModules)
+    EventBus.off('settings_changed', this.initModules)
+    EventBus.off('trustedusers_changed', this.initModules)
   }
 
   getTabs = (): ToolbarTab[] => {
@@ -531,6 +536,7 @@ class _App extends React.Component<AppProps, AppState> {
           classNameIcon={styles.overlayTabIcon}
           classNameList={styles.overlayTabList}
           classNameItem={styles.overlayTabItem}
+          pathname={pathname}
         />
       )
     })

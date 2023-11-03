@@ -23,7 +23,7 @@ const dapplets = [
 for (const dappletName of dapplets) {
   const test = base({ devServerUrl, dappletName })
 
-  test(`should inject widget in ${dappletName}`, async ({ page, testableDapplet }) => {
+  test(dappletName, async ({ page, testableDapplet }) => {
     const overlay = new Overlay(page)
 
     switch (dappletName) {
@@ -52,6 +52,7 @@ for (const dappletName of dapplets) {
         await expect(page.getByTestId('new-notification')).not.toBeVisible()
         await expect(page.getByText('Mark all as read')).toBeDisabled()
         await expect(page.getByTestId('old-notification')).toHaveCount(2)
+        await page.waitForTimeout(1000)
         await expect(page.getByRole('button', { name: 'Ok' })).not.toBeVisible() // Action buttons must be hidden, if notification is resolved
         break
 

@@ -298,7 +298,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     { [styles.iconAccounts]: menu.title === 'Connected Accounts' },
                     {
                       [styles.iconSettingsActive]:
-                        menu.title === 'Settings' && p.activeTabMenuId === menu.id,
+                        menu.title === 'Settings' &&
+                        p.activeTabMenuId === menu.id &&
+                        p.pinned &&
+                        p.pathname &&
+                        p.pathname.includes('system'),
                     },
                     {
                       [styles.dappletsListActive]:
