@@ -176,7 +176,7 @@ export default class implements NearWallet {
     await this._connectBrowserWallet(_state.wallet)
   }
 
-  async createAccessKey(contractId: string, loginConfirmationId: string): Promise<void> {
+  async createAccessKey(contractId: string, loginConfirmationId: string): Promise<boolean> {
     /*
         The `near-api-js` library does not support multiple access keys at the same time. 
         When you try to create a second access key with the specified contract 
@@ -208,7 +208,7 @@ export default class implements NearWallet {
 
     const nearWallet = new CustomWalletConnection(near, authData, authDataKey)
 
-    await this._connectBrowserWallet(nearWallet, contractId)
+    return this._connectBrowserWallet(nearWallet, contractId)
   }
 
   async disconnectWallet() {
@@ -232,7 +232,10 @@ export default class implements NearWallet {
     throw new NotImplementedError()
   }
 
-  private async _connectBrowserWallet(nearWallet: CustomWalletConnection, contractId?: string) {
+  private async _connectBrowserWallet(
+    nearWallet: CustomWalletConnection,
+    contractId?: string
+  ): Promise<boolean> {
     // ToDo: why this function became async?
     const expectedAccountId = await nearWallet.getAccountId()
 
@@ -272,16 +275,18 @@ export default class implements NearWallet {
     if (!accountId) throw new Error('No account_id params in callback URL')
 
     if (expectedAccountId !== '' && contractId && expectedAccountId !== accountId) {
-      throw new Error(
-        `Account ${truncateEthAddress(expectedAccountId)} was expected, but ${truncateEthAddress(
-          accountId,
-          24
-        )} is connected`
+      console.log(
+        `Account ${truncateEthAddress(
+          expectedAccountId,
+          30
+        )} was expected, but ${truncateEthAddress(accountId, 30)} is connected`
       )
+      return false
     }
 
-    nearWallet.completeSignIn(accountId, publicKey, allKeys) // ToDo: need to wait promise?
-    browser.storage.local.set({ [this._lastUsageKey]: new Date().toISOString() })
+    await nearWallet.completeSignIn(accountId, publicKey, allKeys) // ToDo: need to wait promise?
+    await browser.storage.local.set({ [this._lastUsageKey]: new Date().toISOString() })
+    return true
   }
 
   private async _setupWalletState() {
