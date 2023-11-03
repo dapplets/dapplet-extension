@@ -87,7 +87,7 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
             })}
             title={title ? title : null}
             disabled={disabled ? disabled : false}
-            onClick={onClick}
+            onClick={() => onClick()}
             {...otherProps}
           >
             {icon && icon.length > 0 ? (
