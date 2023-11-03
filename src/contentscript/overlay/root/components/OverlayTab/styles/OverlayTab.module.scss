@@ -292,6 +292,7 @@
   &:hover {
     svg path:first-child {
       fill: $primary-hover !important;
+      stroke: none !important;
     }
     svg path:last-child {
       fill: $pure-white !important;
@@ -301,6 +302,7 @@
   &:active {
     svg path:first-child {
       fill: $primary-pressed !important;
+      stroke: none !important;
     }
     svg path:last-child {
       fill: $pure-white !important;

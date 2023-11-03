@@ -357,7 +357,7 @@
   height: max-content;
   min-height: 29px;
   margin-bottom: 10px;
-  padding: 5px;
+  // padding: 5px;
 
   background: #fff;
   border-radius: 8px;
@@ -416,7 +416,7 @@
 
 .notificationBlockTop {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   width: 100%;
 }
 
@@ -435,6 +435,7 @@
 
 .closeNotification {
   margin-top: -3px;
+  
 }
 
 [class*='remove_notification'] {
@@ -465,6 +466,7 @@
   width: 16px;
   height: 16px;
   margin-right: 5px;
+  margin-top: -2px;
 }
 
 .titleNotificationWrapper {
@@ -473,7 +475,7 @@
 
 .titleNotificationWrapperTeaser {
   cursor: pointer;
-
+  padding: 2px 5px 0px 5px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -522,6 +524,7 @@
   text-align: left;
   letter-spacing: 0;
   word-wrap: break-word;
+  padding: 0px 5px 5px 5px;
 }
 
 .buttonNotificationBlock {

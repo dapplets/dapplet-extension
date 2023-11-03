@@ -29,6 +29,7 @@
 .isRead {
   background: #f5f5f5;
   border: 1px solid $stroke-color;
+  transition: all 0.5s cubic-bezier(0.36, -0.64, 0.34, 1.76);
 }
 
 .header {
@@ -188,5 +189,23 @@
 
   &:hover {
     opacity: 0.5;
+  }
+}
+
+.isAnimateRead{
+
+//  transition: all 0.5s cubic-bezier(0.36, -0.64, 0.34, 1.76);
+ animation: drop .3s none;
+}
+
+
+
+@keyframes drop {
+ from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100px);
+    // opacity: 0;
   }
 }
