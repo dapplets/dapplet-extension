@@ -180,7 +180,7 @@ class _App extends React.Component<P, S> {
     EventBus.on('context_finished', this.initModules)
     EventBus.on('settings_changed', this.initModules)
     EventBus.on('trustedusers_changed', this.initModules)
-    // 
+    //
   }
 
   componentDidUpdate(prevProps) {
@@ -537,6 +537,7 @@ class _App extends React.Component<P, S> {
           classNameIcon={styles.overlayTabIcon}
           classNameList={styles.overlayTabList}
           classNameItem={styles.overlayTabItem}
+          pathname={pathname}
         />
       )
     })
