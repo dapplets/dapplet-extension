@@ -51,7 +51,18 @@ export const UserSettings = ({
   const { mi, vi, schemaConfig, defaultConfig } = settingsContext
 
   const onOpenDappletAction = async (f: ManifestAndDetails) => {
-    overlays.filter((x) => x.source === f.name).map((x) => navigation!(`/${f.name}/${x.id}`))
+    if (!overlays.lenght) {
+      const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
+      const tab = await getCurrentTab()
+      if (!tab) return
+      await openDappletAction(f.name, tab.id)
+    } else {
+      overlays
+        .filter((x) => x.source === f.name)
+        .map((x) => {
+          return navigation!(`/${f.name}/${x.id}`)
+        })
+    }
   }
 
   const hasActionHandler = modules.find((x) => x.name === mi.name)?.isActionHandler
