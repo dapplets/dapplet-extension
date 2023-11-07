@@ -11,7 +11,6 @@ import { TabLoader } from '../../components/TabLoader'
 import { openLink } from '../../utils/openLink'
 import styles from './Dapplets.module.scss'
 import { DevMessage } from './DevMessage'
-
 export type Module = ManifestDTO & {
   isLoading: boolean
   error: string

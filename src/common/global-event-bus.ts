@@ -108,7 +108,12 @@ if (environment === EnvType.BACKGROUND) {
     postMessage: (message) => {
       browser.tabs.query({}).then((tabs) => {
         tabs.forEach((tab) => {
-          browser.tabs.sendMessage(tab.id, message)
+          browser.tabs.sendMessage(tab.id, message).catch((error) => {
+            // Mute errors if the content script is not injected in the target tab
+            if (error.message !== 'Could not establish connection. Receiving end does not exist.') {
+              throw error
+            }
+          })
         })
       })
     },

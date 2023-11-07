@@ -95,6 +95,10 @@ async function init() {
     } else if (!IS_IFRAME && message.type === 'ALERT_OR_CONFIRM') {
       overlayManager.show()
       return
+    } else if (message.type === 'PING') {
+      // Used for background. When user clicks on the extension icon, content script may be not injected.
+      // It's a way to check liveness of the content script
+      return Promise.resolve('PONG')
     }
   })
 

@@ -1,4 +1,5 @@
 import { StorageRef } from '../../../../../common/types'
+import { DappletActionProps } from '../../hooks/useDappletActions'
 import { ToolbarTabMenu } from '../../types'
 import { ModuleIconProps } from '../ModuleIcon'
 
@@ -24,11 +25,11 @@ export interface OverlayTabProps {
   pathname?: string
   overlays?: any
   onToggleClick?: any
-  menuWidgets?: any
-  getWigetsConstructor?: any
+  dappletActions?: DappletActionProps[]
   mainMenuNavigation?: any
   connectedDescriptors?: any
   selectedWallet?: any
   isToolbar?: boolean
   hasActionHandler?: boolean
+  isOverlayCollapsed: boolean
 }

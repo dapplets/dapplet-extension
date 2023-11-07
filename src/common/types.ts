@@ -112,6 +112,7 @@ export type LoginRequest = {
   reusePolicy?: ReusePolicyOptions | ValueOf<ReusePolicyOptions>
   from?: LoginRequestFromOptions | ValueOf<LoginRequestFromOptions>
   contractId?: string // ToDo: rethink this parameter, needed for NEAR only
+  creatingLoginConfirmationFailed?: boolean
 }
 
 export enum SecureLoginOptions {

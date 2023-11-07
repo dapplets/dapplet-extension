@@ -1,4 +1,5 @@
 import { expect, test as base } from '../fixtures/pass-fail-dapplet'
+import { Overlay } from '../pages/overlay'
 
 const devServerUrl = 'http://localhost:3000/dapplet.json'
 
@@ -17,6 +18,7 @@ const dapplets = [
   'inject-bos-component',
   'inject-nested-bos-component',
   'bos-write-transaction',
+  'dapplet-actions',
   // 'test-dynamic-dapplet', // ToDo: uncomment when dynamic context will be fixed
   // 'update-parsed-context', // ToDo: uncomment when testing website will be implemented
 ]
@@ -24,7 +26,9 @@ const dapplets = [
 for (const dappletName of dapplets) {
   const test = base({ devServerUrl, dappletName })
 
-  test(`should inject widget in ${dappletName}`, async ({ page, testableDapplet }) => {
+  test(dappletName, async ({ page, testableDapplet }) => {
+    const overlay = new Overlay(page)
+
     switch (dappletName) {
       case 'core-alert':
       case 'core-confirm-ok':
@@ -51,6 +55,7 @@ for (const dappletName of dapplets) {
         await expect(page.getByTestId('new-notification')).not.toBeVisible()
         await expect(page.getByText('Mark all as read')).toBeDisabled()
         await expect(page.getByTestId('old-notification')).toHaveCount(2)
+        await page.waitForTimeout(1000)
         await expect(page.getByRole('button', { name: 'Ok' })).not.toBeVisible() // Action buttons must be hidden, if notification is resolved
         break
 
@@ -82,6 +87,15 @@ for (const dappletName of dapplets) {
       case 'bos-write-transaction':
         await page.locator('[data-component="dapplets.near/widget/WriteButton"]').first().click()
         await expect(page.getByTestId('wallet-to-connect-near_mainnet')).toBeVisible()
+
+      case 'dapplet-actions':
+        await overlay.goto()
+        await page.getByTestId('tab-not-pinned').click()
+        await page.getByRole('button', { name: 'HIDE 1' }).click()
+        await expect(page.getByText('HIDE 1')).not.toBeVisible()
+        await page.getByTestId('tab-not-pinned').click()
+        await page.getByRole('button', { name: 'HIDE 2' }).click()
+        await expect(page.getByText('HIDE 2')).not.toBeVisible()
         break
 
       default:

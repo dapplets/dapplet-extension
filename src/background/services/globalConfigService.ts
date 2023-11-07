@@ -516,6 +516,7 @@ export default class GlobalConfigService {
   async updateConfig(callback: (config: GlobalConfig) => void) {
     const config = await this.get()
     callback(config)
+    EventBus.emit('settings_changed')
     await this.set(config)
     EventBus.emit('dev_mod_changed')
   }
