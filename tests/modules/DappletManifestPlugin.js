@@ -1,5 +1,6 @@
 const fs = require('fs')
 const { RawSource } = require('webpack').sources
+const { Compilation } = require('webpack')
 
 /**
  * This plugin generates dapplet.json file with list of dapplets and adapters
@@ -9,11 +10,20 @@ const { RawSource } = require('webpack').sources
  */
 class DappletManifestPlugin {
   apply(compiler) {
-    compiler.hooks.emit.tapPromise('CreateFilePlugin', async (compilation) => {
-      const dapplets = fs.readdirSync('./dapplets').map((x) => `./dapplets/${x}/dapplet.json`)
-      const adapters = fs.readdirSync('./adapters').map((x) => `./adapters/${x}/dapplet.json`)
-      const modules = [...dapplets, ...adapters]
-      compilation.emitAsset('dapplet.json', new RawSource(JSON.stringify(modules, null, 2)))
+    compiler.hooks.thisCompilation.tap('DappletManifestPlugin', (compilation) => {
+      compilation.hooks.processAssets.tapPromise(
+        {
+          name: 'DappletManifestPlugin',
+          stage: Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
+        },
+        async () => {
+          const dapplets = fs.readdirSync('./dapplets').map((x) => `./dapplets/${x}/dapplet.json`)
+          const adapters = fs.readdirSync('./adapters').map((x) => `./adapters/${x}/dapplet.json`)
+          const modules = [...dapplets, ...adapters]
+
+          compilation.emitAsset('dapplet.json', new RawSource(JSON.stringify(modules, null, 2)))
+        }
+      )
     })
   }
 }

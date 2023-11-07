@@ -499,8 +499,14 @@ export class Core {
     delete _request.onLogout
 
     const { createSession, getThisTab } = initBGFunctions()
-    const thisTab = await getThisTab()
-    const session = await createSession(moduleName, _request, thisTab.id)
+    let session = null
+    try {
+      const thisTab = await getThisTab()
+      session = await createSession(moduleName, _request, thisTab.id)
+    } catch (err) {
+      console.log('Error during creating a session:', err)
+      return null
+    }
 
     const ls = {} // ToDo: specify LoginInfo
     onLogin?.call({}, ls)
