@@ -80,7 +80,7 @@ for (const dappletName of dapplets) {
         break
 
       case 'bos-write-transaction':
-        await page.locator('[data-bos-src="dapplets.near/widget/WriteButton"]').first().click()
+        await page.locator('[data-component="dapplets.near/widget/WriteButton"]').first().click()
         await expect(page.getByTestId('wallet-to-connect-near_mainnet')).toBeVisible()
         break
 
