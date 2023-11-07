@@ -3,30 +3,38 @@
 @import "../../assets/styles/null";
 
 .account {
-  cursor: pointer;
-
   position: relative;
 
   display: flex;
   align-items: center;
 
-  height: 44px;
+  height: auto;
+  min-height: 44px;
   margin: 3px;
-  padding: 0 5px 0 2px;
+  padding: 0 10px;
 
-  border-radius: 22px 14px 14px 22px;
+  border: 1px solid #E3E3E3;
+  border-radius: 22px;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.info {
+  width: 250px;
+  background: none;
 }
 
 .imgUser {
   display: inline-block;
 
-  width: 40px;
-  height: 40px;
+  width: 22px;
+  height: 22px;
   margin-right: 10px;
 
   background-color: white;
   filter: drop-shadow(0 2px 2px rgb(0 0 0 / 10%));
-  border: 2px solid #bfbfbf;
   border-radius: 50%;
 
   &.empty {
@@ -34,15 +42,30 @@
   }
 }
 
+.info .imgUser svg {
+  width: 22px;
+  height: 22px;
+  fill: #636363;
+}
+
 .nameUser {
-  padding-right: 14px;
+  flex-grow: 1;
+
+  padding: 10px 14px 10px 0;
 
   font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   font-style: normal;
-  line-height: 100%;
+  line-height: 125%;
   color: $main-black;
+  text-align: left;
+}
+
+.info .nameUser {
+  width: calc(100% - 22px);
+  color: #636363;
+  word-wrap: break-word;
 }
 
 .nameUserActive {
@@ -50,5 +73,43 @@
 
   .nameUser {
     color: $pure-white;
+  }
+}
+
+.copyButton {
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 25px;
+  height: 25px;
+
+  background: none;
+
+  svg {
+    path {
+      fill: #919191 !important;
+      transition: all 0.3s;
+    }
+  }
+
+  &:hover {
+    svg {
+      path {
+        fill: $primary-hover !important;
+        transition: all 0.3s;
+      }
+    }
+  }
+
+  &:active {
+    svg {
+      path {
+        fill: $primary !important;
+        transition: all 0.3s;
+      }
+    }
   }
 }

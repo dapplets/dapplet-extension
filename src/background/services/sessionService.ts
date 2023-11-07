@@ -2,7 +2,15 @@ import { hexlify } from '@ethersproject/bytes'
 import { toUtf8Bytes } from '@ethersproject/strings'
 import { SECURE_AUTH_METHODS } from '../../common/constants'
 import { generateGuid } from '../../common/generateGuid'
-import { ChainTypes, LoginRequest, WalletTypes } from '../../common/types'
+import { isValidEnumValue } from '../../common/helpers'
+import {
+  ChainTypes,
+  LoginRequest,
+  LoginRequestFromOptions,
+  ReusePolicyOptions,
+  SecureLoginOptions,
+  WalletTypes,
+} from '../../common/types'
 import LoginConfirmationBrowserStorage from '../browserStorages/loginConfirmationBrowserStorage'
 import LoginSessionBrowserStorage from '../browserStorages/loginSessionBrowserStorage'
 import SessionEntryBrowserStorage from '../browserStorages/sessionEntryBrowserStorage'
@@ -49,7 +57,7 @@ export class SessionService {
     confirmations = confirmations
       .filter((x) => !x.isExpired())
       .filter((x) => request.authMethods.includes(x.authMethod))
-      .filter((x) => (request.from === 'me' ? x.from === moduleName : true))
+      .filter((x) => (request.from === LoginRequestFromOptions.Me ? x.from === moduleName : true))
       .filter(
         (x) =>
           !!suitableWallets.find(
@@ -91,13 +99,23 @@ export class SessionService {
     tabId: number
   ): Promise<LoginSession> {
     request.timeout = request.timeout ?? DEFAULT_REQUEST_TIMEOUT
-    request.secureLogin = request.secureLogin ?? 'disabled'
-    request.from = request.from ?? 'any'
+    request.secureLogin = request.secureLogin ?? SecureLoginOptions.Disabled
+    request.reusePolicy = request.reusePolicy ?? ReusePolicyOptions.Disabled
+    request.from = request.from ?? LoginRequestFromOptions.Any
 
-    if (!request.authMethods || request.authMethods.length === 0)
+    if (!request.authMethods || request.authMethods.length === 0) {
       throw new Error(`"authMethods" is required.`)
+    }
 
-    if (request.secureLogin === 'required') {
+    if (!isValidEnumValue(SecureLoginOptions, request.secureLogin)) {
+      throw new Error('Invalid "secureLogin" value.')
+    }
+
+    if (!isValidEnumValue(ReusePolicyOptions, request.reusePolicy)) {
+      throw new Error('Invalid "reusePolicy" value.')
+    }
+
+    if (request.secureLogin === SecureLoginOptions.Required) {
       for (const authMethod of request.authMethods) {
         if (!SECURE_AUTH_METHODS.includes(authMethod)) {
           throw new Error(`${authMethod} doesn't support secure login.`)
@@ -114,30 +132,57 @@ export class SessionService {
       }
     }
 
-    if (!['disabled', 'optional', 'required'].includes(request.secureLogin))
-      throw new Error('Invalid "secureLogin" value.')
-
-    const { wallet, chain, confirmationId } = await this._overlayService.openLoginSessionOverlay(
+    const overlayResult = await this._overlayService.openLoginSessionOverlay(
       moduleName,
       request,
       tabId
     )
 
-    if (request.secureLogin === 'required' && !confirmationId)
+    const { wallet, chain } = overlayResult
+    let { confirmationId } = overlayResult
+
+    if (
+      request.secureLogin === SecureLoginOptions.Required &&
+      request.reusePolicy === ReusePolicyOptions.Manual &&
+      !confirmationId
+    ) {
       throw new Error('LoginConfirmation must be selected in secure login mode.')
-    if (!request.authMethods.includes(chain)) throw new Error('Invalid auth method selected.')
+    }
+
+    if (!request.authMethods.includes(chain)) {
+      throw new Error('Invalid auth method selected.')
+    }
 
     const descriptors = await this._walletService.getWalletDescriptors()
+
     if (
       descriptors.findIndex((x) => x.connected && x.type === wallet && x.chain === chain) === -1
     ) {
       throw new Error('Selected wallet is disconnected.')
     }
 
-    if (confirmationId) {
+    if (request.secureLogin === SecureLoginOptions.Required) {
       const loginConfirmations = await this.getSuitableLoginConfirmations(moduleName, request)
-      if (loginConfirmations.findIndex((x) => x.loginConfirmationId === confirmationId) === -1) {
-        throw new Error('Login confirmation is expired.')
+
+      // Which reuse policy is defined by dapplet developer?
+      if (request.reusePolicy === ReusePolicyOptions.Manual) {
+        // manual - a user must select login confirmation manually and it must exist
+        if (loginConfirmations.findIndex((x) => x.loginConfirmationId === confirmationId) === -1) {
+          throw new Error('Login confirmation is expired.')
+        }
+      } else if (request.reusePolicy === ReusePolicyOptions.Auto && loginConfirmations.length > 0) {
+        // auto - the extension selects any available login confirmation automatically if exists
+        //        if it doesn't exist, then create a new one below
+        confirmationId = loginConfirmations[0].loginConfirmationId
+      } else {
+        // disabled - the extension creates a new login confirmation every time, reusing is disabled
+        const loginConfirmation = await this.createLoginConfirmation(
+          moduleName,
+          request,
+          chain,
+          wallet
+        )
+        confirmationId = loginConfirmation.loginConfirmationId
       }
     }
 
