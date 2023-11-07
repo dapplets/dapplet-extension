@@ -7,7 +7,9 @@
   "type": "FEATURE",
   "title": "Demo Dapplet",
   "icon": "src/images/Red_Icon3.png",
-  "contextIds": ["test-virtual-adapter"],
+  "contextIds": [
+    "test-virtual-adapter"
+  ],
   "dependencies": {
     "test-virtual-adapter": "0.1.0"
   },

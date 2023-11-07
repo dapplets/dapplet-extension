@@ -17,7 +17,7 @@
     "eslint": "eslint ./src --ext .ts --fix",
     "stylelint": "stylelint ./src/**/*.{css,scss,module.scss} --fix",
     "cypress:open": "cypress open",
-    "modules": "cd tests/modules && webpack serve --config webpack.config.js",
+    "modules": "concurrently -c \"yellow,magenta\" -n \"dapplets,overlay\" \"cd tests/modules && webpack serve --config webpack.config.js\" \"npm run start:test-overlay\"",
     "modules:server-interaction": "cd tests/modules/servers/server-interaction && npm run start",
     "test:e2e": "cross-env QASE_REPORT=1 npx cypress run --headed --browser chrome",
     "test:ca": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/connected-accounts\" --headed --browser chrome",
@@ -25,8 +25,10 @@
     "test:wa": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/wallets\" --headed --browser chrome",
     "test:notify": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/notifications\" --headed --browser chrome",
     "test:demo": "concurrently -c \"yellow,magenta\" -n \"test-dapplets,cypress\" \"npm run test-dapplets\" \"npm test\" --kill-others",
-    "postinstall": "patch-package && npm run install:modules:server-interaction",
-    "install:modules:server-interaction": "cd tests/modules/servers/server-interaction && npm i"
+    "postinstall": "patch-package && npm run install:modules:server-interaction && npm run install:test-overlay",
+    "install:modules:server-interaction": "cd tests/modules/servers/server-interaction && npm i",
+    "install:test-overlay": "cd tests/modules/overlays/twitter-demo-overlay && npm i",
+    "start:test-overlay": "cd tests/modules/overlays/twitter-demo-overlay && npm start"
   },
   "devDependencies": {
     "@fontsource/montserrat": "^4.5.14",
