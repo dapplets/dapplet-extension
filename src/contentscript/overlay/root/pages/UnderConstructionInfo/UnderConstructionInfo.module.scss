@@ -10,8 +10,10 @@
   flex-direction: column;
 
   width: 100%;
-  height: calc(100vh - 123px);
-
+  // todo: padding
+  height: calc(100vh - 100px);
+  // height: calc(100vh - 123px);
+  padding-bottom: 10px;
   -ms-overflow-style: none;
 }
 

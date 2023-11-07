@@ -14,8 +14,10 @@
   flex-direction: column;
 
   width: 100%;
-  height: calc(100vh - 130px);
-
+  // todo: padding
+  // height: calc(100vh - 130px);
+  height: calc(100vh - 100px);
+  padding-bottom: 10px;
   -ms-overflow-style: none;
 }
 

@@ -13,14 +13,17 @@
   direction: rtl;
   overflow-y: auto;
   width: 100%;
-  height: calc(100vh - 97px);
-
+  // height: calc(100vh - 97px);
+  // todo: padding
+  height: calc(100vh - 55px);
+  padding-bottom: 10px;
   &::-webkit-scrollbar {
     cursor: pointer;
     width: 4px;
   }
 
   &::-webkit-scrollbar-track {
+    margin-bottom: 20px;
     background: rgb(244 244 244);
     background: linear-gradient(
       90deg,
@@ -33,7 +36,7 @@
   &::-webkit-scrollbar-thumb {
     width: 4px;
     height: 2px;
-    margin-bottom: 15px;
+    // margin-bottom: 15px;
 
     background: $primary;
     border-radius: 2px;
