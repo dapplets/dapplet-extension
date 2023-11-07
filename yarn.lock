@@ -8641,8 +8641,8 @@ near-api-js@^2.1.4:
     tweetnacl "^1.0.1"
 
 "near-social-vm@github:dapplets/near-social-vm":
-  version "2.4.2"
-  resolved "https://codeload.github.com/dapplets/near-social-vm/tar.gz/a61c93739ae836e29ac6fa18a1f7d831a40fd3b4"
+  version "2.5.2"
+  resolved "https://codeload.github.com/dapplets/near-social-vm/tar.gz/7709285af5e814245d0475cb876b5824d69256dd"
   dependencies:
     "@braintree/sanitize-url" "6.0.0"
     "@radix-ui/react-accordion" "^1.1.1"
