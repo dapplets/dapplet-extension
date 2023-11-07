@@ -92,17 +92,7 @@ const Component: React.FC<{
     return null
   }
 
-  return (
-    <Widget
-      src="near/widget/TosCheck"
-      props={{
-        targetComponent: src,
-        targetProps: props,
-        tosName: 'adminalpha.near/widget/TosContent',
-      }}
-      overrides={overrides}
-    />
-  )
+  return <Widget src={src} props={props} overrides={overrides} />
 }
 
 export class BosComponent extends HTMLElement {
