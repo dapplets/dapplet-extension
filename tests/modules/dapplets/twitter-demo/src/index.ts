@@ -102,7 +102,7 @@ export default class DemoDapplet {
     //       DEFAULT: {
     //         icon: MAIN_IMG,
     //         title: 'Test',
-    //         pinnedID: 'test-action-button',
+    //         pinId: 'test-action-button',
     //         action: (_, me) => {
     //           me.title = 'Done!'
     //         },

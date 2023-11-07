@@ -14,10 +14,11 @@
   background: #fff;
   border-radius: 4px 0 0;
 
-  img {
-    width: 30px !important;
-    height: 30px !important;
-  }
+  // ToDo: It was commented out because it broke icons in dapplet actions. Remove if it's not necessary
+  // img {
+  //   width: 30px !important;
+  //   height: 30px !important;
+  // }
 }
 
 .cursor {
@@ -219,6 +220,7 @@
   //   }
   // }
 }
+
 .dappletsList {
   &:hover {
     svg {
@@ -227,18 +229,22 @@
         stroke: $primary-hover;
       }
     }
+
     svg path:first-child {
       fill: $primary-hover !important;
       stroke: $pure-white !important;
     }
+
     svg path:last-child {
       fill: $pure-white !important;
       stroke: $primary-hover !important;
     }
+
     svg rect {
       fill: $primary-hover !important;
       stroke: $pure-white !important;
     }
+
     svg rect:first-child {
       fill: #e3e3e3 !important;
       stroke: $pure-white !important;
@@ -252,24 +258,29 @@
         stroke: $primary-pressed;
       }
     }
+
     svg path:first-child {
       fill: $primary-pressed !important;
       stroke: $pure-white !important;
     }
+
     svg path:last-child {
       fill: $pure-white !important;
       stroke: $primary-pressed !important;
     }
+
     svg rect {
       fill: $primary-pressed !important;
       stroke: $pure-white !important;
     }
+
     svg rect:first-child {
       fill: #e3e3e3 !important;
       stroke: $pure-white !important;
     }
   }
 }
+
 .iconNotification {
   &:hover {
     svg {
@@ -279,6 +290,7 @@
       }
     }
   }
+
   &:active {
     svg {
       path {
@@ -288,26 +300,33 @@
     }
   }
 }
+
 .iconSettings {
   &:hover {
     svg path:first-child {
       fill: $primary-hover !important;
+      stroke: none !important;
     }
+
     svg path:last-child {
       fill: $pure-white !important;
       stroke: $pure-white !important;
     }
   }
+
   &:active {
     svg path:first-child {
       fill: $primary-pressed !important;
+      stroke: none !important;
     }
+
     svg path:last-child {
       fill: $pure-white !important;
       stroke: $pure-white !important;
     }
   }
 }
+
 .iconAccounts{
   &:hover {
     &:hover {
@@ -318,6 +337,7 @@
         }
       }
     }
+
     &:active {
       svg {
         path {
@@ -328,15 +348,18 @@
     }
   }
 }
+
 .iconSettingsActive {
   svg path:first-child {
     fill: $primary !important;
   }
+
   svg path:last-child {
     fill: $pure-white !important;
     stroke: $pure-white !important;
   }
 }
+
 .dappletsListActive {
   svg {
     path {
@@ -344,23 +367,28 @@
       stroke: $primary;
     }
   }
+
   svg path:first-child {
     fill: $primary !important;
     stroke: $pure-white !important;
   }
+
   svg path:last-child {
     fill: $pure-white !important;
     stroke: $primary !important;
   }
+
   svg rect {
     fill: $primary !important;
     stroke: $pure-white !important;
   }
+
   svg rect:first-child {
     fill: #e3e3e3 !important;
     stroke: $pure-white !important;
   }
 }
+
 .iconNotificationActive {
   svg {
     path {
@@ -369,6 +397,7 @@
     }
   }
 }
+
 .iconAccountsActive {
   svg {
     path {
@@ -377,6 +406,7 @@
     }
   }
 }
+
 .mainIconDapplet {
   &:hover {
     svg {
@@ -386,6 +416,7 @@
       }
     }
   }
+
   &:active {
     svg {
       path {

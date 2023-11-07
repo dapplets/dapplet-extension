@@ -1,32 +1,27 @@
 import cn from 'classnames'
 import React, { ButtonHTMLAttributes, DetailedHTMLProps, FC } from 'react'
 import { ReactComponent as Pinned } from '../../assets/icons/iconsWidgetButton/pinned.svg'
+import { DappletActionProps } from '../../hooks/useDappletActions'
 import styles from './WidgetButton.module.scss'
+
 export interface WidgetButtonProps
   extends DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
-  title: string
-  icon?: any
-  disabled?: boolean
-  pinned?: boolean
-  hidden?: boolean
+  action: DappletActionProps
   isMenu?: boolean
-  onClick?: any
-  onPinned?: any
-  pinnedId?: string
 }
 
 export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) => {
+  const { isMenu = false, ...otherProps } = props
   const {
     title,
     icon,
-    disabled,
-    hidden,
-    isMenu = false,
-    pinned,
+    disabled = false,
     onPinned,
+    hidden = false,
+    pinned = false,
+    pinId,
     onClick,
-    ...otherProps
-  } = props
+  } = props.action
 
   return (
     <div data-visible>
@@ -63,21 +58,23 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
             </button>
             <span className={styles.widgetButtonTitle}>{title}</span>
           </div>
-          <button
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              onPinned()
-            }}
-            className={cn(styles.widgetButtonPinned, {
-              [styles.isPinned]: pinned,
-              // 'pinned': pinned
-            })}
-            data-visible
-            data-testid="pinned"
-          >
-            <Pinned />
-          </button>
+          {pinId ? (
+            <button
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                onPinned()
+              }}
+              className={cn(styles.widgetButtonPinned, {
+                [styles.isPinned]: pinned,
+                // 'pinned': pinned
+              })}
+              data-visible
+              data-testid="pinned"
+            >
+              <Pinned />
+            </button>
+          ) : null}
         </div>
       ) : (
         pinned && (
@@ -90,7 +87,7 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
             })}
             title={title ? title : null}
             disabled={disabled ? disabled : false}
-            onClick={onClick}
+            onClick={() => onClick()}
             {...otherProps}
           >
             {icon && icon.length > 0 ? (

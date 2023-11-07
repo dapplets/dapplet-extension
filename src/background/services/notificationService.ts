@@ -1,4 +1,5 @@
 import browser from 'webextension-polyfill'
+import { MutexQueue } from '../../common/decorators/mutex-queue'
 import { generateGuid } from '../../common/generateGuid'
 import * as EventBus from '../../common/global-event-bus'
 import {
@@ -10,6 +11,8 @@ import {
 import NotificationBrowserStorage from '../browserStorages/notificationBrowserStorage'
 
 // ToDo: remove notifications_updated everywhere because it's too generic
+
+const NotificationServiceKey = Symbol()
 
 export class NotificationService {
   public notificationBrowserStorage = new NotificationBrowserStorage()
@@ -28,7 +31,6 @@ export class NotificationService {
     tabId: number
   ): Promise<void> {
     const notificationId = await this.createNotification(notify)
-
     await this.showNotification(notificationId, tabId)
     await this._updateBadge()
   }
@@ -74,12 +76,14 @@ export class NotificationService {
     await this._updateBadge()
   }
 
+  @MutexQueue(NotificationServiceKey)
   async markNotificationAsViewed(id: string | string[]): Promise<void> {
     const ids = Array.isArray(id) ? id : [id]
 
     await Promise.all(
       ids.map(async (id) => {
         const notification = await this.notificationBrowserStorage.getById(id)
+        if (notification.status !== NotificationStatus.Highlighted) return
         notification.status = NotificationStatus.Default
         await this.notificationBrowserStorage.update(notification)
       })
@@ -90,6 +94,7 @@ export class NotificationService {
     await this._updateBadge()
   }
 
+  @MutexQueue(NotificationServiceKey)
   async markAllNotificationsAsViewed(): Promise<void> {
     const notifications = await this.notificationBrowserStorage.getAll(
       (x) => x.status === NotificationStatus.Highlighted
@@ -98,11 +103,9 @@ export class NotificationService {
     const viewedNotificationIds = []
 
     for (const notification of notifications) {
-      if (notification.status !== NotificationStatus.Default) {
-        notification.status = NotificationStatus.Default
-        await this.notificationBrowserStorage.update(notification)
-        viewedNotificationIds.push(notification.id)
-      }
+      notification.status = NotificationStatus.Default
+      await this.notificationBrowserStorage.update(notification)
+      viewedNotificationIds.push(notification.id)
     }
 
     EventBus.emit('notifications_viewed', viewedNotificationIds)
@@ -110,14 +113,19 @@ export class NotificationService {
     await this._updateBadge()
   }
 
+  @MutexQueue(NotificationServiceKey)
   async resolveNotificationAction(
     notificationId: string,
     action: string,
     tabId: number
   ): Promise<void> {
     const notification = await this.notificationBrowserStorage.getById(notificationId)
+
+    if (notification.status === NotificationStatus.Resolved) {
+      throw new Error('Cannot resolve a notification twice')
+    }
+
     notification.status = NotificationStatus.Resolved
-    // ToDo: save resolved actionId?
 
     await this.notificationBrowserStorage.update(notification)
     await this._updateBadge()
@@ -144,7 +152,7 @@ export class NotificationService {
     return unreadNotifications.length
   }
 
-  async _updateBadge() {
+  private async _updateBadge() {
     const count = await this.getUnreadNotificationsCount()
     browser.action.setBadgeText({
       text: count === 0 ? '' : count.toString(),

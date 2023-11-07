@@ -233,6 +233,7 @@ export class OverlayManager implements IOverlayManager {
     ReactDOM.render(
       <App
         hidden={this._panel.classList.contains(HiddenOverlayClass)}
+        collapsed={this._panel.classList.contains(CollapsedOverlayClass)}
         overlayManager={this}
         onToggle={this.toggle.bind(this)}
         systemPopupEventBus={this.systemPopupEventBus}
