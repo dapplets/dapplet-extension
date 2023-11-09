@@ -68,7 +68,7 @@ export const UserSettings = ({
   const hasActionHandler = modules.find((x) => x.name === mi.name)?.isActionHandler
 
   return (
-    <div className={styles.userSettingsWrapper}>
+    <div className={styles.userSettingsWrapper} data-testid="dapplet-settings-wrapper">
       <div className={cn(styles.wrapperCard)}>
         <div className={cn(styles.leftBlock)}>
           <DappletImage storageRef={mi.icon} className={styles.imgBlock} />

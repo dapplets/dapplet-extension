@@ -115,6 +115,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   return (
     <>
       <div
+        title={p.title}
         data-testid={!p.pinned ? 'tab-not-pinned' : 'tab-pinned'}
         tabIndex={0}
         onBlur={(e) => {
@@ -162,6 +163,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
 
             <div className={styles.blockStandartFunction}>
               <SquaredButton
+                title="Dapplet overlay"
                 className={styles.squaredButtonMenuWidget}
                 data-visible
                 appearance={'big'}
@@ -175,6 +177,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                 }}
               />
               <SquaredButton
+                title="Dapplet settings"
                 className={styles.squaredButtonMenuWidget}
                 data-visible
                 appearance={'big'}
@@ -188,6 +191,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                 }}
               />
               <SquaredButton
+                title="Dapplets Store"
                 className={styles.squaredButtonMenuWidget}
                 data-visible
                 appearance={'big'}
