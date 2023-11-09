@@ -28,7 +28,7 @@
   display: flex;
   justify-content: space-around;
   width: 100%;
-  padding: 0 60px 25.5px;
+  padding: 6px 60px 16px;
 }
 
 .titleTokenomics{
@@ -76,7 +76,7 @@
   }
 
   &::-webkit-scrollbar-track {
-    margin-bottom: 43px;
+    margin-bottom: 38px;
     background: rgb(244 244 244);
     background: linear-gradient(
       90deg,
@@ -89,7 +89,7 @@
   &::-webkit-scrollbar-thumb {
     width: 4px;
     height: 2px;
-    margin-bottom: 13px;
+ 
 
     background: $primary;
     border-radius: 2px;
