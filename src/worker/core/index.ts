@@ -186,7 +186,9 @@ export class Core {
     eventDef?: EventDef<any>
   ): OverlayConnection<T | any> {
     cfg.source = this.manifest.name
+    console.log('^^^ cfg.source', cfg.source)
     cfg.module = { name: this.manifest.name, registryUrl: this.manifest.registryUrl }
+    console.log('^^^ cfg.module', cfg.module)
 
     if (cfg.name) {
       const overlay = this.manifest.overlays?.[cfg.name]
@@ -218,16 +220,19 @@ export class Core {
         }
       }
     }
+    console.log('^^^ cfg', cfg)
 
     const _overlay = this.overlayManager.createOverlay({
       url: cfg.url,
       title: cfg.title,
       source: cfg.source,
       module: cfg.module,
+      registryUrl: cfg.module.registryUrl,
     })
+    console.log('!!! _overlay', _overlay)
     const conn = new Connection<T>(_overlay, eventDef)
-    let overridedConn: OverlayConnection<T> // ToDo: looks like a bug
-    const overrides = {
+    const overridedConn: OverlayConnection<T> = Object.assign(conn, {
+      // ToDo: looks like a bug
       id: _overlay.id,
       isOpen() {
         return _overlay.registered
@@ -244,8 +249,8 @@ export class Core {
         conn.state.addConnection(conn)
         return overridedConn
       },
-    }
-    overridedConn = Object.assign(conn, overrides)
+    })
+    console.log('!!! overridedConn', overridedConn)
     return overridedConn
   }
 

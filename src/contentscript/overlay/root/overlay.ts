@@ -13,6 +13,7 @@ export class Overlay implements IOverlay {
   public parent: IOverlay = null
   public module: OverlaySourceModule = null
   public isSystemPopup: boolean
+  public registryUrl: string = null
 
   public _queue: any[] = []
   public _isFrameLoaded = false
@@ -34,6 +35,7 @@ export class Overlay implements IOverlay {
     this.parent = config.parent ?? null
     this.module = config.module ?? null
     this.isSystemPopup = config.isSystemPopup ?? false
+    this.registryUrl = config.registryUrl ?? null
 
     // // disable cache
     // const url = new URL(uri);

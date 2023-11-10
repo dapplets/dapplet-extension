@@ -132,9 +132,19 @@ async function init() {
       title: string,
       source: string,
       hidden: boolean,
+      name: string,
+      registryUrl: string,
       sourceWindow: any
     ) => {
-      const overlay = overlayManager.createOverlay({ url, title, source, hidden })
+      console.log('OVERLAY_CREATE')
+      const overlay = overlayManager.createOverlay({
+        url,
+        title,
+        source,
+        hidden,
+        module: { name, registryUrl },
+        registryUrl,
+      })
       overlay.onclose = () => {
         jsonrpc.call('OVERLAY_CLOSED', [id], sourceWindow)
       }
@@ -145,6 +155,7 @@ async function init() {
         jsonrpc.call('OVERLAY_EXEC', [id, topic, message], sourceWindow)
       })
       overlayMap.set(id, overlay)
+      console.log('OVERLAY_CREATE - overlay', overlay)
       return true
     }
   )

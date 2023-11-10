@@ -27,28 +27,29 @@ export const UserSettings = ({
 }: UserSettingsProps): ReactElement => {
   const [settingsContext, setSettingsContext] = useState(null)
   const [isLoad, setLoad] = useState(false)
+
   useEffect(() => {
     const init = async () => {
       setLoad(true)
       setSettingsContext(null)
-      const { getUserSettingsForOverlay, getRegistries } = await initBGFunctions(browser)
-      const registries = await getRegistries()
-      const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
+      const { getUserSettingsForOverlay } = await initBGFunctions(browser)
+      console.log('~ registryUrl', registryUrl)
+      console.log('~ dappletName', dappletName)
 
       const { mi, vi, schemaConfig, defaultConfig } = await getUserSettingsForOverlay(
-        registryUrl ? registryUrl : prodRegistries[0]?.url,
+        registryUrl,
         dappletName
       )
+
+      console.log('~ mi', mi)
+      console.log('~ vi', vi)
+      console.log('~ schemaConfig', schemaConfig)
+      console.log('~ defaultConfig', defaultConfig)
 
       setSettingsContext({ mi, vi, schemaConfig, defaultConfig })
     }
     init()
-
-    return () => {}
   }, [dappletName, registryUrl])
-
-  if (!settingsContext) return null
-  const { mi, vi, schemaConfig, defaultConfig } = settingsContext
 
   const onOpenDappletAction = async (f: ManifestAndDetails) => {
     if (!overlays.lenght) {
@@ -65,8 +66,9 @@ export const UserSettings = ({
     }
   }
 
+  if (!settingsContext) return null
+  const { mi, vi, schemaConfig, defaultConfig } = settingsContext
   const hasActionHandler = modules.find((x) => x.name === mi.name)?.isActionHandler
-
   return (
     <div className={styles.userSettingsWrapper} data-testid="dapplet-settings-wrapper">
       <div className={cn(styles.wrapperCard)}>

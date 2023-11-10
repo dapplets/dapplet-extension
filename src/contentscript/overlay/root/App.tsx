@@ -207,12 +207,17 @@ class _App extends React.Component<AppProps, AppState> {
 
   getTabs = (): ToolbarTab[] => {
     const overlays = this.getOverlays()
+    console.log('% overlays', overlays)
     const overlayGroups = groupBy(overlays, (x) => x.source)
 
     const tabs: ToolbarTab[] = [SYSTEM_TAB]
 
+    console.log('% overlayGroups', overlayGroups)
     for (const source in overlayGroups) {
       const group = overlayGroups[source].filter((x) => !x.isSystemPopup)
+      console.log('% source', source)
+      console.log('% group', group)
+      console.log('% group[0]', group[0])
 
       // system legacy tab
       if (source === 'null') {
@@ -263,6 +268,7 @@ class _App extends React.Component<AppProps, AppState> {
             },
           ],
         }
+        console.log('% tab', tab)
 
         tabs.push(tab)
       }
@@ -286,7 +292,9 @@ class _App extends React.Component<AppProps, AppState> {
   }
 
   getOverlays() {
-    return this.props.overlayManager.getOverlays().filter((x) => !x.parent)
+    const allOverlays = this.props.overlayManager.getOverlays()
+    console.log('% allOverlays', allOverlays)
+    return allOverlays.filter((x) => !x.parent)
   }
 
   handleCloseTabClick = async (tab: ToolbarTab) => {
@@ -359,7 +367,9 @@ class _App extends React.Component<AppProps, AppState> {
   }
 
   handleUserSettingsClick = (mi: ManifestDTO) => {
+    console.log('& mi', mi)
     const tab = this.getTabs().find((x) => x.id === mi.name)
+    console.log('& tab', tab)
 
     if (!tab) {
       const internalTabs = [...this.state.internalTabs]
@@ -548,13 +558,17 @@ class _App extends React.Component<AppProps, AppState> {
 
     const overlays = this.getOverlays()
     // TODO: naming wallets is the notification
+    console.log('this.props.location', this.props.location)
     const { pathname } = this.props.location!
+    console.log('pathname', pathname)
 
     const activeTabId = pathname.split('/')[1]
     const activeTabMenuId = pathname.split('/')[2]
 
     const tab = this.getTabs().find((x) => x.id === activeTabId)
+    console.log('tab', tab)
     const menu = tab?.menus.find((x) => x.id === activeTabMenuId)
+    console.log('menu', menu)
 
     const systemPopups = overlays.filter((x) => x.isSystemPopup)
 
