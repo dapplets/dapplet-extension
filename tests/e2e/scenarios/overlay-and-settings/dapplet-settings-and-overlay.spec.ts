@@ -318,7 +318,7 @@ test('should open dapplet settings after its overlay opening and go back to the 
 
   await page.getByTestId('dapplet-overlay-wrapper').locator('[title=Settings]').click()
 
-  await page.getByTestId('dapplet-overlay-wrapper').locator('[title=Home]').click()
+  await page.getByTestId('dapplet-settings-wrapper').locator('[title=Home]').click()
   await expect(page.getByTestId('dapplet-overlay-wrapper')).toBeVisible()
   await expect(page.getByTestId('dapplet-title')).toContainText(dappletTitle)
 })
@@ -348,7 +348,7 @@ test('should open dapplet settings after its overlay opening and go back to the 
 
   await page.getByTestId('dapplet-overlay-wrapper').locator('[title=Settings]').click()
 
-  await page.getByTestId('dapplet-overlay-wrapper').locator('[title=Home]').click()
+  await page.getByTestId('dapplet-settings-wrapper').locator('[title=Home]').click()
   await expect(page.getByTestId('dapplet-overlay-wrapper')).toBeVisible()
   await expect(page.getByTestId('dapplet-title')).toContainText(dappletTitle)
 })

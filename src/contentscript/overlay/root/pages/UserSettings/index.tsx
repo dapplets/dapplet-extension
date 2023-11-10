@@ -52,15 +52,19 @@ export const UserSettings = ({
   }, [dappletName, registryUrl])
 
   const onOpenDappletAction = async (f: ManifestAndDetails) => {
-    if (!overlays.lenght) {
+    console.log('$$$ f', f)
+    console.log('$$$ overlays', overlays)
+    if (!overlays.length) {
       const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
       const tab = await getCurrentTab()
+      console.log('$$$ tab', tab)
       if (!tab) return
       await openDappletAction(f.name, tab.id)
     } else {
       overlays
         .filter((x) => x.source === f.name)
         .map((x) => {
+          console.log('$$$ x', x)
           return navigation!(`/${f.name}/${x.id}`)
         })
     }
