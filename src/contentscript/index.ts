@@ -136,7 +136,6 @@ async function init() {
       registryUrl: string,
       sourceWindow: any
     ) => {
-      console.log('OVERLAY_CREATE')
       const overlay = overlayManager.createOverlay({
         url,
         title,
@@ -155,7 +154,6 @@ async function init() {
         jsonrpc.call('OVERLAY_EXEC', [id, topic, message], sourceWindow)
       })
       overlayMap.set(id, overlay)
-      console.log('OVERLAY_CREATE - overlay', overlay)
       return true
     }
   )

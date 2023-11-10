@@ -22,7 +22,6 @@ export class OverlayIframe implements IOverlay {
   private _callbacks = new Set<Function>()
 
   constructor(private _iframeMessenger: JsonRpc, config: OverlayConfig) {
-    console.log('??? config', config)
     this.url = config.url
     this.title = config.title
     this.source = config.source ?? null

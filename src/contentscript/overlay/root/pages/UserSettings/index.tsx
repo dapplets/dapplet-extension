@@ -1,21 +1,23 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useEffect, useState } from 'react'
+import { NavigateFunction } from 'react-router-dom'
 import browser from 'webextension-polyfill'
 import { ManifestAndDetails } from '../../../../../common/types'
 import { ReactComponent as Home } from '../../assets/svg/home.svg'
 import { DappletImage } from '../../components/DappletImage'
 import { DappletTitle } from '../../components/DappletTitle'
 import { SquaredButton } from '../../components/SquaredButton'
+import { Overlay } from '../../overlay'
 import { SettingsPage } from './SettingsPage'
 import styles from './UserSettings.module.scss'
 
 export interface UserSettingsProps {
   dappletName: string
   registryUrl: string
-  modules?: any
-  overlays?: any
-  navigation?: any
+  modules?: any[]
+  overlays?: Overlay[]
+  navigation?: NavigateFunction
 }
 
 export const UserSettings = ({
@@ -33,40 +35,24 @@ export const UserSettings = ({
       setLoad(true)
       setSettingsContext(null)
       const { getUserSettingsForOverlay } = await initBGFunctions(browser)
-      console.log('~ registryUrl', registryUrl)
-      console.log('~ dappletName', dappletName)
-
       const { mi, vi, schemaConfig, defaultConfig } = await getUserSettingsForOverlay(
         registryUrl,
         dappletName
       )
-
-      console.log('~ mi', mi)
-      console.log('~ vi', vi)
-      console.log('~ schemaConfig', schemaConfig)
-      console.log('~ defaultConfig', defaultConfig)
-
       setSettingsContext({ mi, vi, schemaConfig, defaultConfig })
     }
     init()
   }, [dappletName, registryUrl])
 
   const onOpenDappletAction = async (f: ManifestAndDetails) => {
-    console.log('$$$ f', f)
-    console.log('$$$ overlays', overlays)
     if (!overlays.length) {
       const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
       const tab = await getCurrentTab()
-      console.log('$$$ tab', tab)
       if (!tab) return
       await openDappletAction(f.name, tab.id)
     } else {
-      overlays
-        .filter((x) => x.source === f.name)
-        .map((x) => {
-          console.log('$$$ x', x)
-          return navigation!(`/${f.name}/${x.id}`)
-        })
+      const overlayToOpen = overlays.find((overlay) => overlay.source === f.name)
+      navigation?.(`/${f.name}/${overlayToOpen.id}`)
     }
   }
 
@@ -78,7 +64,6 @@ export const UserSettings = ({
       <div className={cn(styles.wrapperCard)}>
         <div className={cn(styles.leftBlock)}>
           <DappletImage storageRef={mi.icon} className={styles.imgBlock} />
-
           <DappletTitle
             className={styles.title}
             isShowDescription={false}
@@ -97,7 +82,6 @@ export const UserSettings = ({
           </div>
         )}
       </div>
-
       <SettingsPage
         isLoad={isLoad}
         setLoad={setLoad}

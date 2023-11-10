@@ -186,10 +186,7 @@ export class Core {
     eventDef?: EventDef<any>
   ): OverlayConnection<T | any> {
     cfg.source = this.manifest.name
-    console.log('^^^ cfg.source', cfg.source)
     cfg.module = { name: this.manifest.name, registryUrl: this.manifest.registryUrl }
-    console.log('^^^ cfg.module', cfg.module)
-
     if (cfg.name) {
       const overlay = this.manifest.overlays?.[cfg.name]
       if (!overlay) throw new Error(`Cannot find overlay with name "${cfg.name}" in the manifest.`)
@@ -220,7 +217,6 @@ export class Core {
         }
       }
     }
-    console.log('^^^ cfg', cfg)
 
     const _overlay = this.overlayManager.createOverlay({
       url: cfg.url,
@@ -229,7 +225,6 @@ export class Core {
       module: cfg.module,
       registryUrl: cfg.module.registryUrl,
     })
-    console.log('!!! _overlay', _overlay)
     const conn = new Connection<T>(_overlay, eventDef)
     const overridedConn: OverlayConnection<T> = Object.assign(conn, {
       // ToDo: looks like a bug
@@ -250,7 +245,6 @@ export class Core {
         return overridedConn
       },
     })
-    console.log('!!! overridedConn', overridedConn)
     return overridedConn
   }
 

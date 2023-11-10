@@ -979,25 +979,16 @@ export default class FeatureService {
   }
 
   public async getUserSettingsForOverlay(registryUrl: string, moduleName: string) {
-    console.log('# registryUrl', registryUrl)
-    console.log('# moduleName', moduleName)
     const mi = await this.getModuleInfoByName(registryUrl, moduleName)
-    console.log('# mi', mi)
     const versions = await this.getVersions(registryUrl, moduleName)
-    console.log('# versions', versions)
     const version = versions.sort(rcompare)[0] // Last version by SemVer
-    console.log('# version', version)
     const vi = await this._registryAggregatorService.getVersionInfo(
       mi.name,
       DEFAULT_BRANCH_NAME,
       version
     )
-    console.log('# vi', vi)
     const dist = await this._moduleManagerService.loadModule(vi)
-    console.log('# dist', dist)
     const configRegistries = await this._globalConfigService.getRegistries()
-    console.log('# configRegistries', configRegistries)
-
     return {
       mi: {
         ...mi,
