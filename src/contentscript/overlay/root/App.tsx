@@ -539,23 +539,14 @@ class _App extends React.Component<AppProps, AppState> {
   render() {
     const p = this.props
     const s = this.state
-
     const overlays = this.getOverlays()
     // TODO: naming wallets is the notification
-    console.log('this.props.location', this.props.location)
     const { pathname } = this.props.location!
-    console.log('pathname', pathname)
-
     const activeTabId = pathname.split('/')[1]
     const activeTabMenuId = pathname.split('/')[2]
-
     const tab = this.getTabs().find((x) => x.id === activeTabId)
-    console.log('tab', tab)
     const menu = tab?.menus.find((x) => x.id === activeTabMenuId)
-    console.log('menu', menu)
-
     const systemPopups = overlays.filter((x) => x.isSystemPopup)
-
     return (
       <>
         <SystemPopup bus={p.systemPopupEventBus} />
