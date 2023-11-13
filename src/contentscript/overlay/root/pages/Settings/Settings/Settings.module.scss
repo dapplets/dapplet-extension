@@ -9,7 +9,8 @@
 
   width: 100%;
   height: 100%;
-  padding: 25px 15px 0 16px;
+
+  padding: 10px;
 
   -ms-overflow-style: none;
 }
@@ -26,10 +27,10 @@
   display: flex;
   justify-content: space-around;
   width: 100%;
-  padding: 0 60px 25.5px;
+  padding: 6px 60px 16px;
 }
 
-.titleTokenomics{
+.titleTokenomics {
   padding: 25px 75px 25.5px;
   background: $overlay-bg;
 }
@@ -47,7 +48,8 @@
   flex-direction: column;
 
   width: 100%;
-  height: calc(100% - 90px);
+
+  height: 100%;
 }
 
 .scrollBlock {
@@ -59,16 +61,19 @@
   flex-direction: column;
 
   width: 100%;
-  height: calc(100% - 120px);
-  padding: 15px 0 0 15px;
 
+  height: 100%;
+
+  padding-top: 12px;
+  padding-left: 5px;
+  padding-bottom: 22px;
   &::-webkit-scrollbar {
     cursor: pointer;
     width: 4px;
   }
 
   &::-webkit-scrollbar-track {
-    margin-bottom: 13px;
+    margin-bottom: 38px;
     background: rgb(244 244 244);
     background: linear-gradient(
       90deg,
@@ -81,7 +86,6 @@
   &::-webkit-scrollbar-thumb {
     width: 4px;
     height: 2px;
-    margin-bottom: 13px;
 
     background: $primary;
     border-radius: 2px;
@@ -145,7 +149,7 @@
   // todo: removed when checkox will be more 2
   width: 80%;
 
-    // todo: uncommented when checkox will be more 2
+  // todo: uncommented when checkox will be more 2
   // width: 100%;
   padding: 0 50px 0 0;
 }
@@ -206,10 +210,10 @@
   background-image: url('../../../assets/svg/loaderSettings.svg');
 }
 
-.deleteUserAgentName{
+.deleteUserAgentName {
   cursor: pointer;
 
-  &:hover{
+  &:hover {
     transform: scale(1.5);
   }
 }
