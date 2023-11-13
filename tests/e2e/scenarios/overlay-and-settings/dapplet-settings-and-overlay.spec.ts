@@ -352,3 +352,79 @@ test('should open dapplet settings after its overlay opening and go back to the 
   await expect(page.getByTestId('dapplet-overlay-wrapper')).toBeVisible()
   await expect(page.getByTestId('dapplet-title')).toContainText(dappletTitle)
 })
+
+// ToDo: qase 80
+
+test('should check that Home button triggers Core.onAction() method but not just opens the dapplet overlay', async ({
+  page,
+  skipOnboarding,
+  enableDevMode,
+  enableDevServer,
+}) => {
+  const dappletId = 'home-action-button'
+  const overlay = new Overlay(page)
+  const dapplets = new Dapplets(page)
+
+  await page.goto('/')
+  await overlay.goto()
+  await skipOnboarding()
+  await enableDevMode()
+  await enableDevServer(devServerUrl)
+  await overlay.clickToggle()
+  await dapplets.activateDapplet(dappletId)
+
+  await dapplets.openOverlayFromDappletsList(dappletId)
+  await expect(
+    page.getByTestId('dapplet-overlay-wrapper').frameLocator('iframe').locator('#root')
+  ).toContainText('10000')
+
+  await page.locator('.dapplet-widget').locator(':scope > *').first().click()
+  await expect(
+    page.getByTestId('dapplet-overlay-wrapper').frameLocator('iframe').locator('#root')
+  ).toContainText('Counter: ')
+
+  await overlay.goto()
+
+  await dapplets.openOverlayFromDappletsList(dappletId)
+  await expect(
+    page.getByTestId('dapplet-overlay-wrapper').frameLocator('iframe').locator('#root')
+  ).toContainText('10000')
+})
+
+// ToDo: qase 81
+
+test('should check that Home button in dapplet setting tab must just open the dapplet overlay', async ({
+  page,
+  skipOnboarding,
+  enableDevMode,
+  enableDevServer,
+}) => {
+  const dappletId = 'home-action-button'
+  const overlay = new Overlay(page)
+  const dapplets = new Dapplets(page)
+
+  await page.goto('/')
+  await overlay.goto()
+  await skipOnboarding()
+  await enableDevMode()
+  await enableDevServer(devServerUrl)
+  await overlay.clickToggle()
+  await dapplets.activateDapplet(dappletId)
+
+  await dapplets.openOverlayFromDappletsList(dappletId)
+  await expect(
+    page.getByTestId('dapplet-overlay-wrapper').frameLocator('iframe').locator('#root')
+  ).toContainText('10000')
+
+  await page.locator('.dapplet-widget').locator(':scope > *').first().click()
+  await expect(
+    page.getByTestId('dapplet-overlay-wrapper').frameLocator('iframe').locator('#root')
+  ).toContainText('Counter: ')
+
+  await page.getByTestId('dapplet-overlay-wrapper').locator('[title=Settings]').click()
+
+  await page.getByTestId('dapplet-settings-wrapper').locator('[title=Home]').click()
+  await expect(
+    page.getByTestId('dapplet-overlay-wrapper').frameLocator('iframe').locator('#root')
+  ).toContainText('Counter: ')
+})
