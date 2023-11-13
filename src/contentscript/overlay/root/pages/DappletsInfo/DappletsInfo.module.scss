@@ -14,8 +14,7 @@
   flex-direction: column;
 
   width: 100%;
-  // todo: padding
-  // height: calc(100vh - 130px);
+
   height: calc(100vh - 100px);
   padding-bottom: 10px;
   -ms-overflow-style: none;
@@ -451,7 +450,7 @@
   height: 20px;
   margin: 0 auto;
 
-  background-image: url("../../assets/svg/loaderSettings.svg");
+  background-image: url('../../assets/svg/loaderSettings.svg');
   background-repeat: no-repeat;
   background-position-x: center;
 }
@@ -547,7 +546,6 @@
   background: $app-bg;
   border: 1px solid $stroke-color;
   border-radius: 5px;
-
 }
 
 .blockContextTitle {
@@ -584,11 +582,10 @@
   &:hover {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' viewBox='0 0 6 6' fill='none'%3E%3Cpath d='M5.09409 0.083313L2.99992 2.17748L0.905752 0.083313L0.083252 0.905813L2.17742 2.99998L0.083252 5.09415L0.905752 5.91665L2.99992 3.82248L5.09409 5.91665L5.91658 5.09415L3.82242 2.99998L5.91658 0.905813L5.09409 0.083313Z' fill='%23747376'/%3E%3C/svg%3E");
   }
- 
 }
 
 .addContext {
-  cursor: pointer!important;
+  cursor: pointer !important;
 
   display: flex;
   align-items: center;
@@ -603,18 +600,18 @@
   font-size: 10px;
   font-weight: 400;
   line-height: 100%;
-  color: #fff!important;
+  color: #fff !important;
   text-transform: uppercase;
 
-  background: $primary!important;
+  background: $primary !important;
   border-radius: 4px;
 
   &:hover {
-    background: $primary-hover!important;
+    background: $primary-hover !important;
   }
 
   &:active {
-    background: $primary-pressed!important;
+    background: $primary-pressed !important;
   }
 }
 
@@ -662,7 +659,7 @@
   background-position-x: center;
 }
 
-.addcontextDelete{
+.addcontextDelete {
   cursor: pointer;
 
   display: block;

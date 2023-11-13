@@ -9,9 +9,8 @@
 
   width: 100%;
   height: 100%;
-  // todo: padding
+
   padding: 10px;
-  // padding: 25px 15px 0 16px;
 
   -ms-overflow-style: none;
 }
@@ -31,7 +30,7 @@
   padding: 6px 60px 16px;
 }
 
-.titleTokenomics{
+.titleTokenomics {
   padding: 25px 75px 25.5px;
   background: $overlay-bg;
 }
@@ -49,8 +48,7 @@
   flex-direction: column;
 
   width: 100%;
-  // height: calc(100% - 90px);
-    // todo: padding
+
   height: 100%;
 }
 
@@ -63,10 +61,9 @@
   flex-direction: column;
 
   width: 100%;
-  // height: calc(100% - 120px);
-   // todo: padding
-   height: 100%;
-  // padding: 15px 0 0 15px;
+
+  height: 100%;
+
   padding-top: 12px;
   padding-left: 5px;
   padding-bottom: 22px;
@@ -89,7 +86,6 @@
   &::-webkit-scrollbar-thumb {
     width: 4px;
     height: 2px;
- 
 
     background: $primary;
     border-radius: 2px;
@@ -153,7 +149,7 @@
   // todo: removed when checkox will be more 2
   width: 80%;
 
-    // todo: uncommented when checkox will be more 2
+  // todo: uncommented when checkox will be more 2
   // width: 100%;
   padding: 0 50px 0 0;
 }
@@ -214,10 +210,10 @@
   background-image: url('../../../assets/svg/loaderSettings.svg');
 }
 
-.deleteUserAgentName{
+.deleteUserAgentName {
   cursor: pointer;
 
-  &:hover{
+  &:hover {
     transform: scale(1.5);
   }
 }
