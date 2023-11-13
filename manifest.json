@@ -67,6 +67,6 @@
       "matches": ["*://*/*"]
     }
   ],
-  "permissions": ["tabs", "activeTab", "storage", "unlimitedStorage", "scripting", "offscreen"],
+  "permissions": ["tabs", "activeTab", "storage", "unlimitedStorage", "offscreen"],
   "host_permissions": ["*://localhost/*", "http://*/*", "https://*/*"]
 }
