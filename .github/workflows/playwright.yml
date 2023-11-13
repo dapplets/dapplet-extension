@@ -18,7 +18,7 @@ jobs:
       - name: Install test dependencies
         run: npm run install:modules:server-interaction
       - name: Install test overlay dependencies
-        run: npm run install:test-overlay
+        run: npm run install:test-overlays
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Build extension
