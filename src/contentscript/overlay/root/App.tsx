@@ -267,6 +267,7 @@ class _App extends React.Component<AppProps, AppState> {
       const existingTab = tabs.find((x) => x.id === internalTab.id)
 
       if (existingTab) {
+        existingTab.title = internalTab.title
         for (const menu of internalTab.menus) {
           if (!existingTab.menus.find((x) => x.id === menu.id)) {
             existingTab.menus.push(menu)
