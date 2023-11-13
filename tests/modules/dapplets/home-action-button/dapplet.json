@@ -1,0 +1,19 @@
+{
+  "name": "home-action-button",
+  "branch": "default",
+  "version": "0.1.0",
+  "type": "FEATURE",
+  "title": "Home Action Button Tester",
+  "description": "",
+  "main": "build/index.js",
+  "icon": "src/example.png",
+  "contextIds": [
+    "test-virtual-adapter"
+  ],
+  "overlays": {
+    "overlay": "http://localhost:8082"
+  },
+  "dependencies": {
+    "test-virtual-adapter": "0.1.0"
+  }
+}

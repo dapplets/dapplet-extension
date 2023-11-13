@@ -18,10 +18,11 @@
     "stylelint": "stylelint ./src/**/*.{css,scss,module.scss} --fix",
     "modules": "cd tests/modules && webpack serve --config webpack.config.js",
     "modules:server-interaction": "cd tests/modules/servers/server-interaction && npm run start",
-    "postinstall": "patch-package && npm run install:modules:server-interaction && npm run install:test-overlay",
+    "postinstall": "patch-package && npm run install:modules:server-interaction && npm run install:test-overlays",
     "install:modules:server-interaction": "cd tests/modules/servers/server-interaction && npm i",
-    "install:test-overlay": "cd tests/modules/overlays/twitter-demo-overlay && npm i",
+    "install:test-overlays": "concurrently -c \"yellow,blue\" -n \"overlay-1,overlay-2\" \"cd tests/modules/overlays/twitter-demo-overlay && npm i\" \"cd tests/modules/overlays/overlay && npm i\"",
     "start:test-overlay": "cd tests/modules/overlays/twitter-demo-overlay && npm start",
+    "start:test-overlay-2": "cd tests/modules/overlays/overlay && npm start",
     "test:overlay,settings": "playwright test tests/e2e/scenarios/overlay-and-settings"
   },
   "devDependencies": {

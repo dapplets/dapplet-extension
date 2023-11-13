@@ -33,5 +33,10 @@ export default {
       port: 8080,
       reuseExistingServer: !process.env.CI,
     },
+    {
+      command: 'npm run start:test-overlay-2',
+      port: 8082,
+      reuseExistingServer: !process.env.CI,
+    },
   ],
 }
