@@ -1,18 +1,13 @@
 @import '../../../assets/styles/fonts';
 @import '../../../assets/styles/color.variables';
 @import '../../../assets/styles/null';
+@import '../../../assets/styles/pages';
 @import './adaptive';
 
 .wrapper {
-  overflow: hidden;
-  overflow: -moz-scrollbars-none;
-
-  width: 100%;
   height: 100%;
 
   padding: 10px;
-
-  -ms-overflow-style: none;
 }
 
 .wrapperTokenomics {

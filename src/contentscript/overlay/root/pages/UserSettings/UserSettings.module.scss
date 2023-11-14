@@ -1,7 +1,7 @@
 @import '../../assets/styles/null';
 @import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
-
+@import '../../assets/styles/pages';
 /* Segoe UI Regular */
 @font-face {
   font-family: SegoeUIRegular, sans-serif;
@@ -13,9 +13,6 @@
 }
 
 .wrapper {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
   margin-top: 25px;
 }
 

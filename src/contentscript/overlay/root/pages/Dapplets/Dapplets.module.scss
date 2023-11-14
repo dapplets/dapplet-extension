@@ -1,9 +1,9 @@
 @import '../../assets/styles/color.variables';
 @import '../../assets/styles/null';
+@import '../../assets/styles/pages';
 @import './adaptive';
 
 .wrapper {
-  display: flex;
   align-items: center;
   justify-content: end;
   margin-bottom: 5px;
