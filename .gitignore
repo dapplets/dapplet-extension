@@ -3,10 +3,6 @@ build
 secrets.*.js
 dist
 lib
-cypress/screenshots
-cypress/videos
-cypress/downloads
-cypress/reports
 .env
 .DS_Store
 /test-results/

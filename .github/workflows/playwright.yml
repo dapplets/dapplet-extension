@@ -15,10 +15,6 @@ jobs:
           node-version: 18
       - name: Install dependencies
         run: npm ci
-      - name: Install test dependencies
-        run: npm run install:modules:server-interaction
-      - name: Install test overlay dependencies
-        run: npm run install:test-overlay
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Build extension
