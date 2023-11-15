@@ -12,7 +12,7 @@ export const DappletTitle: FC<DappletTitleProps> = (props: DappletTitleProps) =>
   const { title, children, className } = props
 
   return (
-    <div className={cn(styles.BlockTitleCard)}>
+    <div className={cn(styles.BlockTitleCard)} data-testid="dapplet-title">
       <h2 className={cn(styles.titleCard, className)}>{title}</h2>
 
       {children}

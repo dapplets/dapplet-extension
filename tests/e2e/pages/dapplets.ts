@@ -30,4 +30,28 @@ export class Dapplets {
       return text.includes(dappletName) && text.includes('is unloaded')
     })
   }
+
+  async openSettingsFromDappletsList(dappletName: string) {
+    this.overlay.getByTestId(dappletName).locator('[title=Settings]').click()
+  }
+
+  async openOverlayFromDappletsList(dappletName: string) {
+    this.overlay.getByTestId(dappletName).locator('[title=Home]').click()
+  }
+
+  async openSettingsFromToolbar(dappletTitle: string) {
+    await this.overlay.getByTestId('toolbar-show').locator(`[title="${dappletTitle}"]`).click()
+    this.overlay
+      .getByTestId('toolbar-show')
+      .locator(`[title="${dappletTitle}"] [title="Dapplet settings"]`)
+      .click()
+  }
+
+  async openOverlayFromToolbar(dappletTitle: string) {
+    await this.overlay.getByTestId('toolbar-show').locator(`[title="${dappletTitle}"]`).click()
+    this.overlay
+      .getByTestId('toolbar-show')
+      .locator(`[title="${dappletTitle}"] [title="Dapplet overlay"]`)
+      .click()
+  }
 }

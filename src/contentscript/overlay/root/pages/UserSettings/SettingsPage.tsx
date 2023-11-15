@@ -157,7 +157,9 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
                 <h3 className={styles.cardTitle}>{mi.title}</h3>
                 <h3 className={styles.cardType}>{mi.type}</h3>
                 <div className={styles.cardDescription}>{mi.description}</div>
-                <div className={styles.cardName}>{mi.name}</div>
+                <div className={styles.cardName} data-testid="dapplet-settings-id">
+                  {mi.name}
+                </div>
                 <div className={styles.blockInfo}>
                   <div className={styles.cardOwner}>
                     version:

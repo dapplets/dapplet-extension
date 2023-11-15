@@ -989,7 +989,6 @@ export default class FeatureService {
     )
     const dist = await this._moduleManagerService.loadModule(vi)
     const configRegistries = await this._globalConfigService.getRegistries()
-
     return {
       mi: {
         ...mi,
