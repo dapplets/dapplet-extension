@@ -24,6 +24,12 @@
   border: 0;
 
   -webkit-tap-highlight-color: rgb(255 255 255 / 0%);
+  
+  
+}
+
+#root {
+  font-family: Selawik, sans-serif;
 }
 
 .dapplets-overlay-collapsed {

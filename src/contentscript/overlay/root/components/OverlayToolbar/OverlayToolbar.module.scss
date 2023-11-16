@@ -334,7 +334,7 @@
 
     max-width: 90%;
 
-    font-family: Selawik, sans-serif;
+      
     font-size: 14px;
     font-weight: 400;
     line-height: 149%;
@@ -357,6 +357,7 @@
   height: max-content;
   min-height: 29px;
   margin-bottom: 10px;
+
   // padding: 5px;
 
   background: #fff;
@@ -405,7 +406,7 @@
 
     max-width: 90%;
 
-    font-family: Selawik, sans-serif;
+      
     font-size: 14px;
     font-weight: 400;
     line-height: 149%;
@@ -465,8 +466,8 @@
 .iconNotification {
   width: 16px;
   height: 16px;
-  margin-right: 5px;
   margin-top: -2px;
+  margin-right: 5px;
 }
 
 .titleNotificationWrapper {
@@ -475,19 +476,20 @@
 
 .titleNotificationWrapperTeaser {
   cursor: pointer;
-  padding: 2px 5px 0px 5px;
+
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
 
   width: 100%;
+  padding: 2px 5px 0;
 }
 
 .titleNotification {
   display: flex;
   flex-direction: column;
 
-  font-family: Selawik, sans-serif;
+    
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
@@ -502,7 +504,7 @@
 
   width: 132px;
 
-  font-family: Selawik, sans-serif;
+    
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
@@ -515,8 +517,9 @@
   display: block;
 
   width: 100%;
+  padding: 0 5px 5px;
 
-  font-family: Selawik, sans-serif;
+    
   font-size: 12px;
   font-weight: 400;
   line-height: 18px;
@@ -524,7 +527,6 @@
   text-align: left;
   letter-spacing: 0;
   word-wrap: break-word;
-  padding: 0px 5px 5px 5px;
 }
 
 .buttonNotificationBlock {
@@ -546,7 +548,7 @@
   height: 20px;
   margin-right: 10px;
 
-  font-family: Selawik, sans-serif;
+    
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
@@ -717,7 +719,7 @@
 .showMore {
   cursor: pointer;
 
-  font-family: Selawik, sans-serif;
+    
   font-size: 12px;
   font-weight: 400;
   line-height: 149%;

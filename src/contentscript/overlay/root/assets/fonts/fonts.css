@@ -3,9 +3,8 @@
   font-weight: 400;
   font-style: normal;
   font-display: swap;
-  src: url('../fonts/Selawik.woff') format('woff'), url('../fonts/Selawik.woff2') format('woff2') ;
-  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F,
-    U+FE2E-FE2F;
+  src: url('../fonts/Selawik.woff2') format('woff2'), url('../fonts/Selawik.woff') format('woff');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
 
 @font-face {
@@ -13,9 +12,9 @@
   font-weight: 700;
   font-style: normal;
   font-display: swap;
-  src: url('../fonts/SelawikBold.woff') format('woff'), url('../fonts/SelawikBold.woff2') format('woff2') ;
-  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F,
-    U+FE2E-FE2F;
+  src: url('../fonts/SelawikBold.woff2') format('woff2'),
+    url('../fonts/SelawikBold.woff') format('woff');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
 
 @font-face {
@@ -23,9 +22,9 @@
   font-weight: 600;
   font-style: normal;
   font-display: swap;
-  src: url('../fonts/SelawikSB.woff') format('woff'), url('../fonts/SelawikSB.woff2') format('woff2') ;
-  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F,
-    U+FE2E-FE2F;
+  src: url('../fonts/SelawikSB.woff2') format('woff2'),
+    url('../fonts/SelawikSB.woff') format('woff');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
 
 @font-face {
@@ -33,9 +32,9 @@
   font-weight: 300;
   font-style: normal;
   font-display: swap;
-  src: url('../fonts/SelawikLight.woff') format('woff'), url('../fonts/SelawikLight.woff') format('woff2') ;
-  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F,
-    U+FE2E-FE2F;
+  src: url('../fonts/SelawikLight.woff') format('woff2'),
+    url('../fonts/SelawikLight.woff') format('woff');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
 
 @font-face {
@@ -43,9 +42,7 @@
   font-weight: 100;
   font-style: normal;
   font-display: swap;
-  src: url('../fonts/SelawikThin.woff') format('woff'), url('../fonts/SelawikThin.woff') format('woff2') ;
-  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F,
-    U+FE2E-FE2F;
+  src: url('../fonts/SelawikThin.woff') format('woff2'),
+    url('../fonts/SelawikThin.woff') format('woff');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
-
-

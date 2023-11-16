@@ -14,7 +14,7 @@ header {
 
     margin-bottom: 6px;
 
-    font-family: Selawik, sans-serif;
+      
     font-size: 14px;
     font-weight: 400;
     line-height: 149%;
@@ -26,7 +26,6 @@ svg {
 }
 
 div{
-    font-family: Selawik, sans-serif;
     font-size: 12px;
     font-weight: 400;
     font-style: normal;
@@ -35,7 +34,6 @@ div{
 }
 
 a{
-    font-family: Selawik, sans-serif;
     font-size: 12px;
     font-weight: 400;
     font-style: normal;
