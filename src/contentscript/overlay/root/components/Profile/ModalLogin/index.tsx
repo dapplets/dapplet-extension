@@ -5,8 +5,8 @@ import React, { useState } from 'react'
 import browser from 'webextension-polyfill'
 import * as walletIcons from '../../../../../../common/resources/wallets'
 import { DefaultSigners, WalletDescriptor } from '../../../../../../common/types'
-import { ReactComponent as Copy } from '../../../assets/svg/copyModal.svg'
-import { ReactComponent as Disconnect } from '../../../assets/svg/logOut.svg'
+// import { ReactComponent as Copy } from '../../../assets/svg/copyModal.svg'
+import { ReactComponent as Disconnect } from '../../../assets/svg/unlink.svg'
 import { ReactComponent as WalletImg } from '../../../assets/svg/wallet.svg'
 import { truncateEthAddress } from '../../../helpers/truncateEthAddress'
 import useCopied from '../../../hooks/useCopyed'
@@ -148,10 +148,12 @@ export const ModalLogin = ({
                       {x.type !== 'near' ? (
                         <p title={x.account} className={styles.newProfileBlockName}>
                           {truncateEthAddress(x.account)}
+                         
                         </p>
                       ) : (
                         <p title={x.account} className={styles.newProfileBlockNameNear}>
                           {x.account}
+                         
                         </p>
                       )}
 
@@ -165,7 +167,7 @@ export const ModalLogin = ({
                     </div>
                   ) : null}
                 </div>
-                <div
+                {/* <div
                   onClick={() => {
                     setValue(x.account)
                     setTimeout(() => {
@@ -177,7 +179,7 @@ export const ModalLogin = ({
                   <span>
                     <Copy />
                   </span>
-                </div>
+                </div> */}
                 <div className={styles.profileImgButtonBlock}>
                   <button
                     onClick={() => disconnectButtonClick(x.chain, x.type)}
