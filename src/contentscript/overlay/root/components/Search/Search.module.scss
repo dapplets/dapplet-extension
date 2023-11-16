@@ -4,14 +4,7 @@
 @import '../../assets/styles/animate';
 @import './adaptive';
 
-@font-face {
-  font-family: SegoeUIRegular, sans-serif;
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-  src: url('../../assets/fonts/SegoeUI.woff') format('woff');
-  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
+
 
 .wrapper {
   position: relative;
@@ -19,7 +12,7 @@
   display: flex;
   align-items: center;
 
-  font-family: Roboto, sans-serif;
+  font-family: Selawik, sans-serif;
 
   border: 1px solid $stroke-color;
   border-radius: 4px;
@@ -154,7 +147,7 @@
   height: 100%;
   padding: 0 30px 0 10px;
 
-  font-family: SegoeUIRegular, sans-serif;
+  font-family: Selawik, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 16px;

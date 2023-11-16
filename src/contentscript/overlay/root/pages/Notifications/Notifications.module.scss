@@ -3,15 +3,7 @@
 @import '../../assets/styles/null';
 @import './adaptive';
 
-// ToDo: code duplication
-@font-face {
-  font-family: SegoeUIRegular, sans-serif;
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-  src: url('../../assets/fonts/Segoe_UI.ttf') format('ttf');
-  // unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
+
 .wrapper {
   overflow: hidden;
   overflow: -moz-scrollbars-none;
@@ -98,7 +90,7 @@
 }
 
 .clearAll {
-  font-family: Roboto, sans-serif;
+  font-family: Selawik, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
@@ -136,7 +128,7 @@
 
   color: $main-black;
   /* InApp/InApp-H2 */
-  font-family: Roboto;
+  font-family: Selawik;
   font-size: 16px;
   font-style: normal;
   font-weight: 700;
@@ -179,7 +171,7 @@
   margin: 0;
   padding: 0;
   margin-left: auto;
-  font-family: SegoeUIRegular, sans-serif;
+  font-family: Selawik, sans-serif;
   font-size: 14px;
   font-style: normal;
   font-weight: 400;
@@ -221,7 +213,7 @@
   height: 100%;
   padding-top: 50px;
 
-  font-family: SegoeUIRegular, sans-serif;
+  font-family: Selawik, sans-serif;
   font-size: 36px;
   font-weight: 400;
   line-height: 149%;

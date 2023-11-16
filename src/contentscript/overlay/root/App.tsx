@@ -1,5 +1,3 @@
-import '@fontsource/montserrat'
-import '@fontsource/roboto'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import TimeAgo from 'javascript-time-ago'

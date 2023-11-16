@@ -1,5 +1,5 @@
 @import '../../../assets/styles/null';
-@import '../../../assets/styles/fonts';
+@import '../../../assets/fonts/fonts.css';
 @import '../../../assets/styles/color.variables';
 
 .root {
@@ -11,7 +11,7 @@
   margin-top: 10px;
   margin-left: 10px;
 
-  font-family: Roboto, sans-serif;
+  font-family: Selawik, sans-serif;
   font-size: 14px;
   line-height: 16px;
   color: $pure-black;
@@ -22,7 +22,7 @@
   margin: 10px;
   padding: 5px 13px;
 
-  font-family: Roboto, sans-serif;
+  font-family: Selawik, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
