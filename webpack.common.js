@@ -37,7 +37,7 @@ function handleInsertStyles(element) {
     panel.attachShadow({ mode: 'open' })
 
     const container = document.createElement('div')
-    container.id = 'app'
+    container.id = 'dapplets-overlay-react-app'
 
     // Add style tag to shadow host
     panel.shadowRoot.appendChild(element)
