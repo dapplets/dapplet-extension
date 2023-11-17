@@ -1,5 +1,4 @@
 @import '../../../assets/styles/null';
-@import '../../../assets/styles/fonts';
 @import '../../../assets/styles/color.variables';
 @import '../../../assets/styles/animate';
 
@@ -92,7 +91,7 @@
 
   margin-top: 12px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 16px;
   font-weight: 400;
   font-style: normal;
@@ -161,8 +160,10 @@
 .newProfileBlockInfo {
   display: flex;
   align-items: center;
+
   // width: 80%;
   width: 148px;
+
   // padding-left: 5px;
   margin-left: auto;
 }
@@ -179,22 +180,26 @@
   flex-direction: column;
   align-items: start;
   justify-content: center;
-width: 110px;
+
+  width: 110px;
+
   // width: 80%;
   padding-left: 10px;
 }
 
 .newProfileBlockName {
-  display: inline-block;
   overflow: hidden;
+  display: inline-block;
+
   width: 100%;
-  text-overflow: ellipsis;
+
   font-family: Roboto, sans-serif;
   font-size: 16px;
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
   color: $main-black;
+  text-overflow: ellipsis;
   text-transform: capitalize;
 }
 
@@ -263,7 +268,7 @@ width: 110px;
 
   width: 100%;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 16px;
   font-weight: 400;
   font-style: normal;
@@ -294,7 +299,7 @@ width: 110px;
 .AddUserLabel {
   display: inline-block;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 14px;
   font-weight: 400;
   font-style: normal;
@@ -334,7 +339,7 @@ width: 110px;
   width: auto;
   padding: 5px 10px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 14px;
   font-weight: 400;
   font-style: italic;

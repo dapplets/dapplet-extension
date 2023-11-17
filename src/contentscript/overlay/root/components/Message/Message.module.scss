@@ -1,5 +1,4 @@
 @import "../../assets/styles/null";
-@import "../../assets/styles/fonts";
 @import "../../assets/styles/color.variables";
 
 .wrapper {
@@ -11,7 +10,7 @@
   width: 100%;
   height: 100%;
 
-  font-family: Roboto, sans-serif;
+    
 }
 
 
@@ -24,7 +23,7 @@
 .title {
   padding: 0 0 4px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 22px;
   font-weight: 700;
   line-height: 26px;
@@ -42,7 +41,7 @@
 
   padding: 0 20px 10px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
