@@ -1,5 +1,4 @@
 @import '../../../../assets/styles/null';
-@import '../../../../assets/fonts/fonts.css';
 @import '../../../../assets/styles/color.variables';
 
 .wrapper{
@@ -23,13 +22,13 @@
 
 .indicatorBlock{
     display: flex;
-align-items: center;
-justify-content: space-between;
+    align-items: center;
+    justify-content: space-between;
 
 
-width: 78px;
-height: 18px;
-padding: 4px;
+    width: 78px;
+    height: 18px;
+    padding: 4px;
 }
 
 .indicator{
@@ -39,9 +38,9 @@ padding: 4px;
     height: 10px;
 
     background: $stroke-color;
-border-radius: 50%; 
+    border-radius: 50%; 
 }
 
 .indicatorActive{
-background: $primary;
+    background: $primary;
 }
