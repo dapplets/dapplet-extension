@@ -81,7 +81,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
         await openDappletAction(f, tab.id)
         p.overlays.filter((x) => x.source === f).map((x) => p.navigate!(`/${f}/${x.id}`))
         if (p.isOverlayCollapsed) {
-          p.onToggleClick()
+          p.onToggleClick && p.onToggleClick()
         }
       } catch (err) {
         console.error(err)
@@ -89,7 +89,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     } else {
       p.onTabClick()
       if (p.isOverlayCollapsed) {
-        p.onToggleClick()
+        p.onToggleClick && p.onToggleClick()
       }
     }
   }
@@ -180,7 +180,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                   e.stopPropagation()
                   setMenuVisible(!menuVisible)
                   p.navigate(`/${p.id}/settings`)
-                  p.onToggleClick()
+                  p.onToggleClick && p.onToggleClick()
                 }}
               />
               <SquaredButton
@@ -252,20 +252,20 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                       // menu.id === 'dapplets' && setMenuVisible(!menuVisible)
 
                       if (p.pathname === '/system/dapplets') {
-                        p.onToggleClick()
+                        p.onToggleClick && p.onToggleClick()
                       } else {
                         //todo: uncomment when main menu will be works
                         // p.navigate('/system/dapplets')
                         //todo: remove when main menu will be works
 
-                        p.onToggleClick()
+                        p.onToggleClick && p.onToggleClick()
                       }
 
                       // menuVisible && setMenuVisible()
                     } else {
                       if (menu.id === 'dapplets') {
                         if (p.pathname === '/system/dapplets') {
-                          p.onToggleClick()
+                          p.onToggleClick && p.onToggleClick()
                         } else {
                           p.navigate('/system/dapplets')
                         }
