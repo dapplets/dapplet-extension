@@ -198,7 +198,10 @@ export const ContentItem = (props: IContentItemProps) => {
         </div>
       )}
 
-      <div style={{ display: loadingMode === LoadingMode.NotLoading ? undefined : 'none' }}>
+      <div
+        style={{ display: loadingMode === LoadingMode.NotLoading ? undefined : 'none' }}
+        data-testid="dapplet-overlay-wrapper"
+      >
         {activeModuleInfo && (
           <div className={cn(styles.wrapperCard)}>
             <div className={cn(styles.leftBlock)}>

@@ -14,6 +14,7 @@ export type OverlayConfig = {
   parent?: IOverlay
   module?: OverlaySourceModule
   isSystemPopup?: boolean
+  registryUrl?: string
 }
 
 export interface IOverlay extends IPubSub {

@@ -1,8 +1,8 @@
-@import "../../../assets/styles/null";
-@import "../../../assets/styles/fonts";
-@import "../../../assets/styles/color.variables";
-@import "../../../assets/styles/animate";
-@import "./adaptive";
+@import '../../../assets/styles/null';
+@import '../../../assets/styles/fonts';
+@import '../../../assets/styles/color.variables';
+@import '../../../assets/styles/animate';
+@import './adaptive';
 
 // ToDo: looks that the code below is duplicated
 
@@ -14,9 +14,10 @@
   flex-direction: column;
 
   width: 100%;
-  max-height: calc(100vh - 120px);
-  padding-bottom: 15px;
 
+  max-height: calc(100vh - 100px);
+
+  padding-bottom: 10px;
   -ms-overflow-style: none;
 }
 
@@ -44,13 +45,12 @@
 
   &::-webkit-scrollbar-track {
     background: rgb(244 244 244);
-    background:
-      linear-gradient(
-        90deg,
-        rgb(244 244 244 / 0%) 10%,
-        rgb(227 227 227 / 100%) 50%,
-        rgb(244 244 244 / 0%) 90%
-      );
+    background: linear-gradient(
+      90deg,
+      rgb(244 244 244 / 0%) 10%,
+      rgb(227 227 227 / 100%) 50%,
+      rgb(244 244 244 / 0%) 90%
+    );
   }
 
   &::-webkit-scrollbar-thumb {
@@ -210,7 +210,7 @@
   height: 20px;
   margin: 0 auto;
 
-  background-image: url("../../../assets/svg/loaderSettings.svg");
+  background-image: url('../../../assets/svg/loaderSettings.svg');
   background-repeat: no-repeat;
   background-position-x: center;
 }
@@ -224,7 +224,7 @@
   height: 31px;
   padding: 0 10px;
 
-  background-image: url("../../../assets/svg/loadAddLocalhost.svg");
+  background-image: url('../../../assets/svg/loadAddLocalhost.svg');
   background-repeat: no-repeat;
   border-radius: 4px;
 }

@@ -19,13 +19,12 @@ function modifyManifest(buffer) {
 function handleInsertStyles(element) {
   // ToDo: the same function is in common/helpers.ts
   const isE2ETestingEnvironment = (win) => {
-    // ToDo: find another way to determine Cypress
+    // ToDo: find another way to determine Cypress - ???????? - is it needed for PlayWright?
 
     try {
       // Reading of href can throw Error when cross-origin
       const href = win.location.href
 
-      if (href.indexOf('cypress') !== -1) return true
       if (href.indexOf('specs') !== -1) return true
       if (href.indexOf('localhost:55618') !== -1) return true
 

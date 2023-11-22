@@ -209,12 +209,9 @@ class _App extends React.Component<AppProps, AppState> {
   getTabs = (): ToolbarTab[] => {
     const overlays = this.getOverlays()
     const overlayGroups = groupBy(overlays, (x) => x.source)
-
     const tabs: ToolbarTab[] = [SYSTEM_TAB]
-
     for (const source in overlayGroups) {
       const group = overlayGroups[source].filter((x) => !x.isSystemPopup)
-
       // system legacy tab
       if (source === 'null') {
         for (const overlay of group) {
@@ -232,7 +229,6 @@ class _App extends React.Component<AppProps, AppState> {
               },
             ],
           }
-
           tabs.push(tab)
         }
       } else {
@@ -264,7 +260,6 @@ class _App extends React.Component<AppProps, AppState> {
             },
           ],
         }
-
         tabs.push(tab)
       }
     }
@@ -273,6 +268,7 @@ class _App extends React.Component<AppProps, AppState> {
       const existingTab = tabs.find((x) => x.id === internalTab.id)
 
       if (existingTab) {
+        existingTab.title = internalTab.title
         for (const menu of internalTab.menus) {
           if (!existingTab.menus.find((x) => x.id === menu.id)) {
             existingTab.menus.push(menu)
@@ -287,7 +283,8 @@ class _App extends React.Component<AppProps, AppState> {
   }
 
   getOverlays() {
-    return this.props.overlayManager.getOverlays().filter((x) => !x.parent)
+    const allOverlays = this.props.overlayManager.getOverlays()
+    return allOverlays.filter((x) => !x.parent)
   }
 
   handleCloseTabClick = async (tab: ToolbarTab) => {
@@ -361,7 +358,6 @@ class _App extends React.Component<AppProps, AppState> {
 
   handleUserSettingsClick = (mi: ManifestDTO) => {
     const tab = this.getTabs().find((x) => x.id === mi.name)
-
     if (!tab) {
       const internalTabs = [...this.state.internalTabs]
       internalTabs.push({
@@ -386,13 +382,11 @@ class _App extends React.Component<AppProps, AppState> {
       })
       this.setState({ internalTabs })
     }
-
     this.props.navigate!(`/${mi.name}/settings`)
   }
 
   getTabsForDapplet = (mi: ManifestDTO) => {
     const tab = this.getTabs().find((x) => x.id === mi.name)
-
     if (!tab) {
       const internalTabs = [...this.state.internalTabs]
       internalTabs.push({
@@ -547,19 +541,14 @@ class _App extends React.Component<AppProps, AppState> {
   render() {
     const p = this.props
     const s = this.state
-
     const overlays = this.getOverlays()
     // TODO: naming wallets is the notification
     const { pathname } = this.props.location!
-
     const activeTabId = pathname.split('/')[1]
     const activeTabMenuId = pathname.split('/')[2]
-
     const tab = this.getTabs().find((x) => x.id === activeTabId)
     const menu = tab?.menus.find((x) => x.id === activeTabMenuId)
-
     const systemPopups = overlays.filter((x) => x.isSystemPopup)
-
     return (
       <>
         <MultitablePanel
