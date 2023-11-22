@@ -160,22 +160,24 @@
 
 .buttonNotificationBlock {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
   justify-content: flex-start;
 
   width: 100%;
   margin-top: 5px;
+  margin-bottom: -6px;
 }
 
 .buttonNotification {
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
 
   min-width: 64px;
-  height: 20px;
   margin-right: 10px;
+  margin-bottom: 6px;
+  padding: 5px 12px;
 
     
   font-size: 14px;
@@ -185,7 +187,7 @@
 
   background-color: inherit;
   border: 1px solid $stroke-color;
-  border-radius: 8px;
+  border-radius: 99px;
 
   &:hover {
     opacity: 0.5;
