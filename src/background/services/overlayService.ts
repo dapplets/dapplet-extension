@@ -81,6 +81,7 @@ export class OverlayService {
       accountsToDisconnect,
       accountToChangeStatus,
       condition,
+      network,
     },
     tabId: number
   ) {
@@ -93,6 +94,7 @@ export class OverlayService {
         accountToChangeStatus,
         condition,
         loginRequest: 'yes',
+        network,
       },
       tabId,
       SystemOverlayTabs.CONNECTED_ACCOUNTS
