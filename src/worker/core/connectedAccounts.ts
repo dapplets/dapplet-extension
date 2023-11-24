@@ -1,6 +1,6 @@
 import makeBlockie from 'ethereum-blockies-base64'
 import { resources } from '../../common/resources'
-import { TConnectedAccountsVerificationRequestInfo } from '../../common/types'
+import { NearNetworks, TConnectedAccountsVerificationRequestInfo } from '../../common/types'
 import { initBGFunctions } from '../communication'
 
 interface IRequestVerificationProps {
@@ -37,54 +37,69 @@ class ConnectedAccounts {
   public async getConnectedAccounts(
     accountId: string,
     originId: string,
-    closeness?: number
+    closeness?: number,
+    network?: NearNetworks
   ): Promise<Account[][] | null> {
     const { getConnectedAccounts } = initBGFunctions()
-    return getConnectedAccounts(accountId, originId, closeness)
+    return getConnectedAccounts(accountId, originId, closeness, network)
   }
 
-  public async getMinStakeAmount(): Promise<number> {
+  public async getMinStakeAmount(network?: NearNetworks): Promise<number> {
     const { getConnectedAccountsMinStakeAmount } = initBGFunctions()
-    return getConnectedAccountsMinStakeAmount()
+    return getConnectedAccountsMinStakeAmount(network)
   }
 
-  public async getPendingRequests(): Promise<number[]> {
+  public async getPendingRequests(network?: NearNetworks): Promise<number[]> {
     const { getConnectedAccountsPendingRequests } = initBGFunctions()
-    return getConnectedAccountsPendingRequests()
+    return getConnectedAccountsPendingRequests(network)
   }
 
   public async getVerificationRequest(
-    id: number
+    id: number,
+    network?: NearNetworks
   ): Promise<TConnectedAccountsVerificationRequestInfo | null> {
     const { getConnectedAccountsVerificationRequest } = initBGFunctions()
-    return getConnectedAccountsVerificationRequest(id)
+    return getConnectedAccountsVerificationRequest(id, network)
   }
 
-  public async getStatus(accountId: string, originId: string): Promise<boolean> {
+  public async getStatus(
+    accountId: string,
+    originId: string,
+    network?: NearNetworks
+  ): Promise<boolean> {
     const { getConnectedAccountStatus } = initBGFunctions()
-    return getConnectedAccountStatus(accountId, originId)
+    return getConnectedAccountStatus(accountId, originId, network)
   }
 
-  public async getMainAccount(accountId: string, originId: string): Promise<string | null> {
+  public async getMainAccount(
+    accountId: string,
+    originId: string,
+    network?: NearNetworks
+  ): Promise<string | null> {
     const { getConnectedAccountsMainAccount } = initBGFunctions()
-    return getConnectedAccountsMainAccount(accountId, originId)
+    return getConnectedAccountsMainAccount(accountId, originId, network)
   }
 
   public async getRequestStatus(
-    id: number
+    id: number,
+    network?: NearNetworks
   ): Promise<'not found' | 'pending' | 'approved' | 'rejected'> {
     const { getConnectedAccountsRequestStatus } = initBGFunctions()
-    return getConnectedAccountsRequestStatus(id)
+    return getConnectedAccountsRequestStatus(id, network)
   }
 
-  public async areConnected(accountGId1: string, accountGId2: string): Promise<boolean> {
+  public async areConnected(
+    accountGId1: string,
+    accountGId2: string,
+    network?: NearNetworks
+  ): Promise<boolean> {
     const { areConnectedAccounts } = initBGFunctions()
-    return areConnectedAccounts(accountGId1, accountGId2)
+    return areConnectedAccounts(accountGId1, accountGId2, network)
   }
 
-  public async getNet(accountGId: string): Promise<string[] | null> {
+  public async getNet(accountGId: string, network?: NearNetworks): Promise<string[] | null> {
     const { getConnectedAccountsNet } = initBGFunctions()
-    return getConnectedAccountsNet(accountGId)
+    return getConnectedAccountsNet(accountGId, network)
   }
 
   // ***** CALL *****
@@ -104,7 +119,8 @@ class ConnectedAccounts {
     condition: {
       type: string
       [name: string]: string
-    }
+    },
+    network?: NearNetworks
   ): Promise<number> {
     if (!resources[firstOriginId] || !resources[secondOriginId]) {
       throw new Error(`Unsupported account type: ${firstOriginId} or ${secondOriginId}`)
@@ -125,8 +141,8 @@ class ConnectedAccounts {
           }
     )
 
-    const firstAccountStatus = await this.getStatus(firstAccountId, firstOriginId)
-    const secondAccountStatus = await this.getStatus(secondAccountId, secondOriginId)
+    const firstAccountStatus = await this.getStatus(firstAccountId, firstOriginId, network)
+    const secondAccountStatus = await this.getStatus(secondAccountId, secondOriginId, network)
 
     const { openConnectedAccountsPopup, getThisTab } = initBGFunctions()
     const thisTab = await getThisTab()
@@ -154,23 +170,27 @@ class ConnectedAccounts {
           result: !canConnect,
           original: condition,
         },
+        network,
       },
       thisTab.id
     )
     return canConnect && result ? result.requestId : -1
   }
 
-  public async changeStatus({
-    accountId,
-    originId,
-    accountImage,
-    isMain,
-  }: {
-    accountId: string
-    originId: string
-    accountImage: string
-    isMain: boolean
-  }): Promise<void> {
+  public async changeStatus(
+    {
+      accountId,
+      originId,
+      accountImage,
+      isMain,
+    }: {
+      accountId: string
+      originId: string
+      accountImage: string
+      isMain: boolean
+    },
+    network?: NearNetworks
+  ): Promise<void> {
     const { openConnectedAccountsPopup, getThisTab } = initBGFunctions()
     const thisTab = await getThisTab()
     const { requestId } = await openConnectedAccountsPopup(
@@ -182,7 +202,8 @@ class ConnectedAccounts {
           accountActive: isMain,
         },
       },
-      thisTab.id
+      thisTab.id,
+      network
     )
     return requestId
   }
