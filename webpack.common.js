@@ -75,6 +75,7 @@ module.exports = {
     sandbox: path.join(__dirname, 'src/sandbox/index.ts'),
     offscreen: path.join(__dirname, 'src/offscreen/index.ts'),
     popup: path.join(__dirname, 'src/popup/index.tsx'),
+    bos: path.join(__dirname, 'src/bos/index.tsx'),
   },
   output: {
     path: path.join(__dirname, 'build'),
@@ -115,6 +116,24 @@ module.exports = {
           'sass-loader',
         ],
         include: path.resolve(__dirname, 'src/contentscript'),
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          {
+            loader: 'style-loader',
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                auto: (resourcePath) => resourcePath.endsWith('.module.scss'),
+              },
+            },
+          },
+          'sass-loader',
+        ],
+        include: path.resolve(__dirname, 'src/bos'),
       },
       {
         test: /\.css$/,
@@ -172,6 +191,10 @@ module.exports = {
         {
           from: 'src/popup/index.html',
           to: 'popup.html',
+        },
+        {
+          from: 'src/bos/index.html',
+          to: 'bos.html',
         },
       ],
     }),

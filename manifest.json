@@ -60,6 +60,7 @@
       "resources": [
         "callback.html",
         "sandbox.html",
+        "bos.html",
         "inpage.js",
         "worker.js",
         "mnw-patch-inpage.js"
