@@ -12,9 +12,17 @@ import {
 import IconDefault from '../../assets/icons/notificationIcons/defaultIcon.svg'
 import { Notification } from '../../components/Notification'
 import styles from './Notifications.module.scss'
+
+const sortEvents = (events: Notify[]): Notify[] =>
+  events.sort(
+    (a, b) =>
+      (a.status === NotificationStatus.Highlighted ? 0 : 1) -
+        (b.status === NotificationStatus.Highlighted ? 0 : 1) ||
+      new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf()
+  )
+
 export const Notifications = () => {
   const [event, setEvent] = useState<Notify[]>([])
-
   const [load, setLoad] = useState(true)
   // const [isOlder, setOlder] = useState(false)
   const [count, setCount] = useState(8)
@@ -29,18 +37,17 @@ export const Notifications = () => {
   useEffect(() => {
     const init = async () => {
       const notifications = await getNotifications()
-      setEvent(notifications)
+      setEvent(sortEvents(notifications))
       setLoad(false)
       // checkUpdates()
     }
-    init()
-    return () => {}
+    load && init()
   }, [load])
 
   useEffect(() => {
     const handleUpdateNotifications = async () => {
       const notifications = await getNotifications()
-      setEvent(notifications)
+      setEvent(sortEvents(notifications))
     }
 
     EventBus.on('notifications_updated', handleUpdateNotifications)
@@ -59,37 +66,37 @@ export const Notifications = () => {
     return notifications
   }
 
-  const onRemoveEvent = async (f) => {
-    const { deleteNotification, getCurrentContextIds } = await initBGFunctions(browser)
+  // const onRemoveEvent = async (f) => {
+  //   const { deleteNotification, getCurrentContextIds } = await initBGFunctions(browser)
 
-    const contextIds = await getCurrentContextIds(null)
+  //   const contextIds = await getCurrentContextIds(null)
 
-    await deleteNotification(f.id, contextIds)
+  //   await deleteNotification(f.id, contextIds)
 
-    const d = event.filter((x) => x.id !== f.id)
-    // .sort((x, i) =>
-    //   x.status === NotificationStatus.Highlighted
-    //     ? -1
-    //     : i.status === NotificationStatus.Highlighted
-    //     ? 0
-    //     : 1
-    // )
-    setEvent(d)
-  }
+  //   const d = event.filter((x) => x.id !== f.id)
+  //   // .sort((x, i) =>
+  //   //   x.status === NotificationStatus.Highlighted
+  //   //     ? -1
+  //   //     : i.status === NotificationStatus.Highlighted
+  //   //     ? 0
+  //   //     : 1
+  //   // )
+  //   setEvent(d)
+  // }
 
   const onRemoveEventsAll = async (f) => {
     // setLoadNotify(true)
-    const { markAllNotificationsAsViewed, deleteAllNotifications } = await initBGFunctions(browser)
+    const { markAllNotificationsAsViewed } = await initBGFunctions(browser)
     await markAllNotificationsAsViewed(f)
     // setTimeout(() => setLoadNotify(false), 1000)
     const notification = await getNotifications()
-    setEvent(notification)
+    setEvent(sortEvents(notification))
   }
 
-  const checkUpdates = async () => {
-    const { getNewExtensionVersion } = await initBGFunctions(browser)
-    const isUpdateAvailable = await getNewExtensionVersion()
-  }
+  // const checkUpdates = async () => {
+  //   const { getNewExtensionVersion } = await initBGFunctions(browser)
+  //   const isUpdateAvailable = await getNewExtensionVersion()
+  // }
 
   const setReadNotifications = async (id) => {
     const { markNotificationAsViewed } = await initBGFunctions(browser)
@@ -97,25 +104,7 @@ export const Notifications = () => {
     await markNotificationAsViewed(id)
 
     const notification = await getNotifications()
-    setEvent(notification)
-  }
-  const sortedStatuses = [
-    NotificationStatus.Highlighted,
-    NotificationStatus.Default,
-    NotificationStatus.Resolved,
-  ]
-
-  const sortedData = (data) => {
-    return data
-      .reduce((acc, item) => {
-        acc.push({
-          key1: sortedStatuses.indexOf(item.status),
-          key2: new Date(item.createdAt),
-          item,
-        })
-        return acc
-      }, [])
-      .sort((a, b) => a.key1 - b.key1 || b.key2 - a.key2)
+    setEvent(sortEvents(notification))
   }
 
   return (
@@ -155,25 +144,22 @@ export const Notifications = () => {
                 </div>
 
                 <>
-                  {event.length > 0 &&
-                    sortedData(event) &&
-                    sortedData(event).length &&
-                    sortedData(event).map((x, i) => {
+                  {event?.length > 0 &&
+                    event.map((x, i) => {
                       if (i < count) {
                         return (
                           <Notification
                             onClear={setReadNotifications}
-                            icon={x.item.icon ? x.item.icon : IconDefault}
-                            //
-                            key={x.item.id}
+                            icon={x.icon ? x.icon : IconDefault}
+                            key={x.id}
                             label={'System'}
-                            title={x.item.title}
-                            description={x.item.message}
-                            _id={x.item.id}
-                            date={x.item.createdAt}
-                            actions={x.item.actions}
+                            title={x.title}
+                            description={x.message}
+                            _id={x.id}
+                            date={x.createdAt}
+                            actions={x.actions}
                             stateNotify={state ? state : null}
-                            status={x.item.status}
+                            status={x.status}
                           />
                         )
                       }
