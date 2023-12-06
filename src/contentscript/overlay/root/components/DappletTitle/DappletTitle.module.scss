@@ -1,11 +1,10 @@
-@import "../../assets/styles/color.variables";
-@import "../../assets/styles/null";
-@import "./adaptive";
+@import '../../assets/styles/color.variables';
+@import '../../assets/styles/null';
+@import './adaptive';
 
 .BlockTitleCard {
   display: flex;
   align-items: center;
-  width: 193px;
 
   .titleCard {
     font-size: 14px;
@@ -33,4 +32,3 @@
     }
   }
 }
-
