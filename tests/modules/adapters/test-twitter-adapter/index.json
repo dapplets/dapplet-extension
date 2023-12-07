@@ -1,7 +1,7 @@
 {
   "themes": {
     "LIGHT": "boolean(//body[@style='background-color: #FFFFFF;'] | //body[@style='background-color: rgb(255, 255, 255);'])",
-    "DARK": "boolean(//body[@style='background-color: rgb(21, 32, 43);'] | //body[@style='background-color: rgb(0, 0, 0);'])"
+    "DARK": "boolean(//body[@style='background-color: rgb(21, 32, 43);'] | //body[@style='background-color: #000000;'] | //body[@style='background-color: rgb(0, 0, 0);'])"
   },
   "contexts": {
     "GLOBAL": {
@@ -11,12 +11,13 @@
         "websiteName": "string('Twitter')",
         "username": "substring-after(string(//header//a[@aria-label='Profile']/@href), '/')",
         "fullname": "string(//*[@aria-label='Account menu']//img/@alt)",
-        "img": "string(//*[@aria-label='Account menu']//img/@src)"
+        "img": "string(//*[@aria-label='Account menu']//img/@src)",
+        "url": "string(//html/head/meta[@property='og:url']/@content)"
       }
     },
     "POST": {
       "containerSelector": "main[role=main]",
-      "contextSelector": "article.css-1dbjc4n",
+      "contextSelector": "article[data-testid=tweet]",
       "widgets": {
         "button": {
           "styles": "styles/post/button.css",
@@ -24,7 +25,7 @@
         },
         "avatarBadge": {
           "styles": "styles/post/avatarBadge.css",
-          "insertionPoint": "div.css-1dbjc4n.r-18kxxzh.r-1wbh5a2.r-13qz1uu > *:last-child"
+          "insertionPoint": "div.r-18kxxzh.r-1wbh5a2.r-13qz1uu > *:last-child"
         }
       },
       "events": {
@@ -57,7 +58,8 @@
         "authorFullname": "string(.//*[@data-testid='User-Name']//span)",
         "authorUsername": "substring-before(substring-after(string(.//time/../@href), '/'), '/')",
         "authorImg": "string(.//img/@src)",
-        "createdAt": "string(.//time/@datetime)"
+        "createdAt": "string(.//time/@datetime)",
+        "url": "concat('https://twitter.com/', substring-before(substring-after(string(.//time/../@href), '/'), '/'), '/status/', substring-after(string(.//time/../@href), 'status/'))"
       }
     },
     "PROFILE": {
@@ -66,12 +68,12 @@
       "widgets": {
         "button": {
           "styles": "styles/profile/button.css",
-          "insertionPoint": "div.css-1dbjc4n.r-1ifxtd0.r-ymttw5.r-ttdzmv div.css-1dbjc4n.r-obd0qt.r-18u37iz.r-1w6e6rj.r-1h0z5md.r-dnmrzs > *:last-child",
+          "insertionPoint": "div.css-175oi2r.r-obd0qt.r-18u37iz.r-1w6e6rj.r-1h0z5md.r-dnmrzs > a",
           "insert": "begin"
         },
         "avatarBadge": {
           "styles": "styles/profile/avatarBadge.css",
-          "insertionPoint": "div.css-1dbjc4n.r-1ifxtd0.r-ymttw5.r-ttdzmv div.css-1dbjc4n.r-ggadg3.r-u8s1d.r-8jfcpp",
+          "insertionPoint": "div.r-1ifxtd0.r-ymttw5.r-ttdzmv div.r-ggadg3.r-u8s1d.r-8jfcpp",
           "insert": "end"
         }
       },
@@ -79,7 +81,8 @@
         "id": "substring-after(string(.//*[@data-testid='UserName']/div/div/div[2]//span), '@')",
         "authorFullname": "string(.//*[@data-testid='UserName']//span[1])",
         "authorUsername": "substring-after(string(.//*[@data-testid='UserName']/div/div/div[2]//span), '@')",
-        "authorImg": "string(.//img[contains(@alt,'Opens profile photo')]/@src)"
+        "authorImg": "string(.//img[contains(@alt,'Opens profile photo')]/@src)",
+        "url": "concat('https://twitter.com/', substring-after(string(.//*[@data-testid='UserName']/div/div/div[2]//span), '@'))"
       }
     }
   }
