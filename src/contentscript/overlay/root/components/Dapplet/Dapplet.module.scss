@@ -11,8 +11,6 @@
   margin-bottom: 16px;
   padding: 10px 17px;
 
-    
-
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 1px 2px rgb(225 225 225 / 20%), 0 -1px 2px rgb(225 225 225 / 20%),
@@ -24,19 +22,22 @@
   flex: 1 1 auto;
   flex-direction: column;
   padding: 0 0 0 13px;
+  width: 325px;
+  justify-content: space-between;
 }
-
+.header {
+  width: 100%;
+}
 .blockTop {
   display: flex;
   align-items: center;
   transition: all 0.2s ease;
-
+  width: 100%;
   .blockIcons {
     display: flex;
-    justify-content: space-between;
-    width: 34px;
-    margin: 0 57px 0 13px;
-    margin-left: auto;
+
+    width: 17px;
+    height: 1px;
   }
 }
 
@@ -60,7 +61,7 @@
   }
 
   h2 {
-    color: $error!important;
+    color: $error !important;
   }
 }
 
@@ -70,7 +71,6 @@
   width: 277px;
   padding: 5px 0 13px;
 
-    
   font-size: 12px;
   font-weight: 400;
   line-height: 120%;
@@ -172,7 +172,6 @@
   height: 20px;
   margin-left: 10px;
 
-    
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
@@ -207,7 +206,6 @@
 
   padding-bottom: 5px;
 
-    
   font-size: 12px;
   font-weight: 400;
   line-height: 120%;
