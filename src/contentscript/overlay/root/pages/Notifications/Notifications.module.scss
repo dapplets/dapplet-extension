@@ -1,18 +1,10 @@
 @import '../../assets/styles/color.variables';
 @import '../../assets/styles/null';
+@import '../../assets/styles/pages';
 @import './adaptive';
 
-
 .wrapper {
-  overflow: hidden;
-  overflow: -moz-scrollbars-none;
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
   height: 100%;
-
-  -ms-overflow-style: none;
 }
 
 .wrapper::-webkit-scrollbar {
