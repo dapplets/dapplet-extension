@@ -73,30 +73,23 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   }
 
   const onOpenDappletAction = async (f: string) => {
-    const isOverlayActive = !!p.overlays && p.overlays.find((x) => x.source === f)
     if (p.hasActionHandler) {
-      if ((p.pathname.includes('system') && p.overlays.lenght === 0) || !isOverlayActive) {
-        try {
-          const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
-          const tab = await getCurrentTab()
-          if (!tab) return
-          await openDappletAction(f, tab.id)
-          if (p.isOverlayCollapsed) {
-            p.onToggleClick()
-          }
-        } catch (err) {
-          console.error(err)
-        }
-      } else {
+      try {
+        const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
+        const tab = await getCurrentTab()
+        if (!tab) return
+        await openDappletAction(f, tab.id)
         p.overlays.filter((x) => x.source === f).map((x) => p.navigate!(`/${f}/${x.id}`))
         if (p.isOverlayCollapsed) {
-          p.onToggleClick()
+          p.onToggleClick && p.onToggleClick()
         }
+      } catch (err) {
+        console.error(err)
       }
     } else {
       p.onTabClick()
       if (p.isOverlayCollapsed) {
-        p.onToggleClick()
+        p.onToggleClick && p.onToggleClick()
       }
     }
   }
@@ -115,6 +108,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   return (
     <>
       <div
+        title={p.title}
         data-testid={!p.pinned ? 'tab-not-pinned' : 'tab-pinned'}
         tabIndex={0}
         onBlur={(e) => {
@@ -144,7 +138,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           // [styles.isOpenWallet]: p.isOpenWallet,
         })}
       >
-        {!p.pinned && menuVisible && p.isOverlayCollapsed ? (
+        {!p.pinned && menuVisible && p.isOverlayCollapsed && (
           <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
             {p.dappletActions.map((action, i) =>
               action.onClick ? (
@@ -162,6 +156,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
 
             <div className={styles.blockStandartFunction}>
               <SquaredButton
+                title="Dapplet overlay"
                 className={styles.squaredButtonMenuWidget}
                 data-visible
                 appearance={'big'}
@@ -175,6 +170,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                 }}
               />
               <SquaredButton
+                title="Dapplet settings"
                 className={styles.squaredButtonMenuWidget}
                 data-visible
                 appearance={'big'}
@@ -184,10 +180,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                   e.stopPropagation()
                   setMenuVisible(!menuVisible)
                   p.navigate(`/${p.id}/settings`)
-                  p.onToggleClick()
+                  p.onToggleClick && p.onToggleClick()
                 }}
               />
               <SquaredButton
+                title="Dapplets Store"
                 className={styles.squaredButtonMenuWidget}
                 data-visible
                 appearance={'big'}
@@ -200,7 +197,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
               />
             </div>
           </div>
-        ) : null}
+        )}
         <div className={styles.top}>
           {p.icon && typeof p.icon === 'function' ? null : p.icon &&
             typeof p.icon === 'object' &&
@@ -255,20 +252,20 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                       // menu.id === 'dapplets' && setMenuVisible(!menuVisible)
 
                       if (p.pathname === '/system/dapplets') {
-                        p.onToggleClick()
+                        p.onToggleClick && p.onToggleClick()
                       } else {
                         //todo: uncomment when main menu will be works
                         // p.navigate('/system/dapplets')
                         //todo: remove when main menu will be works
 
-                        p.onToggleClick()
+                        p.onToggleClick && p.onToggleClick()
                       }
 
                       // menuVisible && setMenuVisible()
                     } else {
                       if (menu.id === 'dapplets') {
                         if (p.pathname === '/system/dapplets') {
-                          p.onToggleClick()
+                          p.onToggleClick && p.onToggleClick()
                         } else {
                           p.navigate('/system/dapplets')
                         }

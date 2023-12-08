@@ -36,8 +36,6 @@
     "webpack.dev.js",
     "webpack.jslib.js",
     "webpack.prod.js",
-    "cypress",
-    "/src/contentscript/dynamicAdapter/custom-elements.min.js",
-    "cypress.config.ts"
+    "/src/contentscript/dynamicAdapter/custom-elements.min.js"
   ]
 }

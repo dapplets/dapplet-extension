@@ -67,16 +67,12 @@ export const Dapplets = ({
 
   const onOpenDappletAction = async (f: ManifestAndDetails) => {
     try {
-      const isOverlayActive = !!overlays && overlays.find((x) => x.source === f.name)
-      if ((pathname.includes('system') && overlays.lenght === 0) || !isOverlayActive) {
-        _updateFeatureState(f.name, { isActionLoading: true })
-        const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
-        const tab = await getCurrentTab()
-        if (!tab) return
-        await openDappletAction(f.name, tab.id)
-      } else {
-        overlays.filter((x) => x.source === f.name).map((x) => navigate!(`/${f.name}/${x.id}`))
-      }
+      _updateFeatureState(f.name, { isActionLoading: true })
+      const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
+      const tab = await getCurrentTab()
+      if (!tab) return
+      await openDappletAction(f.name, tab.id)
+      overlays.filter((x) => x.source === f.name).map((x) => navigate!(`/${f.name}/${x.id}`))
     } catch (err) {
       console.error(err)
     } finally {

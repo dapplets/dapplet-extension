@@ -4,7 +4,6 @@ import browser from 'webextension-polyfill'
 import * as EventBus from '../common/global-event-bus'
 import {
   assertFullfilled,
-  isE2ETestingEnvironment,
   parseModuleName,
   parseShareLink,
   ShareLinkPayload,
@@ -20,7 +19,7 @@ import { IOverlay } from './overlay/interfaces'
 import { OverlayManager } from './overlay/root/overlayManager'
 
 const IS_OVERLAY_IFRAME = window.name.indexOf('dapplet-overlay') !== -1
-const IS_E2E_ENV = isE2ETestingEnvironment(window)
+
 let injector: Injector // ToDo ------> look at the getRegistriesInfo() ToDo
 
 /* ToDo: The function is needed for ./overlay/root/utils/createUserEnvInfo.ts that's used in Dapplet.tsx.
@@ -33,8 +32,7 @@ export function getRegistriesInfo() {
 
 async function init() {
   const IS_LIBRARY = typeof window !== 'undefined' && window['DAPPLETS_JSLIB'] === true
-  const IS_E2E_IFRAME = isE2ETestingEnvironment(window.top)
-  const IS_IFRAME = IS_E2E_IFRAME ? false : self !== top
+  const IS_IFRAME = self !== top
 
   const shareLinkPayload = await processShareLink().catch((e) => {
     console.error('Cannot process the share link', e)
@@ -132,9 +130,18 @@ async function init() {
       title: string,
       source: string,
       hidden: boolean,
+      name: string,
+      registryUrl: string,
       sourceWindow: any
     ) => {
-      const overlay = overlayManager.createOverlay({ url, title, source, hidden })
+      const overlay = overlayManager.createOverlay({
+        url,
+        title,
+        source,
+        hidden,
+        module: { name, registryUrl },
+        registryUrl,
+      })
       overlay.onclose = () => {
         jsonrpc.call('OVERLAY_CLOSED', [id], sourceWindow)
       }
@@ -183,9 +190,12 @@ async function init() {
   })
 
   jsonrpc.on('callBackground', (method: string, args: any[]) => {
+    // ToDo: Previously, these methods were used for Cypress-based autotests.
+    //       It seems that they can be removed.
+    //       Need to make sure they are not used by Playwright tests.
     const RESTRICTED_METHODS = ['wipeAllExtensionData', 'addRegistry', 'removeRegistry']
 
-    if (!IS_E2E_IFRAME && RESTRICTED_METHODS.includes(method)) {
+    if (RESTRICTED_METHODS.includes(method)) {
       return Promise.reject('This function is for E2E testing only.')
     }
 
@@ -348,7 +358,7 @@ async function processShareLink() {
 }
 
 // do not inject to overlays frames
-if (!IS_OVERLAY_IFRAME && !IS_E2E_ENV) {
+if (!IS_OVERLAY_IFRAME) {
   if (window.document.body) {
     init()
   } else {

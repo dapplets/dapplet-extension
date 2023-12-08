@@ -148,10 +148,12 @@ export const ModalLogin = ({
                       {x.type !== 'near' ? (
                         <p title={x.account} className={styles.newProfileBlockName}>
                           {truncateEthAddress(x.account)}
+                         
                         </p>
                       ) : (
                         <p title={x.account} className={styles.newProfileBlockNameNear}>
                           {x.account}
+                         
                         </p>
                       )}
 

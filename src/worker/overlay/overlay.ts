@@ -1,6 +1,6 @@
 import { generateGuid } from '../../common/generateGuid'
 import { JsonRpc } from '../../common/jsonrpc'
-import { IOverlay, OverlayConfig } from './interfaces'
+import { IOverlay, OverlayConfig, OverlaySourceModule } from './interfaces'
 
 export class OverlayIframe implements IOverlay {
   public url: string
@@ -8,6 +8,8 @@ export class OverlayIframe implements IOverlay {
   public source: string = null
   public hidden = false
   public parent: IOverlay
+  public module: OverlaySourceModule = null
+  public registryUrl: string = null
 
   frame: HTMLIFrameElement
   registered = false
@@ -25,10 +27,12 @@ export class OverlayIframe implements IOverlay {
     this.source = config.source ?? null
     this.hidden = config.hidden ?? false
     this.parent = config.parent ?? null
+    this.module = config.module ?? null
+    this.registryUrl = config.registryUrl ?? null
 
     this._iframeMessenger.call(
       'OVERLAY_CREATE',
-      [this.id, this.url, this.title, this.source, this.hidden],
+      [this.id, this.url, this.title, this.source, this.hidden, this.module.name, this.registryUrl],
       self
     )
     this._iframeMessenger.on('OVERLAY_EXEC', (id: string, topic: string, message: string) => {

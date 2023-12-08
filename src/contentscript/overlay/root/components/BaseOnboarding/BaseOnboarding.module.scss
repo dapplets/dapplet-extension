@@ -1,8 +1,7 @@
 @import '../../assets/styles/null';
-@import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
 
-.wrapper{
+.wrapper {
   position: fixed;
   z-index: 9999;
   top: 55px;
@@ -21,7 +20,7 @@
   border-radius: 8px;
   box-shadow: 0 4px 5px rgb(45 52 60 / 10%), 0 4px 20px rgb(11 87 111 / 15%);
 
-  &::after{
+  &::after {
     content: '';
 
     position: absolute;
@@ -35,32 +34,30 @@
     background: #fff;
     border-radius: 5px;
     box-shadow: 7px 5px 7px rgb(45 52 60 / 10%), 5px 2px 5px rgb(11 87 111 / 15%);
-
   }
 }
 
-.promoBlock{
+.promoBlock {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
 }
 
-.text{
+.text {
   margin: 10px 0;
 
-  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
   color: $content-black;
 }
 
-.darkColor{
+.darkColor {
   color: $main-black;
 }
 
-.buttonBlock{
+.buttonBlock {
   display: flex;
   justify-content: space-between;
   margin-top: 10px;

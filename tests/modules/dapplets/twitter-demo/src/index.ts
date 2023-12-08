@@ -61,7 +61,7 @@ export default class DemoDapplet {
       console.log('Core.getManifest has en error:', err)
     }
 
-    // Core.onAction(() => this.openOverlay())
+    Core.onAction(() => this.openOverlay())
     Core.onWalletsUpdate(() => console.log('*** Wallets updated'))
     Core.onConnectedAccountsUpdate(() => console.log('*** Connected Accounts updated'))
 

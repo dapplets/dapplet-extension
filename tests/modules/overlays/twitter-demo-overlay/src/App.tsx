@@ -56,14 +56,14 @@ export default () => {
           <Card.Content>
             <Card.Description>
               {context.description}
-              {context.link && (
+              {/* {context.link && (
                 <button
                   className="link"
                   onClick={(e) => goToContextPage(e, context.link!, ctxId + '/' + 0)}
                 >
                   this page
                 </button>
-              )}
+              )} */}
             </Card.Description>
             <Accordion exclusive={false} fluid>
               {context.widgets.map((widget: any, i: number) => (
