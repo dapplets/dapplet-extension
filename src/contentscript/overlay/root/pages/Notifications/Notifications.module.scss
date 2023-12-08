@@ -3,15 +3,6 @@
 @import '../../assets/styles/pages';
 @import './adaptive';
 
-// ToDo: code duplication
-@font-face {
-  font-family: SegoeUIRegular, sans-serif;
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-  src: url('../../assets/fonts/Segoe_UI.ttf') format('ttf');
-}
-
 .wrapper {
   height: 100%;
 }
