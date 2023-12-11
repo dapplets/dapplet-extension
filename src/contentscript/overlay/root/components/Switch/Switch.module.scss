@@ -1,8 +1,9 @@
-@import "../../assets/styles/color.variables";
-@import "../../assets/styles/null";
+@import '../../assets/styles/color.variables';
+@import '../../assets/styles/null';
 
 .wrapper {
   position: relative;
+  margin-left: auto;
 }
 
 .input {
@@ -32,7 +33,7 @@
   transition: all 0.3s ease 0s;
 
   &::before {
-    content: "";
+    content: '';
 
     position: absolute;
     top: 50%;

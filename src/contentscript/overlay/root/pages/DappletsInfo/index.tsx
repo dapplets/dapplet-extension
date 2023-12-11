@@ -23,7 +23,7 @@ export interface DappletsMainInfoProps {
 }
 
 export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
-  const { setDappletsDetail, ModuleInfo, ModuleVersion, setShowChildrenRegistry } = props
+  const { setDappletsDetail, ModuleInfo, setShowChildrenRegistry } = props
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
@@ -68,8 +68,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       setLoad(false)
     }
     init()
-
-    return () => {}
   }, [])
 
   const _updateData = async () => {
@@ -159,7 +157,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       })
       setModalTransaction(false)
       setModal(true)
-    } finally {
     }
   }
 
@@ -230,6 +227,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
       setVisibleContextId(contextIds)
     } catch (error) {
+      console.log(error)
     } finally {
       setEditContextIdLoading(false)
       setAddDisabled(false)
@@ -254,7 +252,9 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       const valueReg = value.match(reg)
 
       return valueReg
-    } catch {}
+    } catch (error) {
+      console.log(error)
+    }
   }
   const _addAdmin = async (address: string) => {
     setEditAdminsLoading(true)
@@ -378,228 +378,102 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       ) : null}
 
       <div className={styles.mainInfoBlock}>
-        <SettingWrapper
-          className={styles.wrapperSettings}
-          title="Social"
-          children={
-            <div className={styles.socialBlock}>
-              <div className={styles.moduleTitle}> {mi.name}</div>
-              <SettingItem
-                title="Title"
-                className={styles.item}
-                component={<></>}
-                children={
-                  <input
-                    value={mi.title ?? ''}
-                    onChange={(e) => {
-                      setMi({ ...mi, title: e.target.value })
+        <SettingWrapper className={styles.wrapperSettings} title="Social">
+          <div className={styles.socialBlock}>
+            <div className={styles.moduleTitle}> {mi.name}</div>
+            <SettingItem title="Title" className={styles.item} component={<></>}>
+              <input
+                value={mi.title ?? ''}
+                onChange={(e) => {
+                  setMi({ ...mi, title: e.target.value })
 
-                      setDisabledPush(false)
-                    }}
-                    className={styles.inputTitle}
-                  />
-                }
+                  setDisabledPush(false)
+                }}
+                className={styles.inputTitle}
               />
-              <SettingItem
-                title="Description"
-                component={<></>}
-                className={styles.item}
-                children={
-                  <input
-                    className={styles.inputTitle}
-                    value={mi.description ?? ''}
-                    onChange={(e) => {
-                      setMi({ ...mi, description: e.target.value })
+            </SettingItem>
+            <SettingItem title="Description" component={<></>} className={styles.item}>
+              <input
+                className={styles.inputTitle}
+                value={mi.description ?? ''}
+                onChange={(e) => {
+                  setMi({ ...mi, description: e.target.value })
 
-                      setDisabledPush(false)
-                    }}
-                  />
-                }
+                  setDisabledPush(false)
+                }}
               />
-              <div className={styles.iconBlock}>
-                <div className={styles.imgBlock}>
-                  <StorageRefImage className={styles.img} storageRef={mi.icon} />
+            </SettingItem>
+            <div className={styles.iconBlock}>
+              <div className={styles.imgBlock}>
+                <StorageRefImage className={styles.img} storageRef={mi.icon} />
 
-                  {newState.map((x, i) => (
-                    <span className={styles.imgTitle} key={i}>
-                      {visibleNameFile(x.name)}
-                    </span>
-                  ))}
-                </div>
+                {newState.map((x, i) => (
+                  <span className={styles.imgTitle} key={i}>
+                    {visibleNameFile(x.name)}
+                  </span>
+                ))}
+              </div>
 
-                <div className={styles.buttonIcon}>
-                  <input
-                    ref={fileInput}
-                    type="file"
-                    name="file"
-                    id="file"
-                    accept=".png"
-                    className={styles.inputfile}
-                    onChange={(e) => {
-                      onChange(e)
-                      iconInputChangeHandler(e)
+              <div className={styles.buttonIcon}>
+                <input
+                  ref={fileInput}
+                  type="file"
+                  name="file"
+                  id="file"
+                  accept=".png"
+                  className={styles.inputfile}
+                  onChange={(e) => {
+                    onChange(e)
+                    iconInputChangeHandler(e)
 
-                      setDisabledPush(false)
-                    }}
-                  />
-                  <label htmlFor="file">Change icon</label>
-                </div>
+                    setDisabledPush(false)
+                  }}
+                />
+                <label htmlFor="file">Change icon</label>
               </div>
             </div>
-          }
-        />
-        <SettingWrapper
-          title="Ownership"
-          className={styles.wrapperSettings}
-          children={
-            <div className={styles.ownershipBlock}>
-              <SettingItem
-                title="Ownership"
-                component={<></>}
-                className={styles.item}
-                children={
-                  <div className={styles.inputOwnershipBlock}>
-                    <input
-                      value={newOwner}
-                      className={cn(styles.inputOwnership, {
-                        [styles.inputOwnershipInvalid]: isDisabledAddOwner,
-                      })}
-                      placeholder={mi.author || 'New owner adress'}
-                      onChange={(e) => {
-                        setNewOwner(e.target.value)
-                        setDisabledAddOwner(false)
-                      }}
-                      onBlur={() => setDisabledAddOwner(false)}
-                    />
+          </div>
+        </SettingWrapper>
+        <SettingWrapper title="Ownership" className={styles.wrapperSettings}>
+          <div className={styles.ownershipBlock}>
+            <SettingItem title="Ownership" component={<></>} className={styles.item}>
+              <div className={styles.inputOwnershipBlock}>
+                <input
+                  value={newOwner}
+                  className={cn(styles.inputOwnership, {
+                    [styles.inputOwnershipInvalid]: isDisabledAddOwner,
+                  })}
+                  placeholder={mi.author || 'New owner adress'}
+                  onChange={(e) => {
+                    setNewOwner(e.target.value)
+                    setDisabledAddOwner(false)
+                  }}
+                  onBlur={() => setDisabledAddOwner(false)}
+                />
 
-                    <button
-                      disabled={newOwner.length <= 0}
-                      onClick={() => {
-                        _transferOwnership(newOwner)
-                      }}
-                      className={cn(styles.ownershipButton, {
-                        [styles.ownershipButtonDisabled]: newOwner.length <= 0,
-                      })}
-                    >
-                      Change
-                    </button>
-                    <Modal
-                      visible={newOwnerLoading}
-                      classNameContent={styles.modalContentOwnership}
-                      title={'Changing the Owner'}
-                      content={
-                        'This modal window will close automatically after your changes are saved'
-                      }
-                      footer={''}
-                      onClose={() => setNewOwnerLoading(false)}
-                    />
-                  </div>
-                }
-              />
-              <>
-                {isLoad || !targetRegistry ? (
-                  <div className={styles.miniLoader}></div>
-                ) : (
-                  <div className={styles.parametersBlock}>
-                    <div className={styles.wrapperContextID}>
-                      <div className={styles.blockContextID}>
-                        <h3 className={styles.blockContextIDTitle}>Admins</h3>
-                        <button
-                          // disabled={autorDisabled}
-                          onClick={() => setVisibleAdmins(!visibleAdmins)}
-                          className={cn(styles.contextIDButton, {
-                            // [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
-                          })}
-                        />
-                      </div>
-                      {visibleAdmins && (
-                        <div className={styles.wrapperContext}>
-                          <div
-                            className={cn(styles.blockContext, {
-                              // [styles.inputAdminInvalid]: isDisabledAddAdmin,
-                            })}
-                          >
-                            <input
-                              ref={nodeInputAdmin}
-                              className={styles.blockContextTitle}
-                              value={editAdmin}
-                              onChange={(e) => {
-                                setEditAdmin(e.target.value)
-                              }}
-                            />
-
-                            <button
-                              // ref={nodeBtnAdmin}
-                              onClick={() => {
-                                setEditAdmin('')
-                              }}
-                              className={cn(styles.contextDelete, {
-                                // [styles.contextDeleteNone]: adminDeleteNone,
-                              })}
-                            >
-                              <Delete />
-                            </button>
-                          </div>
-                          <button
-                            disabled={
-                              (editAdmin.length < 2 && !getCompareAdminValue(editAdmin)) ||
-                              (addAdminDisabled && !getCompareAdminValue(editAdmin))
-                            }
-                            ref={nodeBtnAdmin}
-                            onClick={() => {
-                              // nodeBtnAdmin.current?.classList.add('valid')
-                              _addAdmin(editAdmin)
-                            }}
-                            className={cn(styles.addContextDisabled, {
-                              [styles.addContext]:
-                                (nodeInputAdmin.current?.value.length >= 2 &&
-                                  !addAdminDisabled &&
-                                  getCompareAdminValue(editAdmin)) ||
-                                (editAdmin.length >= 2 &&
-                                  !addAdminDisabled &&
-                                  getCompareAdminValue(editAdmin)),
-                            })}
-                          >
-                            ADD
-                          </button>
-                        </div>
-                      )}
-                      {editAdminsLoading ? (
-                        <div className={styles.editContextIdLoading}></div>
-                      ) : (
-                        <>
-                          {admins && admins.length
-                            ? admins.map((x, i) => (
-                                <div key={i} className={styles.blockContext}>
-                                  <input
-                                    className={styles.blockContextTitle}
-                                    placeholder={x}
-                                    value={x}
-                                    readOnly
-                                  />
-
-                                  <button
-                                    ref={nodeBtnAdmin}
-                                    onClick={() => _deleteAdmin(x)}
-                                    className={cn(styles.addcontextDelete)}
-                                  />
-                                </div>
-                              ))
-                            : null}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </>
-            </div>
-          }
-        />
-
-        <SettingWrapper
-          title="Parameters"
-          className={styles.wrapperSettings}
-          children={
+                <button
+                  disabled={newOwner.length <= 0}
+                  onClick={() => {
+                    _transferOwnership(newOwner)
+                  }}
+                  className={cn(styles.ownershipButton, {
+                    [styles.ownershipButtonDisabled]: newOwner.length <= 0,
+                  })}
+                >
+                  Change
+                </button>
+                <Modal
+                  visible={newOwnerLoading}
+                  classNameContent={styles.modalContentOwnership}
+                  title={'Changing the Owner'}
+                  content={
+                    'This modal window will close automatically after your changes are saved'
+                  }
+                  footer={''}
+                  onClose={() => setNewOwnerLoading(false)}
+                />
+              </div>
+            </SettingItem>
             <>
               {isLoad || !targetRegistry ? (
                 <div className={styles.miniLoader}></div>
@@ -607,63 +481,73 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 <div className={styles.parametersBlock}>
                   <div className={styles.wrapperContextID}>
                     <div className={styles.blockContextID}>
-                      <h3 className={styles.blockContextIDTitle}>Context IDs</h3>
+                      <h3 className={styles.blockContextIDTitle}>Admins</h3>
                       <button
-                        disabled={mi.contextIds.length >= 1}
-                        onClick={addButtonClickHandlerContext}
+                        // disabled={autorDisabled}
+                        onClick={() => setVisibleAdmins(!visibleAdmins)}
                         className={cn(styles.contextIDButton, {
-                          [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
+                          // [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
                         })}
                       />
                     </div>
-                    {mi.contextIds.map((x, i) => (
-                      <div key={i} className={styles.wrapperContext}>
-                        <div className={styles.blockContext}>
+                    {visibleAdmins && (
+                      <div className={styles.wrapperContext}>
+                        <div
+                          className={cn(styles.blockContext, {
+                            // [styles.inputAdminInvalid]: isDisabledAddAdmin,
+                          })}
+                        >
                           <input
-                            key={i}
-                            ref={nodeInput}
+                            ref={nodeInputAdmin}
                             className={styles.blockContextTitle}
-                            value={editContextId}
-                            placeholder={'Context ID (ex: example.com)'}
+                            value={editAdmin}
                             onChange={(e) => {
-                              setEditContextId(e.target.value)
+                              setEditAdmin(e.target.value)
                             }}
                           />
-                          {editContextIdLoading ? null : (
-                            <button
-                              ref={node}
-                              onClick={() => {
-                                onDeleteChildContext(i)
-                                setEditContextId('')
-                              }}
-                              className={cn(styles.contextDelete)}
-                            >
-                              <Delete />
-                            </button>
-                          )}
+
+                          <button
+                            // ref={nodeBtnAdmin}
+                            onClick={() => {
+                              setEditAdmin('')
+                            }}
+                            className={cn(styles.contextDelete, {
+                              // [styles.contextDeleteNone]: adminDeleteNone,
+                            })}
+                          >
+                            <Delete />
+                          </button>
                         </div>
                         <button
-                          disabled={editContextId.length <= 2 || addDisabled}
+                          disabled={
+                            (editAdmin.length < 2 && !getCompareAdminValue(editAdmin)) ||
+                            (addAdminDisabled && !getCompareAdminValue(editAdmin))
+                          }
+                          ref={nodeBtnAdmin}
                           onClick={() => {
-                            node.current?.classList.add('valid')
-                            _addContextId(editContextId)
+                            // nodeBtnAdmin.current?.classList.add('valid')
+                            _addAdmin(editAdmin)
                           }}
                           className={cn(styles.addContextDisabled, {
                             [styles.addContext]:
-                              (editContextId.length >= 2 && !addDisabled) ||
-                              (nodeInput.current?.value.length >= 2 && !addDisabled),
+                              (nodeInputAdmin.current?.value.length >= 2 &&
+                                !addAdminDisabled &&
+                                getCompareAdminValue(editAdmin)) ||
+                              (editAdmin.length >= 2 &&
+                                !addAdminDisabled &&
+                                getCompareAdminValue(editAdmin)),
                           })}
                         >
                           ADD
                         </button>
                       </div>
-                    ))}
-                    {editContextIdLoading ? (
+                    )}
+                    {editAdminsLoading ? (
                       <div className={styles.editContextIdLoading}></div>
                     ) : (
                       <>
-                        {visibleContextId && visibleContextId.length
-                          ? visibleContextId.map((x, i) => (
+                        {admins && admins.length
+                          ? admins.map((x, i) => (
                               <div key={i} className={styles.blockContext}>
                                 <input
                                   className={styles.blockContextTitle}
@@ -673,10 +557,8 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                                 />
 
                                 <button
-                                  ref={node}
-                                  onClick={() => {
-                                    _removeContextID(x)
-                                  }}
+                                  ref={nodeBtnAdmin}
+                                  onClick={() => _deleteAdmin(x)}
                                   className={cn(styles.addcontextDelete)}
                                 />
                               </div>
@@ -688,8 +570,97 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 </div>
               )}
             </>
-          }
-        />
+          </div>
+        </SettingWrapper>
+
+        <SettingWrapper title="Parameters" className={styles.wrapperSettings}>
+          {isLoad || !targetRegistry ? (
+            <div className={styles.miniLoader}></div>
+          ) : (
+            <div className={styles.parametersBlock}>
+              <div className={styles.wrapperContextID}>
+                <div className={styles.blockContextID}>
+                  <h3 className={styles.blockContextIDTitle}>Context IDs</h3>
+                  <button
+                    disabled={mi.contextIds.length >= 1}
+                    onClick={addButtonClickHandlerContext}
+                    className={cn(styles.contextIDButton, {
+                      [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
+                    })}
+                  />
+                </div>
+                {mi.contextIds.map((x, i) => (
+                  <div key={i} className={styles.wrapperContext}>
+                    <div className={styles.blockContext}>
+                      <input
+                        key={i}
+                        ref={nodeInput}
+                        className={styles.blockContextTitle}
+                        value={editContextId}
+                        placeholder={'Context ID (ex: example.com)'}
+                        onChange={(e) => {
+                          setEditContextId(e.target.value)
+                        }}
+                      />
+                      {editContextIdLoading ? null : (
+                        <button
+                          ref={node}
+                          onClick={() => {
+                            onDeleteChildContext(i)
+                            setEditContextId('')
+                          }}
+                          className={cn(styles.contextDelete)}
+                        >
+                          <Delete />
+                        </button>
+                      )}
+                    </div>
+                    <button
+                      disabled={editContextId.length <= 2 || addDisabled}
+                      onClick={() => {
+                        node.current?.classList.add('valid')
+                        _addContextId(editContextId)
+                      }}
+                      className={cn(styles.addContextDisabled, {
+                        [styles.addContext]:
+                          (editContextId.length >= 2 && !addDisabled) ||
+                          (nodeInput.current?.value.length >= 2 && !addDisabled),
+                      })}
+                    >
+                      ADD
+                    </button>
+                  </div>
+                ))}
+                {editContextIdLoading ? (
+                  <div className={styles.editContextIdLoading}></div>
+                ) : (
+                  <>
+                    {visibleContextId && visibleContextId.length
+                      ? visibleContextId.map((x, i) => (
+                          <div key={i} className={styles.blockContext}>
+                            <input
+                              className={styles.blockContextTitle}
+                              placeholder={x}
+                              value={x}
+                              readOnly
+                            />
+
+                            <button
+                              ref={node}
+                              onClick={() => {
+                                _removeContextID(x)
+                              }}
+                              className={cn(styles.addcontextDelete)}
+                            />
+                          </div>
+                        ))
+                      : null}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </SettingWrapper>
       </div>
       <div className={styles.linkNavigation}>
         <button

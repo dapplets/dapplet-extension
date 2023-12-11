@@ -1,18 +1,10 @@
 @import '../../assets/styles/color.variables';
 @import '../../assets/styles/null';
+@import '../../assets/styles/pages';
 @import './adaptive';
 
-
 .wrapper {
-  overflow: hidden;
-  overflow: -moz-scrollbars-none;
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
   height: 100%;
-
-  -ms-overflow-style: none;
 }
 
 .wrapper::-webkit-scrollbar {
@@ -48,7 +40,7 @@
   width: 100%;
   height: 50vh;
   padding: 8px 0 0;
-
+  padding-bottom: 10px;
   &::-webkit-scrollbar {
     cursor: pointer;
     width: 4px;
@@ -56,6 +48,7 @@
 
   &::-webkit-scrollbar-track {
     margin-top: 15px;
+    margin-bottom: 10px;
     background: rgb(244 244 244);
     background: linear-gradient(
       90deg,
