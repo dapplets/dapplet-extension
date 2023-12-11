@@ -10,19 +10,8 @@
     width: calc(100% - 50px);
   }
 
-  .blockIcons {
-    margin: 0;
-  }
-
   .blockTop {
     display: flex;
-
-    .blockIcons {
-      display: flex;
-      justify-content: space-between;
-      width: 34px;
-      margin: 0 8.5% 0 4.5%;
-    }
   }
 
   .blockText {

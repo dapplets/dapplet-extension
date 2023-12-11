@@ -181,13 +181,13 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
               onClick={() => setActiveTabDappletsDetails(DappletsDetails.MAININFO)}
               isActive={activeTaDappletsDetails === DappletsDetails.MAININFO}
             />
-            {ModuleInfo && ModuleInfo.type === 'FEATURE' ? (
+            {/* {ModuleInfo && ModuleInfo.type === 'FEATURE' ? (
               <SettingTitle
                 title="Tokenomics"
                 onClick={() => setActiveTabDappletsDetails(DappletsDetails.TOKENOMICS)}
                 isActive={activeTaDappletsDetails === DappletsDetails.TOKENOMICS}
               />
-            ) : null}
+            ) : null} */}
           </div>
           <div className={styles.settingMain}>
             {activeTaDappletsDetails === DappletsDetails.MAININFO && (
