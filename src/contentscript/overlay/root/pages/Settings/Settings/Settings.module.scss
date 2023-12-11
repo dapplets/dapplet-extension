@@ -195,11 +195,25 @@
   margin: 0 0 25px !important;
 }
 
+.loaderOrSwitchContainer {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+
+  width: 32px;
+  margin: 0;
+}
+
 .loader {
-  display: inline-block;
+  display: block;
+
   width: 20px;
   height: 20px;
+  margin: 0 6px;
+
   background-image: url('../../../assets/svg/loaderSettings.svg');
+  background-repeat: no-repeat;
 }
 
 .deleteUserAgentName {
