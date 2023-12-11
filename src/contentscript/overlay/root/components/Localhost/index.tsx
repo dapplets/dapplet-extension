@@ -1,6 +1,6 @@
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
-import { ReactComponent as Close } from '../../assets/icons/close.svg'
+import { ReactComponent as Close } from '../../assets/icons/closeLocalhost.svg'
 import { ReactComponent as Up } from '../../assets/icons/up.svg'
 import { useToggle } from '../../hooks/useToggle'
 import styles from './Localhost.module.scss'
