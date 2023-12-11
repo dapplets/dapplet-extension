@@ -6,15 +6,16 @@ export interface DappletTitleProps {
   title: string
   isShowDescription?: boolean
   children?: ReactChild | ReactNode
-  className?: any
+  className?
 }
 export const DappletTitle: FC<DappletTitleProps> = (props: DappletTitleProps) => {
   const { title, children, className } = props
 
   return (
     <div className={cn(styles.BlockTitleCard)} data-testid="dapplet-title">
-      <h2 className={cn(styles.titleCard, className)}>{title}</h2>
-
+      <div>
+        <h2 className={cn(styles.titleCard, className)}>{title}</h2>
+      </div>
       {children}
     </div>
   )

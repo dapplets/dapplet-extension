@@ -4,6 +4,7 @@
 
 .BlockTitleCard {
   display: flex;
+  flex-grow: 1;
   align-items: center;
 
   .titleCard {
@@ -12,7 +13,7 @@
     font-style: normal;
     line-height: 100%;
     color: $main-black;
-    width: 245px;
+
     .false {
       margin: 0 0 0 -3%;
     }

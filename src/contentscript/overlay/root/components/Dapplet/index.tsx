@@ -110,15 +110,12 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
               </span>
             ) : null}
             <DappletTitle isShowDescription={false} title={title}>
-              {dapplet.sourceRegistry.isDev && <span className={styles.isDev}>dev</span>}
+              {dapplet.sourceRegistry.isDev ? <div className={styles.isDev}>dev</div> : null}
             </DappletTitle>
-
-            <div className={cn(styles.blockIcons)}></div>
-
             {!isUnderConstruction && (
-              <>
+              <div className={styles.loaderOrSwitchContainer}>
                 {loadHome ? (
-                  <span className={styles.loader}></span>
+                  <div className={styles.loader}></div>
                 ) : (
                   <Switch
                     className={isActive ? 'active-switch' : 'not-active-switch'}
@@ -129,7 +126,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                     }}
                   />
                 )}
-              </>
+              </div>
             )}
           </div>
           {error ? <span className={styles.moduleError}>{'Dapplet error'}</span> : null}
