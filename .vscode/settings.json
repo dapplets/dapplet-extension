@@ -1,23 +1,20 @@
 {
-    "editor.codeActionsOnSave": {
-        "source.fixAll": true
-    },
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "css.validate": false,
-    "less.validate": false,
-    "scss.validate": false,
-    "stylelint.validate": [
-        "css",
-        "scss"
-    ],
-    "[css]": {
-        "editor.defaultFormatter": "stylelint.vscode-stylelint"
-    },
-    "[scss]": {
-        "editor.defaultFormatter": "stylelint.vscode-stylelint"
-    },
-    "stylelint.customSyntax": "postcss-scss",
-    "files.eol": "\n",
-    "editor.tabSize": 2
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "stylelint.validate": ["css", "scss"],
+  "[css]": {
+    "editor.defaultFormatter": "stylelint.vscode-stylelint"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "stylelint.vscode-stylelint"
+  },
+  "stylelint.customSyntax": "postcss-scss",
+  "files.eol": "\n",
+  "editor.tabSize": 2
 }

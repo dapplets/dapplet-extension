@@ -1,22 +1,14 @@
 @import '../../../assets/styles/null';
 @import '../../../assets/styles/color.variables';
 @import '../../../assets/styles/animate';
+@import '../../../assets/styles/pages';
 @import './adaptive';
 
 // ToDo: looks that the code below is duplicated
 
 .wrapper {
-  overflow: hidden;
-  overflow: -moz-scrollbars-none;
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-
-  width: 100%;
   max-height: calc(100vh - 100px);
-  padding-bottom: 10px;
-
-  -ms-overflow-style: none;
+  padding-bottom: 5px;
 }
 
 .wrapper::-webkit-scrollbar {
