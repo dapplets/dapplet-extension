@@ -1,21 +1,8 @@
 @import '../../assets/styles/null';
-@import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
-
-/* Segoe UI Regular */
-@font-face {
-  font-family: SegoeUIRegular, sans-serif;
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-  src: url('../../assets/fonts/SegoeUI.woff') format('woff');
-  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
+@import '../../assets/styles/pages';
 
 .wrapper {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
   margin-top: 25px;
 }
 
@@ -35,7 +22,7 @@
 .cardTitle {
   margin-bottom: 5px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 22px;
   font-weight: 700;
   line-height: 26px;
@@ -45,7 +32,7 @@
 .cardType {
   margin-bottom: 5px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
@@ -57,7 +44,7 @@
 .cardDescription {
   margin-bottom: 20px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
@@ -68,7 +55,7 @@
 .cardName {
   padding-bottom: 5px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 12px;
   font-weight: 500;
   font-style: normal;
@@ -86,7 +73,6 @@
 }
 
 .cardOwner {
-  font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
@@ -100,7 +86,7 @@
 
   margin-left: 5px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
@@ -116,7 +102,7 @@
 
   margin-left: 5px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
@@ -148,7 +134,7 @@
   height: 32px;
   padding: 9px 10px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 14px;
   font-weight: 400;
   font-style: normal;
@@ -179,7 +165,7 @@
   height: min-content;
   padding: 14px 0 14px 18px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
@@ -193,7 +179,7 @@
   h6 {
     margin-left: 0;
 
-    font-family: Roboto, sans-serif;
+      
     font-size: 16px;
     font-weight: 500;
     font-style: normal;
@@ -204,7 +190,7 @@
   p {
     margin-left: 0;
 
-    font-family: Roboto, sans-serif;
+      
     font-size: 12px;
     font-weight: 400;
     font-style: normal;
@@ -256,8 +242,6 @@
 
 .title {
   margin-left: 5px;
-
-  font-family: SegoeUIRegular, sans-serif;
   font-size: 16px !important;
   font-weight: 400 !important;
   color: #2a2a2a !important;

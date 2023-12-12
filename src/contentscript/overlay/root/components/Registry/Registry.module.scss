@@ -1,5 +1,4 @@
 @import '../../assets/styles/null';
-@import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
 
 .localhost {
@@ -15,7 +14,7 @@
 
   background: $pure-white;
   border: 1px solid $stroke-color;
-  border-radius: 10px;
+  border-radius: 6px;
 }
 
 .hostBlock {
@@ -36,7 +35,7 @@
   height: 20px;
   padding: 5px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 10px;
   font-weight: 500;
   font-style: normal;
@@ -94,9 +93,9 @@
   padding: 0 0 0 20px;
   padding-top: 2px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   font-style: normal;
   line-height: 16px;
   color: $content-black;

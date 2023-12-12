@@ -1,10 +1,9 @@
-@import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
 @import '../../assets/styles/null';
 @import './adaptive';
 
 .MainSettingsAuto {
-  padding: 10px;
+  padding: 10px 1px 10px 0;
 
   background-color: $pure-white;
   border-radius: 10px;
@@ -15,16 +14,16 @@
   animation-fill-mode: forwards;
 
   &:not(:last-child) {
-    margin-bottom: 5px;
+    margin-bottom: 6px;
   }
 }
 
 .title {
   position: relative;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 16px;
   color: #2a2a2a;
 }

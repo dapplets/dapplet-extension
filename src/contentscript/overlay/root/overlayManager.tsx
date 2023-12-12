@@ -39,14 +39,14 @@ export class OverlayManager implements IOverlayManager {
       const shadowRoot = panel.attachShadow({ mode: 'open' })
 
       const container = document.createElement('div')
-      container.id = 'app'
+      container.id = 'dapplets-overlay-react-app'
 
       shadowRoot.appendChild(container)
 
       this._root = createRoot(container)
     } else {
       this._panel = extensionHost
-      this._root = createRoot(extensionHost.shadowRoot.getElementById('app'))
+      this._root = createRoot(extensionHost.shadowRoot.getElementById('dapplets-overlay-react-app'))
     }
 
     const styles = document.createElement('style')

@@ -15,6 +15,7 @@ import { SettingWrapper } from '../../../components/SettingWrapper'
 import { Switch } from '../../../components/Switch'
 import { getDefaultValueProvider } from '../../../utils/getDefaultValue'
 import styles from './Settings.module.scss'
+
 interface SettingsListProps {
   devModeProps: boolean
   setDevMode: (x) => void
@@ -39,13 +40,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [providerInputError, setProviderInputError] = useState(null)
   const [providerInputDefault, setProviderInputDefault] = useState('')
 
-  const [swarmGatewayInput, setSwarmGatewayInput] = useState('')
-  const [swarmGatewayInputError, setSwarmGatewayInputError] = useState(null)
-  const [swarmGatewayInputDefault, setSwarmGatewayInputDefault] = useState('')
+  // const [swarmGatewayInput, setSwarmGatewayInput] = useState('')
+  // const [swarmGatewayInputError, setSwarmGatewayInputError] = useState(null)
+  // const [swarmGatewayInputDefault, setSwarmGatewayInputDefault] = useState('')
 
-  const [swarmPostageStampIdInput, setSwarmPostageStampIdInput] = useState('')
-  const [swarmPostageStampIdInputError, setSwarmPostageStampIdInputError] = useState(null)
-  const [swarmPostageStampIdInputDefault, setSwarmPostageStampIdInputDefault] = useState('')
+  // const [swarmPostageStampIdInput, setSwarmPostageStampIdInput] = useState('')
+  // const [swarmPostageStampIdInputError, setSwarmPostageStampIdInputError] = useState(null)
+  // const [swarmPostageStampIdInputDefault, setSwarmPostageStampIdInputDefault] = useState('')
 
   const [userAgentNameInput, setUserAgentNameInput] = useState('')
   const [userAgentNameInputError, setUserAgentNameInputError] = useState(null)
@@ -56,31 +57,27 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const [targetStorages, setTargetStorages] = useState([])
 
-  const regExpUserAgentName = new RegExp(/^[a-zA-Z0-9-_\.\s]{3,128}$/)
+  const regExpUserAgentName = new RegExp(/^[a-zA-Z0-9-_.\s]{3,128}$/)
   const regExpUserAgentNameFirstSymbol = new RegExp(/^[a-zA-Z0-9]+$/)
   const inputOfFocusIPFS = useRef<HTMLInputElement>()
-  const inputOfFocusSwarmId = useRef<HTMLInputElement>()
-  const inputOfFocusSwarm = useRef<HTMLInputElement>()
+  // const inputOfFocusSwarmId = useRef<HTMLInputElement>()
+  // const inputOfFocusSwarm = useRef<HTMLInputElement>()
   const inputOfFocusEtn = useRef<HTMLInputElement>()
   const inputOfFocusAgentName = useRef<HTMLInputElement>()
 
   useEffect(() => {
     const init = async () => {
       await checkUpdates()
-
       await loadProvider()
-      await loadSwarmGateway()
+      // await loadSwarmGateway()
       await loadErrorReporting()
-      await loadSwarmPostageStampId()
-
-      await loadUserAgentId()
+      // await loadSwarmPostageStampId()
+      // await loadUserAgentId()
       await loadUserAgentName()
       await loadIpfsGateway()
       await loadTargetStorages()
     }
     init()
-
-    return () => {}
   }, [])
 
   const getValidUserAgentName = (value, reg) => {
@@ -88,7 +85,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       const valueReg = value.match(reg)
 
       return valueReg
-    } catch {}
+    } catch (err) {
+      console.log(err)
+    }
   }
   const getValidUserAgentNameFirstSymbol = (value, reg) => {
     try {
@@ -96,7 +95,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       const valueReg = firsSymbolString.match(reg)
 
       return valueReg
-    } catch {}
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const loadErrorReporting = async () => {
@@ -136,64 +137,64 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     }
   }
 
-  const loadSwarmGateway = async () => {
-    const { getInitialConfig } = await initBGFunctions(browser)
-    const config = await getInitialConfig()
+  // const loadSwarmGateway = async () => {
+  // const { getInitialConfig } = await initBGFunctions(browser)
+  // const config = await getInitialConfig()
 
-    if (config.swarmGatewayUrl) {
-      setSwarmGatewayInputDefault(config.swarmGatewayUrl)
-    }
-    const { getSwarmGateway } = await initBGFunctions(browser)
-    const gateway = await getSwarmGateway()
+  // if (config.swarmGatewayUrl) {
+  //   setSwarmGatewayInputDefault(config.swarmGatewayUrl)
+  // }
+  // const { getSwarmGateway } = await initBGFunctions(browser)
+  // const gateway = await getSwarmGateway()
 
-    setSwarmGatewayInput(gateway)
-  }
+  // setSwarmGatewayInput(gateway)
+  // }
 
-  const setSwarmGateway = async (gateway: string) => {
-    try {
-      const { setSwarmGateway } = await initBGFunctions(browser)
-      await setSwarmGateway(gateway)
-      loadSwarmGateway()
-    } catch (err) {
-      setSwarmGatewayInputError(err.message)
-      setTimeout(() => {
-        setSwarmGatewayInputError(null)
-      }, 3000)
-    }
-  }
+  // const setSwarmGateway = async (gateway: string) => {
+  //   try {
+  //     const { setSwarmGateway } = await initBGFunctions(browser)
+  //     await setSwarmGateway(gateway)
+  //     loadSwarmGateway()
+  //   } catch (err) {
+  //     setSwarmGatewayInputError(err.message)
+  //     setTimeout(() => {
+  //       setSwarmGatewayInputError(null)
+  //     }, 3000)
+  //   }
+  // }
 
-  const loadSwarmPostageStampId = async () => {
-    const { getInitialConfig } = await initBGFunctions(browser)
-    const config = await getInitialConfig()
+  // const loadSwarmPostageStampId = async () => {
+  //   const { getInitialConfig } = await initBGFunctions(browser)
+  //   const config = await getInitialConfig()
 
-    if (config.swarmPostageStampId) {
-      setSwarmPostageStampIdInputDefault(config.swarmPostageStampId)
-    }
-    const { getSwarmPostageStampId } = await initBGFunctions(browser)
-    const id = await getSwarmPostageStampId()
+  //   if (config.swarmPostageStampId) {
+  //     setSwarmPostageStampIdInputDefault(config.swarmPostageStampId)
+  //   }
+  //   const { getSwarmPostageStampId } = await initBGFunctions(browser)
+  //   const id = await getSwarmPostageStampId()
 
-    setSwarmPostageStampIdInput(id)
-  }
+  //   setSwarmPostageStampIdInput(id)
+  // }
 
-  const setSwarmPostageStampId = async (id: string) => {
-    try {
-      const { setSwarmPostageStampId } = await initBGFunctions(browser)
-      await setSwarmPostageStampId(id)
+  // const setSwarmPostageStampId = async (id: string) => {
+  //   try {
+  //     const { setSwarmPostageStampId } = await initBGFunctions(browser)
+  //     await setSwarmPostageStampId(id)
 
-      loadSwarmPostageStampId()
-    } catch (err) {
-      setSwarmPostageStampIdInputError(err.message)
+  //     loadSwarmPostageStampId()
+  //   } catch (err) {
+  //     setSwarmPostageStampIdInputError(err.message)
 
-      setTimeout(() => {
-        setSwarmPostageStampIdInputError(null)
-      }, 3000)
-    }
-  }
+  //     setTimeout(() => {
+  //       setSwarmPostageStampIdInputError(null)
+  //     }, 3000)
+  //   }
+  // }
 
-  const loadUserAgentId = async () => {
-    const { getUserAgentId } = await initBGFunctions(browser)
-    const userAgentId = await getUserAgentId()
-  }
+  // const loadUserAgentId = async () => {
+  //   const { getUserAgentId } = await initBGFunctions(browser)
+  //   const userAgentId = await getUserAgentId()
+  // }
 
   const loadUserAgentName = async () => {
     const { getUserAgentName } = await initBGFunctions(browser)
@@ -288,7 +289,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     ref.current?.blur()
   }
   const setOnboarding = async () => {
-    const { setIsFirstInstallation, getIsFirstInstallation } = await initBGFunctions(browser)
+    const { setIsFirstInstallation } = await initBGFunctions(browser)
     await setIsFirstInstallation(true)
   }
 
@@ -338,13 +339,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
           <SettingItem
             title="Developer mode"
             component={
-              <>
+              <div className={styles.loaderOrSwitchContainer}>
                 {isSvgLoaderDevMode ? (
-                  <span className={styles.loader}></span>
+                  <div className={styles.loader}></div>
                 ) : (
                   <Switch checked={devModeProps} onChange={() => setDevMode(!devModeProps)} />
                 )}
-              </>
+              </div>
             }
           />
           <SettingItem

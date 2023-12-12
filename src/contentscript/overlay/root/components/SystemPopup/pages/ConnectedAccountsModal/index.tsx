@@ -32,6 +32,7 @@ interface IConnectedAccountsModalProps {
       }
     }
     frameId: string
+    network?: NearNetworks
   }
   onCloseClick: () => void
   bus: Bus
@@ -66,6 +67,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     accountsToConnect,
     bunchOfAccountsToConnect,
     accountsToDisconnect,
+    network,
   } = data
 
   const [wait, setWait] = useState(true)
@@ -84,7 +86,9 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   const init = async () => {
     const { getPreferredConnectedAccountsNetwork } = await initBGFunctions(browser)
     const preferredConnectedAccountsNetwork: NearNetworks =
-      await getPreferredConnectedAccountsNetwork()
+      network === NearNetworks.Mainnet || network === NearNetworks.Testnet
+        ? network
+        : await getPreferredConnectedAccountsNetwork()
     setContractNetwork(preferredConnectedAccountsNetwork)
 
     if (accountsToConnect) {
@@ -153,7 +157,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   const sendVerivicationRequest = async () => {
     const { requestConnectingAccountsVerification } = await initBGFunctions(browser)
     try {
-      await requestConnectingAccountsVerification(requestBody, null)
+      await requestConnectingAccountsVerification(requestBody, null, contractNetwork)
     } catch (err) {
       if (err.message !== 'User rejected the transaction.')
         console.log('Error in requestConnectingAccountsVerification().', err)
@@ -167,13 +171,13 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
 
   useEffect(() => {
     if (requestBody) sendVerivicationRequest()
-  }, [requestBody])
+  }, [requestBody, contractNetwork])
 
   const handleConnectOrDisconnect = async () => {
     setIsWaiting(true)
     const { getConnectedAccountsMinStakeAmount, requestConnectingAccountsVerification } =
       await initBGFunctions(browser)
-    const minStakeAmount: number = await getConnectedAccountsMinStakeAmount()
+    const minStakeAmount: number = await getConnectedAccountsMinStakeAmount(contractNetwork)
     const firstProofUrl = resources[selectedFirstUser.origin].proofUrl(selectedFirstUser.name)
     const secondProofUrl = resources[selectedSecondUser.origin].proofUrl(selectedSecondUser.name)
 
@@ -246,7 +250,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         isUnlink,
       }
       try {
-        await requestConnectingAccountsVerification(body, minStakeAmount)
+        await requestConnectingAccountsVerification(body, minStakeAmount, contractNetwork)
       } catch (err) {
         if (err.message !== 'User rejected the transaction.')
           console.log('Error in requestConnectingAccountsVerification().', err)
@@ -262,7 +266,12 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
 
     try {
       setIsWaiting(true)
-      await changeConnectedAccountStatus(account.name, account.origin, !account.accountActive)
+      await changeConnectedAccountStatus(
+        account.name,
+        account.origin,
+        !account.accountActive,
+        contractNetwork
+      )
     } catch (err) {
       if (err.message !== 'User rejected the transaction.')
         console.log('Error in changeConnectedAccountStatus().', err)

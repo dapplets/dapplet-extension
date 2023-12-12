@@ -1,23 +1,14 @@
 @import '../../assets/styles/null';
-@import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
+@import '../../assets/styles/pages';
 @import './modalStyles';
 @import './adaptive';
 
 // ToDo: code duplication
 
 .wrapper {
-  overflow: hidden;
-  overflow: -moz-scrollbars-none;
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-
-  width: 100%;
-
   height: calc(100vh - 100px);
-  padding-bottom: 10px;
-  -ms-overflow-style: none;
+  padding-bottom: 5px;
 }
 
 .wrapper::-webkit-scrollbar {
@@ -67,6 +58,10 @@
 
 .wrapperSettings {
   margin: 0 0 20px !important;
+
+  &:last-child {
+    margin: 0 !important;
+  }
 }
 
 .socialBlock {
@@ -88,7 +83,6 @@
   margin: 0 0 10px;
   padding: 10px;
 
-  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
@@ -104,7 +98,6 @@
   width: 100%;
   padding: 5px 13px;
 
-  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
@@ -125,7 +118,6 @@
   min-height: 128px;
   padding: 5px 13px;
 
-  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
@@ -174,7 +166,6 @@
 
   margin: 0 0 0 14px;
 
-  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
@@ -205,11 +196,8 @@
 
   display: block;
 
-  width: 66px;
-  height: 20px;
   padding: 5px;
 
-  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
@@ -233,11 +221,8 @@
 
   display: block;
 
-  width: 66px;
-  height: 20px;
   padding: 5px;
 
-  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
@@ -273,7 +258,6 @@
   width: 100%;
   padding: 5px 13px;
 
-  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
@@ -300,7 +284,6 @@
   margin: 0 0 0 5px;
   padding: 0 10px;
 
-  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 400;
   line-height: 100%;
@@ -341,20 +324,7 @@
 
   width: 100%;
   height: 60px;
-  margin: 20px 0 0;
-
-  &::before {
-    content: '';
-
-    position: absolute;
-    top: -10px;
-    left: 0;
-
-    width: 100%;
-    height: 2px;
-
-    background: $web-bg;
-  }
+  margin: 5px 0 0;
 }
 
 .back {
@@ -366,7 +336,6 @@
 
   margin: 0 0 0 14.5px;
 
-  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
@@ -407,7 +376,6 @@
   margin: 0 auto;
   padding: 0 30.36px 0 0;
 
-  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
@@ -480,7 +448,6 @@
 .blockContextIDTitle {
   display: inline-block;
 
-  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
@@ -553,7 +520,6 @@
 
   width: 90%;
 
-  font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 400;
   font-style: italic;
@@ -596,7 +562,6 @@
   margin: 0 0 0 5px;
   padding: 0 10px;
 
-  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 400;
   line-height: 100%;
@@ -627,7 +592,6 @@
   margin: 0 0 0 5px;
   padding: 0 10px;
 
-  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 400;
   line-height: 100%;
@@ -667,17 +631,14 @@
   width: 11.5px;
   height: 12.5px;
 
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%23747376'/%3E%3C/svg%3E");
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%23747376'/%3E%3C/svg%3E");
   border-color: inherit;
 
   &:hover {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%23919191'/%3E%3C/svg%3E");
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%23919191'/%3E%3C/svg%3E");
   }
 
   &:active {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%232A2A2A'/%3E%3C/svg%3E");
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%232A2A2A'/%3E%3C/svg%3E");
   }
 }
-
-@import './modalStyles';
-@import './adaptive';

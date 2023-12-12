@@ -1,5 +1,4 @@
 @import '../../assets/styles/null';
-@import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
 @import './adaptive';
 
@@ -7,12 +6,10 @@
   display: flex;
 
   max-width: 97%;
-  margin-top: 2px;
-  margin-right: 2px;
-  margin-bottom: 10px;
+  margin-top: 6px;
+  margin-right: 6px;
+  margin-bottom: 16px;
   padding: 10px 17px;
-
-  font-family: Montserrat, sans-serif;
 
   background: #fff;
   border-radius: 10px;
@@ -24,20 +21,21 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
+  justify-content: space-between;
+
+  width: 325px;
   padding: 0 0 0 13px;
+}
+
+.header {
+  width: 100%;
 }
 
 .blockTop {
   display: flex;
   align-items: center;
+  width: 100%;
   transition: all 0.2s ease;
-
-  .blockIcons {
-    display: flex;
-    justify-content: space-between;
-    width: 34px;
-    margin: 0 57px 0 13px;
-  }
 }
 
 .errorIcon {
@@ -48,19 +46,12 @@
 
   &:hover svg path {
     fill: none;
-}
+  }
 }
 
 .errorTitle {
-  .blockIcons {
-    display: flex;
-    justify-content: space-between;
-    width: 3px;
-    margin: 0 57px 0 13px;
-  }
-
   h2 {
-    color: $error!important;
+    color: $error !important;
   }
 }
 
@@ -70,7 +61,6 @@
   width: 277px;
   padding: 5px 0 13px;
 
-  font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 400;
   line-height: 120%;
@@ -171,8 +161,8 @@
   width: 25px;
   height: 20px;
   margin-left: 10px;
+  padding: 5px;
 
-  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
@@ -191,12 +181,22 @@
   height: 24px;
 }
 
+.loaderOrSwitchContainer {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+
+  width: 32px;
+  margin: 0 0 0 17px;
+}
+
 .loader {
-  display: inline-block;
+  display: block;
 
   width: 20px;
   height: 20px;
-  margin-left: 12px;
+  margin: 0 6px;
 
   background-image: url('../../assets/svg/loaderSettings.svg');
   background-repeat: no-repeat;
@@ -207,7 +207,6 @@
 
   padding-bottom: 5px;
 
-  font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 400;
   line-height: 120%;

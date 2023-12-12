@@ -14,30 +14,30 @@ import { StorageRefImage } from '../../components/StorageRefImage'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
 
-enum DeploymentStatus {
-  Unknown,
-  Deployed,
-  NotDeployed,
-  NewModule,
-}
+// enum DeploymentStatus {
+//   Unknown,
+//   Deployed,
+//   NotDeployed,
+//   NewModule,
+// }
 
-enum DependencyType {
-  Dependency,
-  Interface,
-}
+// enum DependencyType {
+//   Dependency,
+//   Interface,
+// }
 
-enum FormMode {
-  Deploying,
-  Creating,
-  Editing,
-}
+// enum FormMode {
+//   Deploying,
+//   Creating,
+//   Editing,
+// }
 
-type DependencyChecking = {
-  name: string
-  version: string
-  type: DependencyType
-  isExists?: boolean
-}
+// type DependencyChecking = {
+//   name: string
+//   version: string
+//   type: DependencyType
+//   isExists?: boolean
+// }
 
 export interface UnderConstructionInfoProps {
   ModuleInfo: any
@@ -50,7 +50,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const {
     setUnderConstructionDetails,
     ModuleInfo,
-    ModuleVersion,
+    // ModuleVersion,
     // setShowChildrenUnderConstraction,
   } = props
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
@@ -141,7 +141,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       })
       setModalTransaction(false)
       setModal(true)
-    } finally {
     }
   }
 
@@ -171,6 +170,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
 
       setVisibleContextId(contextIds)
     } catch (error) {
+      console.log(error)
     } finally {
       setEditContextId('')
       setEditContextIdLoading(false)
@@ -210,6 +210,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
 
       setVisibleContextId(contextIds)
     } catch (error) {
+      console.log(error)
     } finally {
       setEditContextIdLoading(false)
       setAddDisabled(false)
@@ -276,180 +277,160 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
 
       <>
         <div className={styles.mainInfoBlock}>
-          <SettingWrapper
-            className={styles.wrapperSettings}
-            title="Social"
-            children={
-              <div className={styles.socialBlock}>
-                <div className={styles.moduleTitle}>
+          <SettingWrapper className={styles.wrapperSettings} title="Social">
+            <div className={styles.socialBlock}>
+              <div className={styles.moduleTitle}>
+                {' '}
+                {mi.name}{' '}
+                <div className={styles.counterBurn}>
                   {' '}
-                  {mi.name}{' '}
-                  <div className={styles.counterBurn}>
-                    {' '}
-                    Days to burn: <span className={styles.counter}>{counterBurn}</span>
-                  </div>
-                </div>
-
-                <SettingItem
-                  title="Title"
-                  className={styles.item}
-                  component={<></>}
-                  children={
-                    <input
-                      value={mi.title ?? ''}
-                      onChange={(e) => {
-                        setMi({ ...mi, title: e.target.value })
-
-                        setDisabledPush(false)
-                      }}
-                      className={styles.inputTitle}
-                    />
-                  }
-                />
-                <SettingItem
-                  title="Description"
-                  component={<></>}
-                  className={styles.item}
-                  children={
-                    <input
-                      className={styles.inputTitle}
-                      value={mi.description ?? ''}
-                      onChange={(e) => {
-                        setMi({ ...mi, description: e.target.value })
-
-                        setDisabledPush(false)
-                      }}
-                    />
-                  }
-                />
-
-                <div className={styles.iconBlock}>
-                  <div className={styles.imgBlock}>
-                    <StorageRefImage className={styles.img} storageRef={mi.icon} />
-
-                    {st.map((x, i) => (
-                      <span className={styles.imgTitle} key={i}>
-                        {visibleNameFile(x.name)}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className={styles.buttonIcon}>
-                    <input
-                      ref={fileInput}
-                      type="file"
-                      name="file"
-                      id="file"
-                      accept=".png"
-                      className={styles.inputfile}
-                      onChange={(e) => {
-                        onChange(e)
-                        iconInputChangeHandler(e)
-
-                        setDisabledPush(false)
-                      }}
-                    />
-                    <label htmlFor="file">Change icon</label>
-                  </div>
+                  Days to burn: <span className={styles.counter}>{counterBurn}</span>
                 </div>
               </div>
-            }
-          />
 
-          <SettingWrapper
-            title="Parameters"
-            className={styles.wrapperSettings}
-            children={
-              <>
-                {isLoad ? (
-                  <div className={styles.miniLoader}></div>
-                ) : (
-                  <div className={styles.parametersBlock}>
-                    <div className={styles.wrapperContextID}>
-                      <div className={styles.blockContextID}>
-                        <h3 className={styles.blockContextIDTitle}>Context IDs</h3>
-                        <button
-                          disabled={mi.contextIds.length >= 1}
-                          onClick={addButtonClickHandlerContext}
-                          className={cn(styles.contextIDButton, {
-                            [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
-                          })}
-                        />
-                      </div>
-                      {mi.contextIds.map((x, i) => (
-                        <div key={i} className={styles.wrapperContext}>
-                          <div className={styles.blockContext}>
-                            <input
-                              key={i}
-                              ref={nodeInput}
-                              className={styles.blockContextTitle}
-                              value={editContextId}
-                              placeholder={'Context ID (ex: example.com)'}
-                              onChange={(e) => {
-                                setEditContextId(e.target.value)
-                              }}
-                            />
+              <SettingItem title="Title" className={styles.item} component={<></>}>
+                <input
+                  value={mi.title ?? ''}
+                  onChange={(e) => {
+                    setMi({ ...mi, title: e.target.value })
 
-                            <button
-                              ref={node}
-                              onClick={() => {
-                                onDeleteChildContext(i)
-                                setEditContextId('')
-                              }}
-                              className={cn(styles.contextDelete, {
-                                [styles.contextDeleteNone]: contextDeleteNone,
-                              })}
-                            >
-                              <Delete />
-                            </button>
-                          </div>
-                          <button
-                            disabled={nodeInput.current?.value.length < 2 || addDisabled}
-                            onClick={() => {
-                              node.current?.classList.add('valid')
-                              _addContextId(editContextId)
-                            }}
-                            className={cn(styles.addContext, {
-                              [styles.addContextDisabled]:
-                                nodeInput.current?.value.length < 2 || addDisabled,
-                            })}
-                          >
-                            ADD
-                          </button>
-                        </div>
-                      ))}
-                      {editContextIdLoading ? (
-                        <div className={styles.editContextIdLoading}></div>
-                      ) : (
-                        <>
-                          {visibleContextId && visibleContextId.length
-                            ? visibleContextId.map((x, i) => (
-                                <div key={i} className={styles.blockContext}>
-                                  <input
-                                    className={styles.blockContextTitle}
-                                    placeholder={x}
-                                    value={x}
-                                    readOnly
-                                  />
+                    setDisabledPush(false)
+                  }}
+                  className={styles.inputTitle}
+                />
+              </SettingItem>
+              <SettingItem title="Description" component={<></>} className={styles.item}>
+                <input
+                  className={styles.inputTitle}
+                  value={mi.description ?? ''}
+                  onChange={(e) => {
+                    setMi({ ...mi, description: e.target.value })
 
-                                  <button
-                                    ref={node}
-                                    onClick={() => {
-                                      _removeContextID(x)
-                                    }}
-                                    className={cn(styles.addcontextDelete)}
-                                  />
-                                </div>
-                              ))
-                            : null}
-                        </>
-                      )}
-                    </div>
+                    setDisabledPush(false)
+                  }}
+                />
+              </SettingItem>
+
+              <div className={styles.iconBlock}>
+                <div className={styles.imgBlock}>
+                  <StorageRefImage className={styles.img} storageRef={mi.icon} />
+
+                  {st.map((x, i) => (
+                    <span className={styles.imgTitle} key={i}>
+                      {visibleNameFile(x.name)}
+                    </span>
+                  ))}
+                </div>
+
+                <div className={styles.buttonIcon}>
+                  <input
+                    ref={fileInput}
+                    type="file"
+                    name="file"
+                    id="file"
+                    accept=".png"
+                    className={styles.inputfile}
+                    onChange={(e) => {
+                      onChange(e)
+                      iconInputChangeHandler(e)
+
+                      setDisabledPush(false)
+                    }}
+                  />
+                  <label htmlFor="file">Change icon</label>
+                </div>
+              </div>
+            </div>
+          </SettingWrapper>
+
+          <SettingWrapper title="Parameters" className={styles.wrapperSettings}>
+            {isLoad ? (
+              <div className={styles.miniLoader}></div>
+            ) : (
+              <div className={styles.parametersBlock}>
+                <div className={styles.wrapperContextID}>
+                  <div className={styles.blockContextID}>
+                    <h3 className={styles.blockContextIDTitle}>Context IDs</h3>
+                    <button
+                      disabled={mi.contextIds.length >= 1}
+                      onClick={addButtonClickHandlerContext}
+                      className={cn(styles.contextIDButton, {
+                        [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
+                      })}
+                    />
                   </div>
-                )}
-              </>
-            }
-          />
+                  {mi.contextIds.map((x, i) => (
+                    <div key={i} className={styles.wrapperContext}>
+                      <div className={styles.blockContext}>
+                        <input
+                          key={i}
+                          ref={nodeInput}
+                          className={styles.blockContextTitle}
+                          value={editContextId}
+                          placeholder={'Context ID (ex: example.com)'}
+                          onChange={(e) => {
+                            setEditContextId(e.target.value)
+                          }}
+                        />
+
+                        <button
+                          ref={node}
+                          onClick={() => {
+                            onDeleteChildContext(i)
+                            setEditContextId('')
+                          }}
+                          className={cn(styles.contextDelete, {
+                            [styles.contextDeleteNone]: contextDeleteNone,
+                          })}
+                        >
+                          <Delete />
+                        </button>
+                      </div>
+                      <button
+                        disabled={nodeInput.current?.value.length < 2 || addDisabled}
+                        onClick={() => {
+                          node.current?.classList.add('valid')
+                          _addContextId(editContextId)
+                        }}
+                        className={cn(styles.addContext, {
+                          [styles.addContextDisabled]:
+                            nodeInput.current?.value.length < 2 || addDisabled,
+                        })}
+                      >
+                        ADD
+                      </button>
+                    </div>
+                  ))}
+                  {editContextIdLoading ? (
+                    <div className={styles.editContextIdLoading}></div>
+                  ) : (
+                    <>
+                      {visibleContextId && visibleContextId.length
+                        ? visibleContextId.map((x, i) => (
+                            <div key={i} className={styles.blockContext}>
+                              <input
+                                className={styles.blockContextTitle}
+                                placeholder={x}
+                                value={x}
+                                readOnly
+                              />
+
+                              <button
+                                ref={node}
+                                onClick={() => {
+                                  _removeContextID(x)
+                                }}
+                                className={cn(styles.addcontextDelete)}
+                              />
+                            </div>
+                          ))
+                        : null}
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+          </SettingWrapper>
         </div>
         <div className={styles.linkNavigation}>
           <button

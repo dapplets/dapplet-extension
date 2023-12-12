@@ -8,6 +8,7 @@ import {
   DefaultSigners,
   IConnectedAccountsPair,
   IConnectedAccountUser,
+  NearNetworks,
   TConnectedAccount,
   TConnectedAccountsVerificationRequestInfo,
   WalletDescriptorWithCAMainStatus,
@@ -46,8 +47,11 @@ export default class ConnectedAccountService {
       changeMethods: ['requestVerification', 'changeStatus'],
     })
 
-  private async _getContract() {
-    const contractNetwork = await this._globalConfigService.getPreferredConnectedAccountsNetwork()
+  private async _getContract(network?: NearNetworks) {
+    const contractNetwork =
+      network === NearNetworks.Mainnet || network === NearNetworks.Testnet
+        ? network
+        : await this._globalConfigService.getPreferredConnectedAccountsNetwork()
     switch (contractNetwork) {
       case 'mainnet':
         if (!this._mainnetContract) {
@@ -79,9 +83,10 @@ export default class ConnectedAccountService {
   public async getConnectedAccounts(
     accountId: string,
     originId: string,
-    closeness?: number
+    closeness?: number,
+    network?: NearNetworks
   ): Promise<TConnectedAccount[][] | null> {
-    const contract = await this._getContract()
+    const contract = await this._getContract(network)
     return contract['getConnectedAccounts']({
       accountId,
       originId,
@@ -89,45 +94,61 @@ export default class ConnectedAccountService {
     })
   }
 
-  public async getMinStakeAmount(): Promise<number> {
-    const contract = await this._getContract()
+  public async getMinStakeAmount(network?: NearNetworks): Promise<number> {
+    const contract = await this._getContract(network)
     return contract['getMinStakeAmount']()
   }
 
-  public async getPendingRequests(): Promise<number[]> {
-    const contract = await this._getContract()
+  public async getPendingRequests(network?: NearNetworks): Promise<number[]> {
+    const contract = await this._getContract(network)
     return contract['getPendingRequests']()
   }
 
   public async getVerificationRequest(
-    id: number
+    id: number,
+    network?: NearNetworks
   ): Promise<TConnectedAccountsVerificationRequestInfo | null> {
-    const contract = await this._getContract()
+    const contract = await this._getContract(network)
     return contract['getVerificationRequest']({ id })
   }
 
-  public async getStatus(accountId: string, originId: string): Promise<boolean> {
-    const contract = await this._getContract()
+  public async getStatus(
+    accountId: string,
+    originId: string,
+    network?: NearNetworks
+  ): Promise<boolean> {
+    const contract = await this._getContract(network)
     return contract['getStatus']({ accountId, originId })
   }
 
-  public async areConnected(accountGId1: string, accountGId2: string): Promise<boolean> {
-    const contract = await this._getContract()
+  public async areConnected(
+    accountGId1: string,
+    accountGId2: string,
+    network?: NearNetworks
+  ): Promise<boolean> {
+    const contract = await this._getContract(network)
     return contract['areConnected']({ accountGId1, accountGId2 })
   }
 
-  public async getNet(accountGId: string): Promise<string[] | null> {
-    const contract = await this._getContract()
+  public async getNet(accountGId: string, network?: NearNetworks): Promise<string[] | null> {
+    const contract = await this._getContract(network)
     return contract['getNet']({ accountGId })
   }
 
-  public async getMainAccount(accountId: string, originId: string): Promise<string | null> {
-    const contract = await this._getContract()
+  public async getMainAccount(
+    accountId: string,
+    originId: string,
+    network?: NearNetworks
+  ): Promise<string | null> {
+    const contract = await this._getContract(network)
     return contract['getMainAccount']({ accountId, originId })
   }
 
-  public async getRequestStatus(id: number): Promise<ConnectedAccountsRequestStatus> {
-    const contract = await this._getContract()
+  public async getRequestStatus(
+    id: number,
+    network?: NearNetworks
+  ): Promise<ConnectedAccountsRequestStatus> {
+    const contract = await this._getContract(network)
     const status = await contract['getRequestStatus']({ id })
     switch (status) {
       case 0:
@@ -288,7 +309,8 @@ export default class ConnectedAccountService {
       signature?: EthSignature
       statement?: string
     },
-    stake?: number
+    stake?: number,
+    network?: NearNetworks
   ): Promise<number> {
     const {
       firstAccountId,
@@ -301,7 +323,7 @@ export default class ConnectedAccountService {
       signature,
       statement,
     } = props
-    const contract = await this._getContract()
+    const contract = await this._getContract(network)
     const requestBody: {
       firstAccountId: string
       firstOriginId: string
@@ -331,8 +353,13 @@ export default class ConnectedAccountService {
     return res
   }
 
-  public async changeStatus(accountId: string, originId: string, isMain: boolean): Promise<void> {
-    const contract = await this._getContract()
+  public async changeStatus(
+    accountId: string,
+    originId: string,
+    isMain: boolean,
+    network?: NearNetworks
+  ): Promise<void> {
+    const contract = await this._getContract(network)
     const res = await contract['changeStatus']({
       accountId,
       originId,

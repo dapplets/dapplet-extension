@@ -1,5 +1,4 @@
 @import '../../../assets/styles/null';
-@import '../../../assets/styles/fonts';
 @import '../../../assets/styles/color.variables';
 @import '../../../assets/styles/animate';
 
@@ -92,7 +91,7 @@
 
   margin-top: 12px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 16px;
   font-weight: 400;
   font-style: normal;
@@ -161,7 +160,8 @@
 .newProfileBlockInfo {
   display: flex;
   align-items: center;
-  width: 80%;
+
+  width: 70%;
   padding-left: 5px;
 }
 
@@ -178,11 +178,14 @@
   align-items: start;
   justify-content: center;
 
+  
+
   width: 80%;
   padding-left: 10px;
 }
 
 .newProfileBlockName {
+  // overflow: hidden;
   display: inline-block;
 
   width: 100%;
@@ -193,6 +196,7 @@
   font-style: normal;
   line-height: 100%;
   color: $main-black;
+  // text-overflow: ellipsis;
   text-transform: capitalize;
 }
 
@@ -203,6 +207,7 @@
 
   width: 25px;
   height: 25px;
+  // margin-right: auto;
 }
 
 .profileImgButton {
@@ -229,8 +234,9 @@
     width: 25px;
     height: 25px;
     transition: all 0.5s;
-
+  
     svg {
+      // transform: scale(1.2);
       transform: scale(0.7);
       transition: all 0.5s;
 
@@ -260,7 +266,7 @@
 
   width: 100%;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 16px;
   font-weight: 400;
   font-style: normal;
@@ -291,7 +297,7 @@
 .AddUserLabel {
   display: inline-block;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 14px;
   font-weight: 400;
   font-style: normal;
@@ -331,7 +337,7 @@
   width: auto;
   padding: 5px 10px;
 
-  font-family: Roboto, sans-serif;
+    
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
