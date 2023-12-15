@@ -1,0 +1,44 @@
+:host {
+  display: block;
+  padding: 2px 0 0 10px;
+}
+
+button {
+  width: max-content;
+  max-height: 18px;
+  padding: 0 6px !important;
+
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.75rem !important;
+  color: rgb(101 109 118) !important;
+
+  border: 1px solid rgb(208 215 222) !important;
+  border-radius: 9em;
+
+  transition-timing-function: ease-in-out;
+  transition-duration: 0.1s;
+  transition-property: all;
+}
+
+button:hover {
+  color: green !important;
+}
+
+button:active {
+  color: rgb(0 97 0) !important;
+}
+
+button svg {
+  width: 14px;
+  height: 14px;
+  margin: -2px 0;
+  padding: 0;
+}
+
+button:hover .icon::before {
+  margin: 0 -6px !important;
+}
+
+button svg path {
+  stroke-width: 0.6px !important;
+}

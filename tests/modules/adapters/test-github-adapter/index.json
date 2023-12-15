@@ -1,7 +1,7 @@
 {
   "themes": {
-    "LIGHT": "boolean(//body[@style='background-color: #FFFFFF;'] | //body[@style='background-color: rgb(255, 255, 255);'])",
-    "DARK": "boolean(//body[@style='background-color: rgb(0, 0, 0);'])"
+    "LIGHT": "boolean(//html[@data-color-mode='light'])",
+    "DARK": "boolean(//html[@data-color-mode='dark'])"
   },
   "contexts": {
     "GLOBAL": {
@@ -9,9 +9,10 @@
       "contextBuilder": {
         "id": "string('global')",
         "websiteName": "string('GitHub')",
-        "username": "string(//div[@class='Overlay-titleWrap']//span[@class='Truncate-text'])",
-        "fullname": "string(//div[@class='Overlay-titleWrap']//span[@class='Truncate-text']/../../span[2])",
-        "img": "string(//div[@class='Overlay-titleWrap']//img/@src)"
+        "username": "normalize-space(string(//div[@class='Overlay-titleWrap']//span[@class='Truncate-text']))",
+        "fullname": "normalize-space(string(//div[@class='Overlay-titleWrap']//span[@class='Truncate-text']/../../span[2]))",
+        "img": "string(//div[@class='Overlay-titleWrap']//img/@src)",
+        "url": "string(//html/head/meta[@property='og:url']/@content)"
       }
     },
     "PROFILE": {
@@ -30,10 +31,38 @@
         }
       },
       "contextBuilder": {
-        "id": "substring-before(substring-after(string(.//h1/span[2]), '\n'), '\n')",
-        "authorFullname": "string(.//h1/span[1])",
-        "authorUsername": "substring-before(substring-after(string(.//h1/span[2]), '\n'), '\n')",
-        "authorImg": "string(.//img/@src)"
+        "id": "normalize-space(substring-before(substring-after(string(.//h1/span[2]), '\n'), '\n'))",
+        "authorFullname": "normalize-space(string(.//h1/span[1]))",
+        "authorUsername": "normalize-space(substring-before(substring-after(string(.//h1/span[2]), '\n'), '\n'))",
+        "authorImg": "string(.//img/@src)",
+        "url": "concat('https://github.com/', normalize-space(substring-before(substring-after(string(.//h1/span[2]), '\n'), '\n')))"
+      }
+    },
+    "POST": {
+      "containerSelector": ".js-discussion",
+      "contextSelector": ".TimelineItem.js-comment-container",
+      "widgets": {
+        "button": {
+          "styles": "styles/post/button.css",
+          "insertionPoint": ".timeline-comment-actions",
+          "button": "end"
+        },
+        "avatarBadge": {
+          "styles": "styles/post/avatarBadge.css",
+          "insertionPoint": "div.TimelineItem-avatar > a",
+          "button": "end"
+        },
+        "bos": {
+          "styles": "styles/post/bos.css",
+          "insertionPoint": ".timeline-comment-actions",
+          "button": "end"
+        }
+      },
+      "contextBuilder": {
+        "id": "string(.//div[contains(@class,'timeline-comment-group')]/@id)",
+        "authorUsername": "substring-after(string(.//div[contains(@class,'TimelineItem-avatar')]/a/@href | .//a[contains(@class,'TimelineItem-avatar')]/@href), '/')",
+        "authorImg": "string(.//*[contains(@class,'TimelineItem-avatar')]//img/@src)",
+        "url": "concat('https://github.com', substring(string(//a[@id='pull-requests-tab'][@aria-current='page']/@href), 1, string-length(string(//a[@id='pull-requests-tab'][@aria-current='page']/@href))-1), string(//a[@id='issues-tab'][@aria-current='page']/@href), '/', substring-before(substring-after(substring-after(string(//title), ' · '), '#'), ' · '),'#', string(.//div[contains(@class,'timeline-comment-group')]/@id))"
       }
     }
   }

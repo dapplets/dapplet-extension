@@ -1,0 +1,16 @@
+{
+  "name": "tipping-bos-component",
+  "version": "0.1.0",
+  "description": "Tipping BOS component",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "Tipping BOS component",
+  "icon": "src/tipping.png",
+  "contextIds": [
+    "test-virtual-adapter"
+  ],
+  "dependencies": {
+    "test-virtual-adapter": "0.1.0"
+  }
+}
