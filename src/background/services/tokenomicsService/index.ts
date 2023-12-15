@@ -29,7 +29,7 @@ export class TokenRegistryService {
     if (this.tokenFactory) return
     const signer = await this._walletService.eth_getSignerFor(
       DefaultSigners.EXTENSION,
-      ChainTypes.ETHEREUM_GOERLI
+      ChainTypes.ETHEREUM_SEPOLIA
     )
     const address = '0x34Ef7E1354D7F032aa7968b410B152c2B579260A'
     this.tokenFactory = new ethers.Contract(address, abi, signer)
@@ -85,7 +85,7 @@ export class TokenRegistryService {
 
     const signer = await this._walletService.eth_getSignerFor(
       DefaultSigners.EXTENSION, //todo:mocked
-      ChainTypes.ETHEREUM_GOERLI //todo:mocked
+      ChainTypes.ETHEREUM_SEPOLIA //todo:mocked
     )
 
     const data = new ethers.Contract(tokenAddress, ERC20Interface, signer)

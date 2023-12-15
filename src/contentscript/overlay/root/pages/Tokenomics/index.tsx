@@ -287,7 +287,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
                   <a
                     onClick={() =>
                       window.open(
-                        `https://goerli.etherscan.io/address/${tokenCreated[0][2]}`,
+                        `https://sepolia.etherscan.io/address/${tokenCreated[0][2]}`,
                         '_blank'
                       )
                     }

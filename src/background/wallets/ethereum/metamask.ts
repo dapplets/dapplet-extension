@@ -13,9 +13,19 @@ export default class extends ethers.Signer implements EthereumWallet {
   public provider: ethers.providers.StaticJsonRpcProvider
   private _metamaskProviderPromise: Promise<MetaMaskInpageProvider> | null = null
 
-  constructor(config: { providerUrl: string; chainId: number }) {
+  constructor(config: {
+    providerUrl: string
+    chainId: number
+    ensAddress?: string
+    name?: string
+  }) {
     super()
-    this.provider = new ethers.providers.StaticJsonRpcProvider(config.providerUrl, config.chainId)
+    this.provider = new ethers.providers.StaticJsonRpcProvider(
+      config.providerUrl,
+      config.ensAddress && config.name
+        ? { name: config.name, chainId: config.chainId, ensAddress: config.ensAddress }
+        : config.chainId
+    )
   }
 
   async getAddress(): Promise<string> {

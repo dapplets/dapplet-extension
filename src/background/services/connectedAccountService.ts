@@ -176,7 +176,7 @@ export default class ConnectedAccountService {
     const newPendingIds: number[] = []
 
     const receiverOrigin =
-      receiver.chain === ChainTypes.ETHEREUM_GOERLI || receiver.chain === ChainTypes.ETHEREUM_XDAI
+      receiver.chain === ChainTypes.ETHEREUM_SEPOLIA || receiver.chain === ChainTypes.ETHEREUM_XDAI
         ? 'ethereum'
         : receiver.chain
     const receiverConnectedAccountUser: IConnectedAccountUser = {

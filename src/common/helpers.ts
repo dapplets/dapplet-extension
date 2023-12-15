@@ -172,6 +172,7 @@ export function networkName(chainId: number) {
     5: 'goerli',
     42: 'kovan',
     100: 'xdai',
+    11155111: 'sepolia',
   }
 
   return map[chainId] ?? 'unknown'
@@ -238,9 +239,9 @@ export async function waitTab(url: string) {
 export function chainByUri(t: UriTypes): ChainTypes {
   switch (t) {
     case UriTypes.Ens:
-      return ChainTypes.ETHEREUM_GOERLI
+      return ChainTypes.ETHEREUM_SEPOLIA
     case UriTypes.Ethereum:
-      return ChainTypes.ETHEREUM_GOERLI
+      return ChainTypes.ETHEREUM_SEPOLIA
     case UriTypes.Near:
       return ChainTypes.NEAR_TESTNET
     default:
@@ -500,7 +501,7 @@ export function mergeSameWallets(descriptors: WalletDescriptor[]): WalletDescrip
 
   for (const descriptor of descriptors) {
     const isEthereum =
-      descriptor.chain === ChainTypes.ETHEREUM_GOERLI ||
+      descriptor.chain === ChainTypes.ETHEREUM_SEPOLIA ||
       descriptor.chain === ChainTypes.ETHEREUM_XDAI
     const isTheSameWallets = wallets.findIndex((x) => x.type === descriptor.type) !== -1
 

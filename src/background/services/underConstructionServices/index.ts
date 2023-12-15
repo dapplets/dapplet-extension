@@ -21,7 +21,7 @@ export class UnderConstructionService {
     if (this.tokenFactory) return
     const signer = await this._walletService.eth_getSignerFor(
       DefaultSigners.EXTENSION,
-      ChainTypes.ETHEREUM_GOERLI
+      ChainTypes.ETHEREUM_SEPOLIA
     )
     const address = '0x0000000000000000000000000000000000000000'
     this.tokenFactory = new ethers.Contract(address, abi, signer)

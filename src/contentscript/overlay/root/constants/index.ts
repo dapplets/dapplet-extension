@@ -1,8 +1,8 @@
 const IPFS_GATEWAY = 'https://ipfs-gateway.mooo.com'
 
-const DEFAULT_NETWORK = 'goerli'
+const DEFAULT_NETWORK = 'sepolia'
 
-const DEFAULT_CHAIN_ID = 5
+const DEFAULT_CHAIN_ID = 11155111
 
 const DEFAULT_ECOSYSTEM = 'zoo'
 

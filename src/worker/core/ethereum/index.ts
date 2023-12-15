@@ -39,14 +39,14 @@ export async function createWalletConnection<T>(
 ): Promise<IEtherneumWallet> {
   const { network } = cfg
   const chain =
-    network === 'goerli'
-      ? ChainTypes.ETHEREUM_GOERLI
+    network === 'sepolia'
+      ? ChainTypes.ETHEREUM_SEPOLIA
       : network === 'xdai'
       ? ChainTypes.ETHEREUM_XDAI
       : null
 
   if (chain === null) {
-    throw new Error('Only "goerli" and "xdai" netowrks are supported.')
+    throw new Error('Only "sepolia" and "xdai" netowrks are supported.')
   }
 
   const transport = {
@@ -116,14 +116,14 @@ export async function createContractWrapper(
 ) {
   const { network } = cfg
   const chain =
-    network === 'goerli'
-      ? ChainTypes.ETHEREUM_GOERLI
+    network === 'sepolia'
+      ? ChainTypes.ETHEREUM_SEPOLIA
       : network === 'xdai'
       ? ChainTypes.ETHEREUM_XDAI
       : null
 
   if (chain === null) {
-    throw new Error('Only "goerli" and "xdai" netowrks are supported.')
+    throw new Error('Only "sepolia" and "xdai" netowrks are supported.')
   }
 
   const signer = new ProxySigner(app, chain)
