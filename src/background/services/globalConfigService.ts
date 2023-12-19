@@ -272,7 +272,7 @@ export default class GlobalConfigService {
     ]
     config.targetStorages = [StorageTypes.Ipfs] // ToDo: add Swarm when they release new stable testnet
     config.userSettings = {}
-    config.providerUrl = 'https://sepolia.infura.io/v3/f1e18c6f81a24a708414085ef2520f2c'
+    config.providerUrl = 'https://rpc-sepolia.mooo.com'
     config.xdaiProviderUrl = 'https://rpc.gnosischain.com/'
     config.swarmGatewayUrl = 'https://swarmgateway.mooo.com/'
     config.walletsUsage = {}
@@ -289,7 +289,7 @@ export default class GlobalConfigService {
         networkId: 'sepolia',
         chainId: 11155111,
         ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
-        nodeUrl: 'https://sepolia.infura.io/v3/f1e18c6f81a24a708414085ef2520f2c',
+        nodeUrl: 'https://rpc-sepolia.mooo.com',
         explorerUrl: 'https://sepolia.etherscan.io',
       },
     ]
