@@ -297,7 +297,7 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
           )}
         </div>
       </div>
-      <div className={styles.createUnderConstraction}>
+      {/* <div className={styles.createUnderConstraction}>
         <button
           className={styles.btnCreate}
           onClick={() => {
@@ -308,7 +308,7 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
         >
           Create «under construction» dapplet
         </button>
-      </div>
+      </div> */}
     </div>
   )
 })
