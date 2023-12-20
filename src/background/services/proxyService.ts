@@ -9,7 +9,7 @@ export default class ProxyService {
   async fetchJsonRpc(chain: ChainTypes, method: string, params?: Array<any>): Promise<any> {
     let endpointUrl
 
-    if (chain === ChainTypes.ETHEREUM_GOERLI) {
+    if (chain === ChainTypes.ETHEREUM_SEPOLIA) {
       endpointUrl = await this._globalConfigService.getEthereumProvider()
     } else if (chain === ChainTypes.ETHEREUM_XDAI) {
       endpointUrl = await this._globalConfigService.getXdaiProvider()

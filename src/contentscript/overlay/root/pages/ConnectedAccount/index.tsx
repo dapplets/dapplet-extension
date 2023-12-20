@@ -90,7 +90,7 @@ export const ConnectedAccount = () => {
       .filter(
         (d: WalletDescriptor) =>
           d.type !== WalletTypes.DAPPLETS &&
-          (d.chain === ChainTypes.ETHEREUM_GOERLI ||
+          (d.chain === ChainTypes.ETHEREUM_SEPOLIA ||
             d.chain === ChainTypes.ETHEREUM_XDAI ||
             (preferredConnectedAccountsNetwork === NearNetworks.Testnet
               ? d.chain === ChainTypes.NEAR_TESTNET
@@ -99,7 +99,7 @@ export const ConnectedAccount = () => {
     const walletsForGettingCALists: WalletDescriptorWithCAMainStatus[] = await Promise.all(
       connectedWalletsDescriptors.map(async (wallet) => {
         const receiverOrigin =
-          wallet.chain === ChainTypes.ETHEREUM_GOERLI || wallet.chain === ChainTypes.ETHEREUM_XDAI
+          wallet.chain === ChainTypes.ETHEREUM_SEPOLIA || wallet.chain === ChainTypes.ETHEREUM_XDAI
             ? 'ethereum'
             : wallet.chain
         const receiverStatus: boolean = await getConnectedAccountStatus(
@@ -149,7 +149,7 @@ export const ConnectedAccount = () => {
     const connectedEthWallets = connectedWalletsDescriptors.filter(
       (d: WalletDescriptor) =>
         d.type !== WalletTypes.DAPPLETS &&
-        (d.chain === ChainTypes.ETHEREUM_GOERLI || d.chain === ChainTypes.ETHEREUM_XDAI)
+        (d.chain === ChainTypes.ETHEREUM_SEPOLIA || d.chain === ChainTypes.ETHEREUM_XDAI)
     )
     const connectedNearWallet = connectedWalletsDescriptors.find((d: WalletDescriptor) =>
       contractNetwork === NearNetworks.Testnet

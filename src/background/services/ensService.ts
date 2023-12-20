@@ -7,7 +7,7 @@ export default class EnsService {
   async resolveName(name: string): Promise<string> {
     const signer = await this._walletService.eth_getSignerFor(
       DefaultSigners.EXTENSION,
-      ChainTypes.ETHEREUM_GOERLI
+      ChainTypes.ETHEREUM_SEPOLIA
     )
     return signer.resolveName(name)
   }

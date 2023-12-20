@@ -1,8 +1,8 @@
-import anime from 'animejs'
+// import anime from 'animejs'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
+import React, { FC, useEffect, /*useMemo,*/ useRef, useState } from 'react'
 import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../../common/global-event-bus'
 import * as walletIcons from '../../../../../../common/resources/wallets'
@@ -23,7 +23,7 @@ export interface HeaderLogInProps {
   isMini: boolean
   setOpen: () => void
   isOpen: boolean
-  newProfile: any
+  newProfile
   isOverlay: boolean
   setOpenWalletMini: () => void
   // isOpenSearch: boolean
@@ -36,7 +36,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     isMini,
     setOpen,
     isOpen,
-    newProfile,
+    // newProfile,
     isOverlay,
     setOpenWalletMini,
     // isOpenSearch,
@@ -47,7 +47,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
   const [selectedWallet, setSelectedWallet] = useState<string | null>(null)
   const connectedDescriptors = descriptors.filter((x) => x.connected)
-  const [isModal, setModal] = useState(false)
+  // const [isModal, setModal] = useState(false)
   const [isModalWallet, setModalWallet] = useState(false)
   const onCloseModalWallet = async () => {
     setModalWallet(false)
@@ -67,9 +67,8 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     }
 
     init()
-
-    return () => {}
   }, [])
+
   useEffect(() => {
     EventBus.on('wallet_changed', refresh)
 
@@ -86,6 +85,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       EventBus.off('dev_mod_changed', refresh)
     }
   }, [])
+
   const loadDevMode = async () => {
     const { getDevMode } = await initBGFunctions(browser)
     const devMode = await getDevMode()
@@ -98,7 +98,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     const descriptorsRefresh = await getWalletDescriptors()
     const selectedWallet = await getDefaultWalletFor(
       DefaultSigners.EXTENSION,
-      ChainTypes.ETHEREUM_GOERLI
+      ChainTypes.ETHEREUM_SEPOLIA
     )
 
     setSelectedWallet(selectedWallet)
@@ -167,30 +167,32 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         setOpen()
       }
     } catch (error) {
+      console.log(error)
     } finally {
       await refresh()
     }
   }
-  const animation = useMemo(() => {
-    const animeRef = anime({
-      targets: liRef.current,
-      scale: () => {
-        if (
-          isMini === true
-          // || isOpenSearch
-        ) {
-          return ['0', '0']
-        } else if (isMini === false) {
-          return ['0', '1']
-        }
-      },
-      duration: 300,
-    })
-  }, [
-    liRef,
-    isMini,
-    //  isOpenSearch
-  ])
+
+  // const animation = useMemo(() => {
+  //   const animeRef = anime({
+  //     targets: liRef.current,
+  //     scale: () => {
+  //       if (
+  //         isMini === true
+  //         // || isOpenSearch
+  //       ) {
+  //         return ['0', '0']
+  //       } else if (isMini === false) {
+  //         return ['0', '1']
+  //       }
+  //     },
+  //     duration: 300,
+  //   })
+  // }, [
+  //   liRef,
+  //   isMini,
+  //   //  isOpenSearch
+  // ])
 
   return (
     <div className={cn(styles.wrapper, { [styles.mini]: isMini })} data-testid="profile-widget">

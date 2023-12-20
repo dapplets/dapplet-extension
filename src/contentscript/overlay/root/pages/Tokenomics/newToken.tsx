@@ -220,7 +220,7 @@ export const NewToken: FC<NewTokenProps> = (props) => {
         title="Transaction Confirmation"
         content={
           <div className={styles.finalWarning}>
-            You are creating {valuesProps.name} {valuesProps.symbol.toUpperCase()} in GOERLI
+            You are creating {valuesProps.name} {valuesProps.symbol.toUpperCase()} in Sepolia
             network.
             <br /> It will use a bonding curve with ZOO token as the collateral. This token will be
             associated to your project {module.name}.<br />

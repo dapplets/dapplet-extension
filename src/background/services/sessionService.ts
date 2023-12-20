@@ -230,7 +230,7 @@ export class SessionService {
 
     const genericWallet = await this._walletService.getGenericWallet(chain, wallet)
 
-    if (chain === ChainTypes.ETHEREUM_GOERLI || chain === ChainTypes.ETHEREUM_XDAI) {
+    if (chain === ChainTypes.ETHEREUM_SEPOLIA || chain === ChainTypes.ETHEREUM_XDAI) {
       loginConfirmation.address = await genericWallet.getAddress()
       loginConfirmation.signature = await genericWallet.signMessage(
         hexlify(toUtf8Bytes(loginConfirmation.loginMessage()))

@@ -37,14 +37,14 @@ type OverlayConnection<T> = Connection<T> & {
 }
 
 interface WalletConnection {
-  authMethod: 'ethereum/goerli' | 'ethereum/xdai' | 'near/testnet' | 'near/mainnet'
+  authMethod: 'ethereum/sepolia' | 'ethereum/xdai' | 'near/testnet' | 'near/mainnet'
   isConnected(): Promise<boolean>
   connect(): Promise<void>
   disconnect(): Promise<void>
 }
 
 export interface IEthWallet extends IEtherneumWallet, WalletConnection {
-  authMethod: 'ethereum/goerli' | 'ethereum/xdai'
+  authMethod: 'ethereum/sepolia' | 'ethereum/xdai'
 }
 
 export type INearWallet = NearApi.ConnectedWalletAccount &
@@ -249,13 +249,13 @@ export class Core {
   }
 
   public async wallet(cfg: {
-    authMethods: ('ethereum/goerli' | 'ethereum/xdai')[]
+    authMethods: ('ethereum/sepolia' | 'ethereum/xdai')[]
   }): Promise<IEthWallet>
   public async wallet(cfg: {
     authMethods: ('near/testnet' | 'near/mainnet')[]
   }): Promise<INearWallet>
   public async wallet(cfg: {
-    authMethods: ('ethereum/goerli' | 'ethereum/xdai' | 'near/testnet' | 'near/mainnet')[]
+    authMethods: ('ethereum/sepolia' | 'ethereum/xdai' | 'near/testnet' | 'near/mainnet')[]
   }): Promise<IEthWallet | INearWallet>
   public async wallet(
     cfg: {
@@ -272,7 +272,7 @@ export class Core {
   public async wallet(
     cfg: {
       type: 'ethereum'
-      network: 'goerli'
+      network: 'sepolia'
       username?: string
       domainId?: number
       fullname?: string
@@ -307,9 +307,9 @@ export class Core {
   ): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
   public async wallet(
     cfg: {
-      authMethods?: ('ethereum/goerli' | 'ethereum/xdai' | 'near/testnet' | 'near/mainnet')[]
+      authMethods?: ('ethereum/sepolia' | 'ethereum/xdai' | 'near/testnet' | 'near/mainnet')[]
       type?: 'ethereum' | 'near'
-      network?: 'goerli' | 'xdai' | 'testnet' | 'mainnet'
+      network?: 'sepolia' | 'xdai' | 'testnet' | 'mainnet'
       username?: string
       domainId?: number
       fullname?: string
@@ -322,9 +322,9 @@ export class Core {
       throw new Error(' "authMethods" or "type" with "network" are required in Core.wallet().')
     if (cfg.authMethods) {
       cfg.authMethods.forEach((x) => {
-        if (!['ethereum/goerli', 'ethereum/xdai', 'near/testnet', 'near/mainnet'].includes(x))
+        if (!['ethereum/sepolia', 'ethereum/xdai', 'near/testnet', 'near/mainnet'].includes(x))
           throw new Error(
-            'The "ethereum/goerli", "ethereum/xdai", "near/testnet" and "near/mainnet" only are supported in Core.wallet().'
+            'The "ethereum/sepolia", "ethereum/xdai", "near/testnet" and "near/mainnet" only are supported in Core.wallet().'
           )
       })
     } else {
@@ -332,9 +332,9 @@ export class Core {
         throw new Error('The "ethereum" and "near" only are supported in Core.wallet().')
       if (cfg.type === 'near' && !(cfg.network == 'testnet' || cfg.network == 'mainnet'))
         throw new Error('"testnet" and "mainnet" network only is supported in "near" type wallet.')
-      if (cfg.type === 'ethereum' && !(cfg.network == 'goerli' || cfg.network == 'xdai'))
+      if (cfg.type === 'ethereum' && !(cfg.network == 'sepolia' || cfg.network == 'xdai'))
         throw new Error(
-          '"goerli" and "xdai" networks only are supported in "ethereum" type wallet.'
+          '"sepolia" and "xdai" networks only are supported in "ethereum" type wallet.'
         )
     }
 
@@ -371,7 +371,7 @@ export class Core {
     const authMethod = session?.authMethod
     const wallet = !session
       ? null
-      : authMethod === 'ethereum/goerli' || authMethod === 'ethereum/xdai'
+      : authMethod === 'ethereum/sepolia' || authMethod === 'ethereum/xdai'
       ? <IEthWallet>await session.wallet()
       : <INearWallet>await session.wallet()
 
@@ -391,7 +391,7 @@ export class Core {
         this._session = await me.login({ authMethods, secureLogin: SecureLoginOptions.Disabled })
         this.authMethod = this._session.authMethod
         this._wallet =
-          this.authMethod === 'ethereum/goerli' || this.authMethod === 'ethereum/xdai'
+          this.authMethod === 'ethereum/sepolia' || this.authMethod === 'ethereum/xdai'
             ? <IEthWallet>await this._session.wallet()
             : <INearWallet>await this._session.wallet()
       },
@@ -433,7 +433,7 @@ export class Core {
   ): Promise<any> {
     const moduleName = this.manifest.name
     if (type === 'ethereum') {
-      return ethereum.createContractWrapper(moduleName, { network: 'goerli' }, address, options)
+      return ethereum.createContractWrapper(moduleName, { network: 'sepolia' }, address, options)
     } else if (type === 'ethereum/xdai') {
       return ethereum.createContractWrapper(moduleName, { network: 'xdai' }, address, options)
     } else if (type === 'near') {

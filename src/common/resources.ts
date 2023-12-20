@@ -44,7 +44,7 @@ export const resources: Resources = {
     icon: ETH_ICON,
     proofUrl: () => null,
   },
-  'ethereum/goerli': {
+  'ethereum/sepolia': {
     title: 'Ethereum',
     type: 'wallet',
     icon: ETH_ICON,
