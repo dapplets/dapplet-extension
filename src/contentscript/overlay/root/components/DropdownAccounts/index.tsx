@@ -11,10 +11,11 @@ type TDropdownAccountsProps<T> = {
   setter: React.Dispatch<React.SetStateAction<T>>
   nameId: string
   originId: string
+  maxLength?: number
 }
 
 export function DropdownAccounts<T>(props: TDropdownAccountsProps<T>) {
-  const { values, selected, setter, nameId, originId } = props
+  const { values, selected, setter, nameId, originId, maxLength = 20 } = props
   const [isOpen, setOpen] = useState(false)
 
   return (
@@ -46,7 +47,7 @@ export function DropdownAccounts<T>(props: TDropdownAccountsProps<T>) {
                 accountActive: selected['accountActive'],
               }
             }
-            maxLength={20}
+            maxLength={maxLength}
             color="#eaf0f0"
           />
         </div>
@@ -79,7 +80,7 @@ export function DropdownAccounts<T>(props: TDropdownAccountsProps<T>) {
                       origin: value[originId],
                       accountActive: value['accountActive'],
                     }}
-                    maxLength={20}
+                    maxLength={maxLength}
                     color="#eaf0f0"
                   />
                 </div>

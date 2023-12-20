@@ -47,8 +47,12 @@
   user-select: none;
   display: flex;
 
-  & > div:first-child {
-    width: 64%;
+  // & > div:first-child {
+  //   width: 64%;
+  // }
+
+  & > div {
+    width: 100%;
   }
 }
 
