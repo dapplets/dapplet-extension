@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: 16
       - name: Install Dependencies
-        run: npm ci
+        run: yarn
       - name: Clean build folders
         run: npm run clean
       - name: Build extension
