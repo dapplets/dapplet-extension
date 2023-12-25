@@ -31,7 +31,7 @@ const getSignature = async (
     domain: {
       name: 'Connected Accounts',
       version: '1',
-      chainId: 5,
+      chainId: 11155111,
       verifyingContract: '0x0000000000000000000000000000000000000000',
     },
     primaryType: 'LinkingAccounts',
@@ -62,8 +62,8 @@ const getSignature = async (
   } = await initBGFunctions(browser)
 
   const result: string = await eth_sendCustomRequestToWallet(
-    secondAccountOrigin === ChainTypes.ETHEREUM_GOERLI
-      ? ChainTypes.ETHEREUM_GOERLI
+    secondAccountOrigin === ChainTypes.ETHEREUM_SEPOLIA
+      ? ChainTypes.ETHEREUM_SEPOLIA
       : ChainTypes.ETHEREUM_XDAI,
     walletType,
     'eth_signTypedData_v3',

@@ -91,21 +91,21 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
   }
 
   getMeta(wallet: WalletTypes, chain: ChainTypes) {
-    if (wallet === WalletTypes.METAMASK && chain === ChainTypes.ETHEREUM_GOERLI) {
+    if (wallet === WalletTypes.METAMASK && chain === ChainTypes.ETHEREUM_SEPOLIA) {
       return {
-        id: 'metamask_goerli',
+        id: 'metamask_sepolia',
         label: 'MetaMask',
         icon: MetaMaskLogo,
       }
-    } else if (wallet === WalletTypes.WALLETCONNECT && chain === ChainTypes.ETHEREUM_GOERLI) {
+    } else if (wallet === WalletTypes.WALLETCONNECT && chain === ChainTypes.ETHEREUM_SEPOLIA) {
       return {
-        id: 'walletconnect_goerli',
+        id: 'walletconnect_sepolia',
         label: 'WalletConnect',
         icon: WalletConnectLogo,
       }
-    } else if (wallet === WalletTypes.DAPPLETS && chain === ChainTypes.ETHEREUM_GOERLI) {
+    } else if (wallet === WalletTypes.DAPPLETS && chain === ChainTypes.ETHEREUM_SEPOLIA) {
       return {
-        id: 'dapplets_goerli',
+        id: 'dapplets_sepolia',
         label: 'Built-in Test Only Wallet',
         icon: DappletsLogo,
       }

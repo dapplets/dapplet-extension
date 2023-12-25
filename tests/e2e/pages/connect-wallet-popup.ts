@@ -1,7 +1,7 @@
 import { Locator, Page } from '@playwright/test'
 
 export enum WalletTypes {
-  BuiltIn = 'dapplets_goerli',
+  BuiltIn = 'dapplets_sepolia',
   NearMainnet = 'near_mainnet',
   NearTestnet = 'near_testnet',
 }

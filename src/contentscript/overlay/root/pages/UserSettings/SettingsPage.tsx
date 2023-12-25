@@ -171,7 +171,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
                       <a
                         className={styles.cardLink}
                         onClick={() =>
-                          window.open(`https://goerli.etherscan.io/address/${owner}`, '_blank')
+                          window.open(`https://sepolia.etherscan.io/address/${owner}`, '_blank')
                         }
                       >
                         {visible(owner)}

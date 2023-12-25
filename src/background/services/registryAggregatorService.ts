@@ -301,7 +301,7 @@ export class RegistryAggregatorService {
     } else if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) {
       const ethSigner = await this._walletService.eth_getSignerFor(
         DefaultSigners.EXTENSION,
-        ChainTypes.ETHEREUM_GOERLI
+        ChainTypes.ETHEREUM_SEPOLIA
       )
       return new EthRegistry({
         url: registryConfig.url,

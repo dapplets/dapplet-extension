@@ -33,7 +33,7 @@ export const DAPPLETS_STORE_URL = 'https://store.dapplets.org'
 export const MUTATION_LINK_URL = 'https://augm.link'
 
 export const SECURE_AUTH_METHODS: string[] = [
-  ChainTypes.ETHEREUM_GOERLI,
+  ChainTypes.ETHEREUM_SEPOLIA,
   ChainTypes.ETHEREUM_XDAI,
   ChainTypes.NEAR_MAINNET,
   ChainTypes.NEAR_TESTNET,
