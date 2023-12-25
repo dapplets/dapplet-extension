@@ -272,7 +272,7 @@ export default class GlobalConfigService {
     ]
     config.targetStorages = [StorageTypes.Ipfs] // ToDo: add Swarm when they release new stable testnet
     config.userSettings = {}
-    config.providerUrl = 'https://goerli.mooo.com/'
+    config.providerUrl = 'https://rpc-sepolia.mooo.com'
     config.xdaiProviderUrl = 'https://rpc.gnosischain.com/'
     config.swarmGatewayUrl = 'https://swarmgateway.mooo.com/'
     config.walletsUsage = {}
@@ -286,16 +286,11 @@ export default class GlobalConfigService {
     config.ipfsGatewayUrl = 'https://ipfs-gateway.mooo.com'
     config.ethereumNetworks = [
       {
-        networkId: 'rinkeby',
-        chainId: 4,
-        nodeUrl: 'https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992',
-        explorerUrl: 'https://rinkeby.etherscan.io',
-      },
-      {
-        networkId: 'goerli',
-        chainId: 5,
-        nodeUrl: 'https://goerli.mooo.com/',
-        explorerUrl: 'https://goerli.etherscan.io',
+        networkId: 'sepolia',
+        chainId: 11155111,
+        ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+        nodeUrl: 'https://rpc-sepolia.mooo.com',
+        explorerUrl: 'https://sepolia.etherscan.io',
       },
     ]
     config.nearNetworks = [

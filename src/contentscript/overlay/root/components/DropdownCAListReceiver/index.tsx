@@ -6,10 +6,11 @@ type TDropdownCAListReceiverProps = {
   values: WalletDescriptorWithCAMainStatus[]
   selected?: WalletDescriptorWithCAMainStatus
   setter: React.Dispatch<React.SetStateAction<WalletDescriptorWithCAMainStatus>>
+  maxLength?: number
 }
 
 export const DropdownCAListReceiver = (props: TDropdownCAListReceiverProps) => {
-  const { values, selected, setter } = props
+  const { values, selected, setter, maxLength } = props
 
   return (
     <DropdownAccounts<WalletDescriptorWithCAMainStatus>
@@ -18,6 +19,7 @@ export const DropdownCAListReceiver = (props: TDropdownCAListReceiverProps) => {
       setter={setter}
       nameId="account"
       originId="chain"
+      maxLength={maxLength}
     />
   )
 }

@@ -16,7 +16,7 @@ export class OverlayService {
   ): Promise<void> {
     const arr = !chains
       ? [
-          ChainTypes.ETHEREUM_GOERLI,
+          ChainTypes.ETHEREUM_SEPOLIA,
           ChainTypes.ETHEREUM_XDAI,
           ChainTypes.NEAR_MAINNET,
           ChainTypes.NEAR_TESTNET,

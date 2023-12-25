@@ -100,9 +100,12 @@ export class WalletService {
   async eth_getSignerFor(app: string | DefaultSigners, chain: ChainTypes): Promise<Signer> {
     if (!this._signersByApp.has(app)) {
       const me = this
-      const { providerUrl, chainId } = await this._getChainParameters(chain)
+      const { providerUrl, chainId, ensAddress, name } = await this._getChainParameters(chain)
       const signer = new (class extends Signer {
-        provider = new providers.StaticJsonRpcProvider(providerUrl, chainId)
+        provider = new providers.StaticJsonRpcProvider(
+          providerUrl,
+          ensAddress && name ? { name, chainId, ensAddress } : chainId
+        )
 
         constructor() {
           super()
@@ -448,7 +451,9 @@ export class WalletService {
         for (const chain in wallets) {
           map[chain] = {}
           for (const wallet in wallets[chain]) {
-            const { providerUrl, chainId } = await this._getChainParameters(chain as ChainTypes)
+            const { providerUrl, chainId, ensAddress, name } = await this._getChainParameters(
+              chain as ChainTypes
+            )
 
             map[chain][wallet] = new wallets[chain][wallet]({
               providerUrl,
@@ -456,6 +461,8 @@ export class WalletService {
               sendDataToPairingOverlay: this._overlayService.sendDataToPairingOverlay.bind(
                 this._overlayService
               ),
+              ensAddress,
+              name,
             })
           }
         }
@@ -469,10 +476,12 @@ export class WalletService {
 
   private async _getChainParameters(chain: ChainTypes) {
     switch (chain) {
-      case ChainTypes.ETHEREUM_GOERLI:
+      case ChainTypes.ETHEREUM_SEPOLIA:
         return {
-          chainId: 5,
+          name: 'sepolia',
+          chainId: 11155111,
           providerUrl: await this._globalConfigService.getEthereumProvider(),
+          ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
         }
 
       case ChainTypes.ETHEREUM_XDAI:

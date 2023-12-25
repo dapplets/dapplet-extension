@@ -31,7 +31,7 @@ export const CONTEXT_ID_WILDCARD = '*'
 export const DAPPLETS_STORE_URL = 'https://store.dapplets.org'
 
 export const SECURE_AUTH_METHODS: string[] = [
-  ChainTypes.ETHEREUM_GOERLI,
+  ChainTypes.ETHEREUM_SEPOLIA,
   ChainTypes.ETHEREUM_XDAI,
   ChainTypes.NEAR_MAINNET,
   ChainTypes.NEAR_TESTNET,

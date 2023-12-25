@@ -22,7 +22,7 @@ import { TabLoader } from '../../components/TabLoader'
 import useAbortController from '../../hooks/useAbortController'
 import { DropdownCAListReceiver } from './../../../root/components/DropdownCAListReceiver'
 import Attention from './assets/attention.svg'
-import { ReactComponent as Info } from './assets/info.svg'
+// import { ReactComponent as Info } from './assets/info.svg'
 import HOME_ICON from './assets/newHome.svg'
 import Ok from './assets/ok.svg'
 import Time from './assets/time.svg'
@@ -32,14 +32,14 @@ import styles from './ConnectedAccount.module.scss'
 export const ConnectedAccount = () => {
   const [contractNetwork, setContractNetwork] = useState<NearNetworks>()
   const [pairsToDisplay, setPairs] = useState<IConnectedAccountsPair[]>([])
-  const [walletsForConnect, setWalletsForConnect] = useState<
-    [IConnectedAccountUser, IConnectedAccountUser][]
-  >([])
+  // const [walletsForConnect, setWalletsForConnect] = useState<
+  //   [IConnectedAccountUser, IConnectedAccountUser][]
+  // >([])
   const [walletsForDisconnect, setWalletsForDisconnect] = useState<
     [IConnectedAccountUser, IConnectedAccountUser][]
   >([])
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(true)
-  const [showConnectWalletsInfo, setShowConnectWalletsInfo] = useState(false)
+  // const [showConnectWalletsInfo, setShowConnectWalletsInfo] = useState(false)
   const [walletsReceivers, setWalletsReceivers] = useState<
     WalletDescriptorWithCAMainStatus[] | undefined
   >()
@@ -90,7 +90,7 @@ export const ConnectedAccount = () => {
       .filter(
         (d: WalletDescriptor) =>
           d.type !== WalletTypes.DAPPLETS &&
-          (d.chain === ChainTypes.ETHEREUM_GOERLI ||
+          (d.chain === ChainTypes.ETHEREUM_SEPOLIA ||
             d.chain === ChainTypes.ETHEREUM_XDAI ||
             (preferredConnectedAccountsNetwork === NearNetworks.Testnet
               ? d.chain === ChainTypes.NEAR_TESTNET
@@ -99,7 +99,7 @@ export const ConnectedAccount = () => {
     const walletsForGettingCALists: WalletDescriptorWithCAMainStatus[] = await Promise.all(
       connectedWalletsDescriptors.map(async (wallet) => {
         const receiverOrigin =
-          wallet.chain === ChainTypes.ETHEREUM_GOERLI || wallet.chain === ChainTypes.ETHEREUM_XDAI
+          wallet.chain === ChainTypes.ETHEREUM_SEPOLIA || wallet.chain === ChainTypes.ETHEREUM_XDAI
             ? 'ethereum'
             : wallet.chain
         const receiverStatus: boolean = await getConnectedAccountStatus(
@@ -116,7 +116,6 @@ export const ConnectedAccount = () => {
   useEffect(() => {
     updateContractNetworkAndWallets()
     EventBus.on('connected_accounts_changed', () => updateContractNetworkAndWallets())
-    return () => {}
   }, [abortController.signal.aborted])
 
   useEffect(() => {
@@ -141,7 +140,7 @@ export const ConnectedAccount = () => {
     const descriptors: WalletDescriptor[] = await getWalletDescriptors()
     const connectedWalletsDescriptors = descriptors.filter((d) => d.connected === true)
     if (connectedWalletsDescriptors.length < 2) {
-      setWalletsForConnect([])
+      // setWalletsForConnect([])
       setWalletsForDisconnect([])
       return
     }
@@ -149,7 +148,7 @@ export const ConnectedAccount = () => {
     const connectedEthWallets = connectedWalletsDescriptors.filter(
       (d: WalletDescriptor) =>
         d.type !== WalletTypes.DAPPLETS &&
-        (d.chain === ChainTypes.ETHEREUM_GOERLI || d.chain === ChainTypes.ETHEREUM_XDAI)
+        (d.chain === ChainTypes.ETHEREUM_SEPOLIA || d.chain === ChainTypes.ETHEREUM_XDAI)
     )
     const connectedNearWallet = connectedWalletsDescriptors.find((d: WalletDescriptor) =>
       contractNetwork === NearNetworks.Testnet
@@ -158,7 +157,7 @@ export const ConnectedAccount = () => {
     )
     if (!connectedNearWallet) {
       // ToDo: we can't connect Eth wallets directly to each other. ONE Near wallet
-      setWalletsForConnect([])
+      // setWalletsForConnect([])
       setWalletsForDisconnect([])
       return
     }
@@ -213,7 +212,7 @@ export const ConnectedAccount = () => {
       }
       pairsToConnect.push([connectedAccountUserEth, connectedAccountUserNear])
     }
-    setWalletsForConnect(pairsToConnect)
+    // setWalletsForConnect(pairsToConnect)
     setWalletsForDisconnect(pairsToDisconnect)
   }
 
@@ -227,7 +226,9 @@ export const ConnectedAccount = () => {
     try {
       await openConnectedAccountsPopup({ accountToChangeStatus: account }, thisTab.id)
       updatePairs()
-    } catch (err) {}
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const handleDisconnectAccounts = async (pair: IConnectedAccountsPair) => {
@@ -246,34 +247,38 @@ export const ConnectedAccount = () => {
         thisTab.id
       )
       updatePairs()
-    } catch (err) {}
+    } catch (err) {
+      console.log(err)
+    }
   }
 
-  const handleConnectWallets = async () => {
-    if (!walletsForConnect.length) return
-    const {
-      openConnectedAccountsPopup,
-      getThisTab,
-    }: {
-      openConnectedAccountsPopup: (
-        {
-          bunchOfAccountsToConnect,
-        }: { bunchOfAccountsToConnect: [IConnectedAccountUser, IConnectedAccountUser][] },
-        id: number
-      ) => Promise<void>
-      getThisTab: () => Promise<{ id: number }>
-    } = await initBGFunctions(browser)
-    const thisTab = await getThisTab()
-    try {
-      await openConnectedAccountsPopup(
-        {
-          bunchOfAccountsToConnect: walletsForConnect,
-        },
-        thisTab.id
-      )
-      updatePairs()
-    } catch (err) {}
-  }
+  // const handleConnectWallets = async () => {
+  //   if (!walletsForConnect.length) return
+  //   const {
+  //     openConnectedAccountsPopup,
+  //     getThisTab,
+  //   }: {
+  //     openConnectedAccountsPopup: (
+  //       {
+  //         bunchOfAccountsToConnect,
+  //       }: { bunchOfAccountsToConnect: [IConnectedAccountUser, IConnectedAccountUser][] },
+  //       id: number
+  //     ) => Promise<void>
+  //     getThisTab: () => Promise<{ id: number }>
+  //   } = await initBGFunctions(browser)
+  //   const thisTab = await getThisTab()
+  //   try {
+  //     await openConnectedAccountsPopup(
+  //       {
+  //         bunchOfAccountsToConnect: walletsForConnect,
+  //       },
+  //       thisTab.id
+  //     )
+  //     updatePairs()
+  //   } catch (err) {
+  //     console.log(err)
+  //   }
+  // }
 
   return (
     <>
@@ -294,9 +299,10 @@ export const ConnectedAccount = () => {
               values={walletsReceivers}
               setter={setConnectedAccountsListReceiver}
               selected={connectedAccountsListReceiver}
+              maxLength={42}
             />
           </div>
-          <div className={styles.connectWalletsBtnModule}>
+          {/* <div className={styles.connectWalletsBtnModule}>
             <button
               disabled={!walletsForConnect.length}
               className={styles.connectWalletsBtn}
@@ -310,9 +316,9 @@ export const ConnectedAccount = () => {
             >
               <Info />
             </button>
-          </div>
+          </div> */}
         </div>
-        <div className={styles.connectWalletsInfoWrapper}>
+        {/* <div className={styles.connectWalletsInfoWrapper}>
           <div
             className={cn(
               styles.connectWalletsInfo,
@@ -324,7 +330,7 @@ export const ConnectedAccount = () => {
               Add the wallets you want to connect to the WALLETS list above and click the button.
             </p>
           </div>
-        </div>
+        </div> */}
         {isLoadingListDapplets ? (
           <TabLoader />
         ) : (

@@ -372,7 +372,7 @@ export default class DemoDapplet {
                 console.log('existSessions', existSessions)
 
                 const newSessions = await Core.login(
-                  { authMethods: ['ethereum/goerli'] },
+                  { authMethods: ['ethereum/sepolia'] },
                   {
                     onLogin: () => console.log('onLogin'),
                     onLogout: () => console.log('onLogout'),

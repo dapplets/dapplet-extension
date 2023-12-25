@@ -108,34 +108,34 @@ export class LoginSession extends React.Component<Props, State> {
           />
         )
 
-      case '/pairing/metamask_goerli':
+      case '/pairing/metamask_sepolia':
         return (
           <MetaMask
             bus={p.bus}
             frameId={p.request.frameId}
-            chain={ChainTypes.ETHEREUM_GOERLI}
+            chain={ChainTypes.ETHEREUM_SEPOLIA}
             data={p.request}
             redirect={this.redirect.bind(this)}
           />
         )
 
-      case '/pairing/walletconnect_goerli':
+      case '/pairing/walletconnect_sepolia':
         return (
           <WalletConnect
             bus={p.bus}
             frameId={p.request.frameId}
-            chain={ChainTypes.ETHEREUM_GOERLI}
+            chain={ChainTypes.ETHEREUM_SEPOLIA}
             data={p.request}
             redirect={this.redirect.bind(this)}
           />
         )
 
-      case '/pairing/dapplets_goerli':
+      case '/pairing/dapplets_sepolia':
         return (
           <Dapplets
             bus={p.bus}
             frameId={p.request.frameId}
-            chain={ChainTypes.ETHEREUM_GOERLI}
+            chain={ChainTypes.ETHEREUM_SEPOLIA}
             data={p.request}
             redirect={this.redirect.bind(this)}
           />
