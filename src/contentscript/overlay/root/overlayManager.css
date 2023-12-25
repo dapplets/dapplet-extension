@@ -20,6 +20,8 @@
   font-size: 14px;
   line-height: 20px;
 
+  /* Fixes visibility in Reddit */
+  visibility: visible !important;
   background: #fff;
   border: 0;
 
