@@ -31,6 +31,7 @@ export class TokenRegistryService {
       DefaultSigners.EXTENSION,
       ChainTypes.ETHEREUM_SEPOLIA
     )
+    // ToDo: get address from config, switch from goerli to sepolia
     const address = '0x34Ef7E1354D7F032aa7968b410B152c2B579260A'
     this.tokenFactory = new ethers.Contract(address, abi, signer)
   }
