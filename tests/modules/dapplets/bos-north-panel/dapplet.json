@@ -1,0 +1,16 @@
+{
+  "name": "bos-north-panel",
+  "version": "0.1.0",
+  "description": "bos-north-panel",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "bos-north-panel",
+  "contextIds": [
+    "twitter.com",
+    "http://twitter.com"
+  ],
+  "dependencies": {
+    "twitter-bos-config": "0.1.6"
+  }
+}

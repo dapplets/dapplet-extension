@@ -45,7 +45,7 @@ module.exports = {
   },
   plugins: [new DappletManifestPlugin()],
   devServer: {
-    port: 3000,
+    port: 3001,
     hot: false,
     liveReload: false,
     static: './',

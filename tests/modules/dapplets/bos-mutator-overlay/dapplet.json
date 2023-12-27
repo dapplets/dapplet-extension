@@ -1,0 +1,16 @@
+{
+  "name": "bos-mutator-overlay",
+  "version": "0.1.0",
+  "description": "bos-mutator-overlay",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "bos-mutator-overlay",
+  "contextIds": [
+    "twitter.com",
+    "http://twitter.com"
+  ],
+  "dependencies": {
+    "twitter-bos-config": "0.1.6"
+  }
+}
