@@ -1,5 +1,5 @@
-![dapplet-extension-1](https://github.com/dapplets/dapplet-extension/blob/8cef27e00f706478d73ec2507c792c4b49f2dc41/resources/icons/dapplet-extension.png#gh-dark-mode-only)
-![dapplet-extension-1](https://github.com/dapplets/dapplet-extension/blob/8cef27e00f706478d73ec2507c792c4b49f2dc41/resources/icons/dapplet-extension-light.png#gh-light-mode-only)
+![dapplet-extension-1](/docs/images/dark_top.png#gh-dark-mode-only)
+![dapplet-extension-1](/docs/images/light_top.png#gh-light-mode-only)
 
 # Dapplet Browser Extension
 
